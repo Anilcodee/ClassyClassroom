@@ -61,6 +61,12 @@ export default function StudentAuth() {
         }
         throw new Error(`${res.status} ${msg}`);
       }
+      if (!data?.user || data?.user?.role !== "student") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setError("This email is a teacher account. Use Teacher login or a different email to sign up as student.");
+        return;
+      }
       localStorage.setItem("token", data?.token);
       localStorage.setItem("user", JSON.stringify(data?.user));
       window.dispatchEvent(new Event("auth-changed"));
