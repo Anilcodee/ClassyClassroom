@@ -105,15 +105,7 @@ export default function ClassDetail() {
                 a.href = url; a.download = `${cls?.name||'class'}-${new Date().toISOString().slice(0,10)}.pdf`;
                 a.click(); URL.revokeObjectURL(url);
               }} className="px-3 py-2 rounded-lg border border-border">Download today PDF</button>
-              <button onClick={async ()=>{
-                const token = localStorage.getItem('token');
-                const res = await fetch(`/api/classes/${id}/attendance/pdf/all`, { headers: { Authorization: token?`Bearer ${token}`:'' } });
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url; a.download = `${cls?.name||'class'}-all-days.pdf`;
-                a.click(); URL.revokeObjectURL(url);
-              }} className="px-3 py-2 rounded-lg border border-border">Download PDF list (all days)</button>
+              <Link to={`/classes/${id}/history`} className="px-3 py-2 rounded-lg border border-border">PDF history</Link>
             </div>
           </div>
           <div className="mt-6">
