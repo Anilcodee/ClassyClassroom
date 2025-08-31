@@ -12,8 +12,7 @@ export default function StudentAuth() {
   const nav = useNavigate();
 
   // If already authenticated, go to student dashboard
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  require("react").useEffect(() => {
+  useEffect(() => {
     if (typeof window === "undefined") return;
     const t = localStorage.getItem("token");
     if (t) nav("/student");
