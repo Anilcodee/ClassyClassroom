@@ -47,10 +47,13 @@ export default function StudentAuth() {
         const msg = (data && (data.message || data.error)) || raw || res.statusText || "Request failed";
         throw new Error(`${res.status} ${msg}`);
       }
+      if (data?.user?.role !== "student") {
+        setError("Please use teacher login for teacher accounts");
+        return;
+      }
       localStorage.setItem("token", data?.token);
       localStorage.setItem("user", JSON.stringify(data?.user));
-      const role = data?.user?.role || "teacher";
-      nav(role === "student" ? "/student" : "/classes");
+      nav("/student");
     } catch (e: any) {
       setError(e.message || "Something went wrong");
     } finally {
