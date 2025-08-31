@@ -38,6 +38,10 @@ export function createServer() {
   // Auth
   app.post("/api/auth/signup", signup);
   app.post("/api/auth/login", login);
+  app.post("/api/auth/signup/student", signupStudent);
+  app.post("/api/auth/signup/teacher", signupTeacher);
+  app.post("/api/auth/login/student", loginStudent);
+  app.post("/api/auth/login/teacher", loginTeacher);
 
   // Classes
   app.get("/api/classes", requireAuth, listClasses);
