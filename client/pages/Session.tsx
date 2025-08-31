@@ -37,7 +37,7 @@ export default function Session() {
       <p className="text-foreground/70">Share this QR or link with students.</p>
       <div className="mt-6 grid place-items-center">
         <div className="p-4 rounded-xl border border-border bg-card">
-          <QRCode value={link} size={220} includeMargin />
+          <QRCodeCanvas value={link} size={220} includeMargin />
         </div>
         <a href={link} className="mt-3 text-sm underline break-all">{link}</a>
         <div className="mt-4 text-xl font-mono">{mm}:{ss}</div>
