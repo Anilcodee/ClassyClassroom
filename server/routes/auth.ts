@@ -19,10 +19,10 @@ export const signup: RequestHandler = async (req, res) => {
     const nameNorm = (name || "").trim();
     if (!emailNorm || !nameNorm || !password) return res.status(400).json({ message: "Missing fields" });
     if (role === "student" && !rollNo) return res.status(400).json({ message: "Roll number required for students" });
-    const existing = await User.findOne({ email: emailNorm });
-    if (existing) return res.status(409).json({ message: "Email already in use" });
-    const passwordHash = await bcrypt.hash(password, 10);
     const roleToUse: "teacher" | "student" = role === "student" ? "student" : "teacher";
+    const existing = await User.findOne({ email: emailNorm, role: roleToUse });
+    if (existing) return res.status(409).json({ message: "Email already in use for this role" });
+    const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({ email: emailNorm, name: nameNorm, passwordHash, role: roleToUse, rollNo });
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
     res.status(201).json({
@@ -43,11 +43,10 @@ export const login: RequestHandler = async (req, res) => {
     const { email, password, role } = req.body as { email: string; password: string; role?: "teacher" | "student" };
     const emailNorm = (email || "").trim().toLowerCase();
     if (!emailNorm || !password) return res.status(400).json({ message: "Missing fields" });
-    const user = await User.findOne({ email: emailNorm });
+    const query: any = { email: emailNorm };
+    if (role) query.role = role;
+    const user = await User.findOne(query);
     if (!user) return res.status(401).json({ message: "Invalid email or password" });
-    if (role && (user as any).role && role !== (user as any).role) {
-      return res.status(403).json({ message: `Please use the ${(user as any).role} login` });
-    }
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) return res.status(401).json({ message: "Invalid email or password" });
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
