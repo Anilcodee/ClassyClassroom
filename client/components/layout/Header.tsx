@@ -38,7 +38,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur supports-[backdrop-filter]:bg-background/70 border-b border-border">
       <div className="container mx-auto flex h-14 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 font-extrabold text-primary">
+        <Link to={user ? (role === "teacher" ? "/classes" : "/student") : "/"} className="flex items-center gap-2 font-extrabold text-primary">
           <span className="inline-block h-7 w-7 rounded-md bg-gradient-to-br from-brand-500 to-brand-700"></span>
           Attendify
         </Link>
