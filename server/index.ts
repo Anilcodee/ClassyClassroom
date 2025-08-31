@@ -11,6 +11,7 @@ import { activateClass, sessionStatus, markAttendance } from "./routes/attendanc
 import { getTodayAttendance } from "./routes/attendance.today";
 import { listAttendanceDates, classAttendancePdf, classAttendancePdfAll } from "./routes/attendance.pdf";
 import { dbHealth } from "./routes/health";
+import { listStudentClasses, joinClass } from "./routes/student";
 
 export function createServer() {
   const app = express();
