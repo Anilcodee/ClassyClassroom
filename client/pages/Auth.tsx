@@ -35,7 +35,7 @@ export default function Auth() {
       }
       if (!res.ok) {
         const msg = (data && (data.message || data.error)) || raw || res.statusText || "Request failed";
-        throw new Error(msg);
+        throw new Error(`${res.status} ${msg}`);
       }
       localStorage.setItem("token", data?.token);
       localStorage.setItem("user", JSON.stringify(data?.user));
