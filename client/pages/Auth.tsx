@@ -43,6 +43,7 @@ export default function Auth() {
       }
       localStorage.setItem("token", data?.token);
       localStorage.setItem("user", JSON.stringify(data?.user));
+      window.dispatchEvent(new Event("auth-changed"));
       const role = data?.user?.role || "teacher";
       nav(role === "student" ? "/student" : "/classes");
     } catch (e: any) {
