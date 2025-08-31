@@ -29,7 +29,7 @@ const App = () => (
       <BrowserRouter>
         <Header />
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<GetStarted />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/student-auth" element={<StudentAuth />} />
           <Route path="/student" element={<StudentDashboard />} />
