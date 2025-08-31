@@ -39,11 +39,14 @@ export const login: RequestHandler = async (req, res) => {
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
   try {
-    const { email, password } = req.body as { email: string; password: string };
+    const { email, password, role } = req.body as { email: string; password: string; role?: "teacher" | "student" };
     const emailNorm = (email || "").trim().toLowerCase();
     if (!emailNorm || !password) return res.status(400).json({ message: "Missing fields" });
     const user = await User.findOne({ email: emailNorm });
     if (!user) return res.status(401).json({ message: "Invalid email or password" });
+    if (role && (user as any).role && role !== (user as any).role) {
+      return res.status(403).json({ message: `Please use the ${(user as any).role} login` });
+    }
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) return res.status(401).json({ message: "Invalid email or password" });
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
