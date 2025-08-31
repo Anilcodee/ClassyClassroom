@@ -27,7 +27,7 @@ export const signup: RequestHandler = async (req, res) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
     res.status(201).json({
       token,
-      user: { id: user.id, email: user.email, name: user.name, role: user.role || "teacher", rollNo: user.rollNo || null },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role, rollNo: user.rollNo || null },
     });
   } catch (e: any) {
     console.error("Signup error:", e);
@@ -53,7 +53,7 @@ export const login: RequestHandler = async (req, res) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
     res.json({
       token,
-      user: { id: user.id, email: user.email, name: user.name, role: (user as any).role || "teacher", rollNo: (user as any).rollNo || null },
+      user: { id: user.id, email: user.email, name: user.name, role: (user as any).role, rollNo: (user as any).rollNo || null },
     });
   } catch (e: any) {
     console.error("Login error:", e);
