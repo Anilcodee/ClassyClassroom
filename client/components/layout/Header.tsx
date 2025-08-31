@@ -16,12 +16,16 @@ export default function Header() {
   }, [pathname]);
 
   const role = user?.role || null;
-  const dynamicNavRaw = [
-    { to: "/", label: "Home" },
-    ...(role === "teacher" ? [{ to: "/classes", label: "Classes" }] : []),
-    ...(role === "student" ? [{ to: "/student", label: "My classes" }] : []),
-    { to: "/get-started", label: "Get Started" },
-  ];
+  const roleHome = role === "teacher" ? "/classes" : role === "student" ? "/student" : "/";
+  const dynamicNavRaw = user
+    ? [
+        { to: roleHome, label: "Home" },
+        ...(role === "teacher" ? [] : []),
+        ...(role === "student" ? [] : []),
+      ]
+    : [
+        { to: "/", label: "Get Started" },
+      ];
   const dynamicNav = dynamicNavRaw.filter((item, idx, arr) => arr.findIndex((i) => i.to === item.to) === idx);
 
   function logout() {
