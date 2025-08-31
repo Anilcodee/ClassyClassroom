@@ -2,8 +2,11 @@ import { RequestHandler } from "express";
 import { User } from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 export const signup: RequestHandler = async (req, res) => {
+  if (mongoose.connection.readyState !== 1)
+    return res.status(503).json({ message: "Database not connected" });
   try {
     const { email, name, password } = req.body as { email: string; name: string; password: string };
     if (!email || !name || !password) return res.status(400).json({ message: "Missing fields" });
@@ -21,6 +24,8 @@ export const signup: RequestHandler = async (req, res) => {
 };
 
 export const login: RequestHandler = async (req, res) => {
+  if (mongoose.connection.readyState !== 1)
+    return res.status(503).json({ message: "Database not connected" });
   try {
     const { email, password } = req.body as { email: string; password: string };
     if (!email || !password) return res.status(400).json({ message: "Missing fields" });
