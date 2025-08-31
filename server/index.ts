@@ -7,6 +7,7 @@ import { signup, login } from "./routes/auth";
 import { requireAuth } from "./middleware/auth";
 import { listClasses, createClass } from "./routes/classes";
 import { activateClass, sessionStatus, markAttendance } from "./routes/attendance";
+import { dbHealth } from "./routes/health";
 
 export function createServer() {
   const app = express();
@@ -17,13 +18,16 @@ export function createServer() {
   app.use(express.urlencoded({ extended: true }));
 
   // DB
-  void connectDB();
+  connectDB().catch((e) => {
+    console.error("DB connect failed:", e);
+  });
 
   // Health/demo
   app.get("/api/ping", (_req, res) => {
     const ping = process.env.PING_MESSAGE ?? "ping";
     res.json({ message: ping });
   });
+  app.get("/api/health/db", dbHealth);
 
   app.get("/api/demo", handleDemo);
 
