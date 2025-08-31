@@ -63,12 +63,14 @@ export default function ClassDetail() {
 
   async function activate() {
     try {
-      const res = await fetch(`/api/classes/${id}/activate`, { method: "POST", headers: { Authorization: token ? `Bearer ${token}` : "" } });
+      if (!token) throw new Error("Please log in");
+      const res = await fetch(`/api/classes/${id}/activate`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.message || res.statusText);
       nav(`/session/${data.sessionId}`);
     } catch (e: any) {
       setError(e.message);
+      if (e.message === "Please log in") nav("/auth");
     }
   }
 
