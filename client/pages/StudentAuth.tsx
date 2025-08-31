@@ -12,13 +12,12 @@ export default function StudentAuth() {
   const nav = useNavigate();
 
   // If already authenticated, go to student dashboard
-  if (typeof window !== "undefined") {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  require("react").useEffect(() => {
+    if (typeof window === "undefined") return;
     const t = localStorage.getItem("token");
-    if (t) {
-      // let dashboard decide permissions
-      nav("/student");
-    }
-  }
+    if (t) nav("/student");
+  }, [nav]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
