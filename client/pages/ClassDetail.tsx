@@ -1,0 +1,87 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+
+interface ClassDoc { _id: string; name: string; students: { name: string; rollNo: string }[]; isActive: boolean; activeSession?: string | null; }
+
+export default function ClassDetail() {
+  const { id } = useParams();
+  const nav = useNavigate();
+  const [cls, setCls] = useState<ClassDoc | null>(null);
+  const [records, setRecords] = useState<{ student: { name: string; rollNo: string }; markedAt: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const token = useMemo(() => localStorage.getItem("token"), []);
+
+  async function load() {
+    setLoading(true); setError(null);
+    try {
+      const res = await fetch(`/api/classes/${id}`, { headers: { Authorization: token ? `Bearer ${token}` : "" } });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.message || res.statusText);
+      setCls(data.class);
+      const r = await fetch(`/api/classes/${id}/attendance/today`, { headers: { Authorization: token ? `Bearer ${token}` : "" } });
+      const rd = await r.json();
+      if (r.ok) setRecords(rd.records || []);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { void load(); }, [id]);
+
+  async function activate() {
+    try {
+      const res = await fetch(`/api/classes/${id}/activate`, { method: "POST", headers: { Authorization: token ? `Bearer ${token}` : "" } });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.message || res.statusText);
+      nav(`/session/${data.sessionId}`);
+    } catch (e: any) {
+      setError(e.message);
+    }
+  }
+
+  const presentKeys = new Set(records.map((r) => `${r.student.name}|${r.student.rollNo}`));
+
+  return (
+    <main className="container mx-auto py-8">
+      <Link to="/classes" className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
+      {loading ? (
+        <p className="mt-4 text-sm text-foreground/70">Loading…</p>
+      ) : error ? (
+        <p className="mt-4 text-sm text-destructive">{error}</p>
+      ) : cls ? (
+        <div className="mt-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold">{cls.name}</h1>
+            <div className="flex items-center gap-3">
+              <button onClick={activate} className="px-3 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground">{cls.isActive ? "Active" : "Activate class"}</button>
+            </div>
+          </div>
+          <div className="mt-6">
+            <h2 className="font-semibold mb-2">Students</h2>
+            <div className="rounded-xl border border-border divide-y">
+              {(cls.students || []).map((s, i) => {
+                const key = `${s.name}|${s.rollNo}`;
+                const present = presentKeys.has(key);
+                return (
+                  <div key={i} className="flex items-center justify-between p-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-brand-500/15 grid place-items-center text-brand-700 font-semibold">{s.name.slice(0,1).toUpperCase()}</div>
+                      <div>
+                        <p className="font-medium">{s.name}</p>
+                        <p className="text-xs text-foreground/60">Roll: {s.rollNo}</p>
+                      </div>
+                    </div>
+                    {present ? <span className="text-green-600">✔</span> : <span className="text-foreground/40">—</span>}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </main>
+  );
+}
