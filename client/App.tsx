@@ -15,6 +15,8 @@ import ClassDetail from "./pages/ClassDetail";
 import Session from "./pages/Session";
 import Attend from "./pages/Attend";
 import AttendanceHistory from "./pages/AttendanceHistory";
+import StudentAuth from "./pages/StudentAuth";
+import StudentDashboard from "./pages/StudentDashboard";
 
 const queryClient = new QueryClient();
 
