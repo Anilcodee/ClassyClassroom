@@ -6,7 +6,9 @@ import { connectDB } from "./db";
 import { signup, login } from "./routes/auth";
 import { requireAuth } from "./middleware/auth";
 import { listClasses, createClass } from "./routes/classes";
+import { getClass } from "./routes/classes.get-by-id";
 import { activateClass, sessionStatus, markAttendance } from "./routes/attendance";
+import { getTodayAttendance } from "./routes/attendance.today";
 import { dbHealth } from "./routes/health";
 
 export function createServer() {
