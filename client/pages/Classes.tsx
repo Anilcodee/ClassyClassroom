@@ -104,7 +104,32 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
           <p className="text-foreground/70 mt-1">Name it, add students manually, via join link, or import a spreadsheet.</p>
           <div className="mt-4 flex gap-3">
             <button onClick={() => setOpen(true)} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90">Create class</button>
-            <button disabled className="px-4 py-2 rounded-lg border border-border text-foreground/50 cursor-not-allowed">Import spreadsheet (soon)</button>
+            <label className="px-4 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground cursor-pointer">
+              Import spreadsheet (CSV)
+              <input type="file" accept=".csv" className="hidden" onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const text = await file.text();
+                const rows = text.split(/\r?\n/).map(r => r.trim()).filter(Boolean);
+                if (rows.length === 0) return;
+                // Try to detect header
+                let start = 0; let nameIdx = 0; let rollIdx = 1;
+                const first = rows[0].split(",").map(c=>c.trim().toLowerCase());
+                if (first.some(h => h.includes("name")) || first.some(h => h.includes("roll"))) {
+                  nameIdx = first.findIndex(h => h.includes("name"));
+                  rollIdx = first.findIndex(h => h.includes("roll"));
+                  start = 1;
+                }
+                const parsed = [] as { name: string; rollNo: string }[];
+                for (let i=start;i<rows.length;i++) {
+                  const cols = rows[i].split(",").map(c=>c.trim());
+                  const n = cols[nameIdx] || cols[0];
+                  const r = cols[rollIdx] || cols[1];
+                  if (n && r) parsed.push({ name: n, rollNo: r });
+                }
+                setStudents((prev) => [...prev.filter(s=>s.name||s.rollNo), ...parsed]);
+              }} />
+            </label>
           </div>
         </div>
         <div className="w-48 h-48 relative">
