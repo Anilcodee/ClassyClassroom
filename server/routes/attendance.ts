@@ -11,6 +11,23 @@ export const activateClass: RequestHandler = async (req: AuthRequest, res) => {
     const { id } = req.params as { id: string };
     const cls = await ClassModel.findOne({ _id: id, teacher: req.userId });
     if (!cls) return res.status(404).json({ message: "Class not found" });
+
+    // If already active and session not expired, return existing
+    if (cls.isActive && cls.activeSession) {
+      const existing = await AttendanceSession.findById(cls.activeSession);
+      if (existing && existing.isActive && existing.expiresAt > new Date()) {
+        return res.json({ sessionId: existing.id, expiresAt: existing.expiresAt });
+      }
+      // Cleanup if expired
+      if (existing && existing.expiresAt <= new Date()) {
+        existing.isActive = false;
+        await existing.save();
+      }
+      cls.isActive = false;
+      cls.activeSession = null;
+      await cls.save();
+    }
+
     const expiresAt = new Date(Date.now() + 4 * 60 * 1000);
     const session = await AttendanceSession.create({ classId: cls.id, expiresAt, isActive: true });
     cls.isActive = true;
