@@ -9,7 +9,7 @@ import { listClasses, createClass } from "./routes/classes";
 import { getClass } from "./routes/classes.get-by-id";
 import { activateClass, sessionStatus, markAttendance } from "./routes/attendance";
 import { getTodayAttendance } from "./routes/attendance.today";
-import { listAttendanceDates, classAttendancePdf } from "./routes/attendance.pdf";
+import { listAttendanceDates, classAttendancePdf, classAttendancePdfAll } from "./routes/attendance.pdf";
 import { dbHealth } from "./routes/health";
 
 export function createServer() {
