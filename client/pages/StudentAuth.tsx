@@ -11,6 +11,15 @@ export default function StudentAuth() {
   const [error, setError] = useState<string | null>(null);
   const nav = useNavigate();
 
+  // If already authenticated, go to student dashboard
+  if (typeof window !== "undefined") {
+    const t = localStorage.getItem("token");
+    if (t) {
+      // let dashboard decide permissions
+      nav("/student");
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (loading) return;
