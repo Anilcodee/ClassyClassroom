@@ -17,23 +17,29 @@ export default function ClassDetail() {
   async function load() {
     setLoading(true); setError(null);
     try {
-      const headers: Record<string,string> = {};
-      if (token) headers.Authorization = `Bearer ${token}`;
-      const res = await fetch(`/api/classes/${id}`, { headers });
-      const data = await res.json();
+      if (!token) throw new Error("Please log in");
+      const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
+      const res = await fetch(`/api/classes/${id}`, { headers, cache: 'no-store' });
+      const raw = await res.text();
+      const data = raw ? JSON.parse(raw) : {};
       if (!res.ok) throw new Error(data?.message || res.statusText);
       setCls(data.class);
-      const r = await fetch(`/api/classes/${id}/attendance/today`, { headers });
-      const rd = await r.json();
+      const r = await fetch(`/api/classes/${id}/attendance/today`, { headers, cache: 'no-store' });
+      const rraw = await r.text();
+      const rd = rraw ? JSON.parse(rraw) : {};
       if (r.ok) setRecords(rd.records || []);
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message || "Network error");
+      if (e.message === "Please log in") nav("/auth");
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => { void load(); }, [id]);
+  useEffect(() => {
+    if (!token) { nav('/auth'); return; }
+    void load();
+  }, [id, token]);
 
   // Auto-refresh status while active so button re-enables after 4 minutes
   useEffect(() => {
