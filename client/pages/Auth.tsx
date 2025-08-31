@@ -23,16 +23,22 @@ export default function Auth() {
           mode === "signup" ? { email, name, password } : { email, password }
         ),
       });
-      // Read body exactly once to avoid stream reuse issues
-      const raw = await res.text();
       let data: any = null;
-      try { data = raw ? JSON.parse(raw) : null; } catch { /* not JSON */ }
+      let raw: string | null = null;
+      if (!res.bodyUsed) {
+        const ct = res.headers.get("content-type") || "";
+        if (ct.includes("application/json")) {
+          try { data = await res.json(); } catch { /* ignore */ }
+        } else {
+          try { raw = await res.text(); data = raw ? JSON.parse(raw) : null; } catch { /* ignore */ }
+        }
+      }
       if (!res.ok) {
         const msg = (data && (data.message || data.error)) || raw || res.statusText || "Request failed";
         throw new Error(msg);
       }
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data?.token);
+      localStorage.setItem("user", JSON.stringify(data?.user));
       nav("/classes");
     } catch (e: any) {
       setError(e.message || "Something went wrong");
