@@ -48,7 +48,31 @@ export default function Classes() {
                 <li key={c.id} className="rounded-xl border border-border p-4 flex items-center justify-between hover:bg-accent cursor-pointer" onClick={() => (window.location.href = `/classes/${c.id}`)}>
                   <div>
                     <p className="font-medium">{c.name}</p>
-                    <p className="text-xs text-foreground/60">Join code: {c.joinCode}</p>
+                    <p className="text-xs text-foreground/60 flex items-center gap-2">
+                      <span>Join code:</span>
+                      <span className="font-mono px-1.5 py-0.5 rounded bg-muted text-foreground/80">{c.joinCode}</span>
+                      <button
+                        className="text-xs px-2 py-0.5 rounded border border-border hover:bg-accent hover:text-accent-foreground"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const code = c.joinCode;
+                          navigator.clipboard.writeText(code).then(() => {
+                            toast({ title: "Copied", description: "Join code copied to clipboard" });
+                          }).catch(async () => {
+                            try {
+                              const ta = document.createElement("textarea");
+                              ta.value = code; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+                              toast({ title: "Copied", description: "Join code copied to clipboard" });
+                            } catch {
+                              toast({ title: "Could not copy", description: code });
+                            }
+                          });
+                        }}
+                        title="Copy join code"
+                      >
+                        Copy
+                      </button>
+                    </p>
                   </div>
                   <span className={"text-xs px-2 py-1 rounded-full " + (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")}>{c.isActive ? "Active" : "Inactive"}</span>
                 </li>
