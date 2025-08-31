@@ -15,7 +15,6 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     if (!token) { nav("/student-auth"); return; }
-    if (role !== "student") { nav("/classes"); return; }
     refresh();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
