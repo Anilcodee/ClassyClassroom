@@ -13,12 +13,14 @@ export default function Classes() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/classes", { headers: { Authorization: token ? `Bearer ${token}` : "" } });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to load");
+      const headers: Record<string, string> = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const res = await fetch("/api/classes", { headers });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.message || (res.status === 401 ? "Please log in" : "Failed to load"));
       setClasses(data.classes.map((c: any) => ({ id: c._id, name: c.name, joinCode: c.joinCode, isActive: c.isActive })));
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message || "Network error");
     } finally {
       setLoading(false);
     }
