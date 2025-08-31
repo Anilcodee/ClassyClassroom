@@ -8,6 +8,7 @@ export default function Classes() {
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string>("");
 
   async function load() {
     setLoading(true);
@@ -57,8 +58,37 @@ export default function Classes() {
         <aside className="md:col-span-1">
           <div className="rounded-2xl border border-border p-5 bg-card shadow">
             <h3 className="font-semibold mb-2">Downloads</h3>
-            <p className="text-sm text-foreground/70 mb-3">View PDFs generated for each day and class.</p>
-            <Link to="#" className="inline-block px-3 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground text-sm">Open PDF list</Link>
+            <p className="text-sm text-foreground/70 mb-3">Download PDF list (all days) for a specific class.</p>
+            <div className="space-y-2">
+              <select
+                className="w-full rounded-lg border border-input bg-background px-3 py-2"
+                value={selectedId}
+                onChange={(e)=>setSelectedId(e.target.value)}
+              >
+                <option value="">Select a class…</option>
+                {classes.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+              <button
+                className="w-full px-3 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground text-sm disabled:opacity-50"
+                disabled={!selectedId}
+                onClick={async ()=>{
+                  const token = localStorage.getItem('token');
+                  const headers: Record<string,string> = {};
+                  if (token) headers.Authorization = `Bearer ${token}`;
+                  const res = await fetch(`/api/classes/${selectedId}/attendance/pdf/all`, { headers });
+                  if (!res.ok) { alert('Failed to download'); return; }
+                  const blob = await res.blob();
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url; a.download = `attendance-all-days.pdf`;
+                  a.click(); URL.revokeObjectURL(url);
+                }}
+              >
+                Download PDF list (all days)
+              </button>
+            </div>
           </div>
         </aside>
       </div>
