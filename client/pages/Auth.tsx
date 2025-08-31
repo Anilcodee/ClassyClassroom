@@ -20,7 +20,7 @@ export default function Auth() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
-          mode === "signup" ? { email, name, password } : { email, password }
+          mode === "signup" ? { email, name, password, role: "teacher" } : { email, password }
         ),
       });
       let data: any = null;
