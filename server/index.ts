@@ -40,6 +40,8 @@ export function createServer() {
   // Classes
   app.get("/api/classes", requireAuth, listClasses);
   app.post("/api/classes", requireAuth, createClass);
+  app.get("/api/classes/:id", requireAuth, getClass);
+  app.get("/api/classes/:id/attendance/today", requireAuth, getTodayAttendance);
 
   // Attendance
   app.post("/api/classes/:id/activate", requireAuth, activateClass);
