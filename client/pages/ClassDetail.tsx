@@ -17,11 +17,13 @@ export default function ClassDetail() {
   async function load() {
     setLoading(true); setError(null);
     try {
-      const res = await fetch(`/api/classes/${id}`, { headers: { Authorization: token ? `Bearer ${token}` : "" } });
+      const headers: Record<string,string> = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const res = await fetch(`/api/classes/${id}`, { headers });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.message || res.statusText);
       setCls(data.class);
-      const r = await fetch(`/api/classes/${id}/attendance/today`, { headers: { Authorization: token ? `Bearer ${token}` : "" } });
+      const r = await fetch(`/api/classes/${id}/attendance/today`, { headers });
       const rd = await r.json();
       if (r.ok) setRecords(rd.records || []);
     } catch (e: any) {
