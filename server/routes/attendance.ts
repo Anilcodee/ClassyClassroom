@@ -2,8 +2,11 @@ import { RequestHandler } from "express";
 import { Attendance, AttendanceSession } from "../models/Attendance";
 import { ClassModel } from "../models/Class";
 import { AuthRequest } from "../middleware/auth";
+import mongoose from "mongoose";
 
 export const activateClass: RequestHandler = async (req: AuthRequest, res) => {
+  if (mongoose.connection.readyState !== 1)
+    return res.status(503).json({ message: "Database not connected" });
   try {
     const { id } = req.params as { id: string };
     const cls = await ClassModel.findOne({ _id: id, teacher: req.userId });
@@ -21,6 +24,8 @@ export const activateClass: RequestHandler = async (req: AuthRequest, res) => {
 };
 
 export const sessionStatus: RequestHandler = async (req, res) => {
+  if (mongoose.connection.readyState !== 1)
+    return res.status(503).json({ message: "Database not connected" });
   try {
     const { sessionId } = req.params as { sessionId: string };
     const session = await AttendanceSession.findById(sessionId);
@@ -39,6 +44,8 @@ export const sessionStatus: RequestHandler = async (req, res) => {
 };
 
 export const markAttendance: RequestHandler = async (req, res) => {
+  if (mongoose.connection.readyState !== 1)
+    return res.status(503).json({ message: "Database not connected" });
   try {
     const { sessionId } = req.params as { sessionId: string };
     const { name, rollNo } = req.body as { name: string; rollNo: string };
