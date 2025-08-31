@@ -16,10 +16,12 @@ export default function Header() {
   }, [pathname]);
 
   const role = user?.role || null;
+  const homeLink = role === "teacher" ? "/classes" : role === "student" ? "/student" : "/";
   const dynamicNav = [
-    { to: "/", label: "Home" },
+    { to: homeLink, label: "Home" },
     ...(role === "teacher" ? [{ to: "/classes", label: "Classes" }] : []),
     ...(role === "student" ? [{ to: "/student", label: "My classes" }] : []),
+    { to: "/get-started", label: "Get Started" },
   ];
 
   function logout() {
