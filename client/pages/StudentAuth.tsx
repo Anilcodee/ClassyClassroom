@@ -52,6 +52,10 @@ export default function StudentAuth() {
           setError("Email already in use. Please log in instead.");
           return;
         }
+        if (res.status === 403) {
+          setError("This email is a teacher account. Use Teacher login or a different email to sign up as student.");
+          return;
+        }
         throw new Error(`${res.status} ${msg}`);
       }
       if (data?.user?.role !== "student") {
