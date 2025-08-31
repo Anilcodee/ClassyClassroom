@@ -18,8 +18,9 @@ export const signup: RequestHandler = async (req, res) => {
     const emailNorm = (email || "").trim().toLowerCase();
     const nameNorm = (name || "").trim();
     if (!emailNorm || !nameNorm || !password) return res.status(400).json({ message: "Missing fields" });
-    if (role === "student" && !rollNo) return res.status(400).json({ message: "Roll number required for students" });
-    const roleToUse: "teacher" | "student" = role === "student" ? "student" : "teacher";
+    const isStudentPath = (req.originalUrl || "").includes("/signup/student");
+    const roleToUse: "teacher" | "student" = isStudentPath || role === "student" ? "student" : "teacher";
+    if (roleToUse === "student" && !rollNo) return res.status(400).json({ message: "Roll number required for students" });
     const existing = await User.findOne({ email: emailNorm });
     if (existing) return res.status(409).json({ message: "Email already in use" });
     const passwordHash = await bcrypt.hash(password, 10);
@@ -46,7 +47,9 @@ export const login: RequestHandler = async (req, res) => {
     const user = await User.findOne({ email: emailNorm });
     if (!user) return res.status(401).json({ message: "Invalid email or password" });
     const userRole = ((user as any).role || "teacher") as "teacher" | "student";
-    if (role && role !== userRole) {
+    const isStudentLogin = (req.originalUrl || "").includes("/login/student");
+    const isTeacherLogin = (req.originalUrl || "").includes("/login/teacher");
+    if ((isStudentLogin && userRole !== "student") || (isTeacherLogin && userRole !== "teacher") || (role && role !== userRole)) {
       return res.status(403).json({ message: `Please use the ${userRole} login` });
     }
     const ok = await bcrypt.compare(password, user.passwordHash);
