@@ -18,7 +18,7 @@ export default function Auth() {
     try {
       const emailNorm = email.trim().toLowerCase();
       const nameNorm = name.trim();
-      const res = await fetch(`/api/auth/${mode === "signup" ? "signup" : "login"}`, {
+      const res = await fetch(`/api/auth/${mode === "signup" ? "signup/teacher" : "login/teacher"}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
