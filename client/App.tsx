@@ -11,6 +11,9 @@ import NotFound from "./pages/NotFound";
 import Header from "./components/layout/Header";
 import Auth from "./pages/Auth";
 import Classes from "./pages/Classes";
+import ClassDetail from "./pages/ClassDetail";
+import Session from "./pages/Session";
+import Attend from "./pages/Attend";
 
 const queryClient = new QueryClient();
 
