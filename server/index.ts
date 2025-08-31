@@ -53,5 +53,9 @@ export function createServer() {
   app.get("/api/session/:sessionId", sessionStatus);
   app.post("/api/session/:sessionId/mark", markAttendance);
 
+  // Student
+  app.get("/api/student/classes", requireAuth, listStudentClasses);
+  app.post("/api/student/classes/join", requireAuth, joinClass);
+
   return app;
 }
