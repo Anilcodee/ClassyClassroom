@@ -22,7 +22,8 @@ export const signup: RequestHandler = async (req, res) => {
     const existing = await User.findOne({ email: emailNorm });
     if (existing) return res.status(409).json({ message: "Email already in use" });
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await User.create({ email: emailNorm, name: nameNorm, passwordHash, role: role || "teacher", rollNo });
+    const roleToUse: "teacher" | "student" = role === "student" ? "student" : "teacher";
+    const user = await User.create({ email: emailNorm, name: nameNorm, passwordHash, role: roleToUse, rollNo });
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
     res.status(201).json({
       token,
@@ -58,4 +59,22 @@ export const login: RequestHandler = async (req, res) => {
     console.error("Login error:", e);
     res.status(500).json({ message: e?.message || "Server error" });
   }
+};
+
+export const signupStudent: RequestHandler = async (req, res, next) => {
+  (req as any).body = { ...(req as any).body, role: "student" };
+  return signup(req, res, next as any);
+};
+export const signupTeacher: RequestHandler = async (req, res, next) => {
+  (req as any).body = { ...(req as any).body, role: "teacher" };
+  return signup(req, res, next as any);
+};
+
+export const loginStudent: RequestHandler = async (req, res, next) => {
+  (req as any).body = { ...(req as any).body, role: "student" };
+  return login(req, res, next as any);
+};
+export const loginTeacher: RequestHandler = async (req, res, next) => {
+  (req as any).body = { ...(req as any).body, role: "teacher" };
+  return login(req, res, next as any);
 };
