@@ -11,14 +11,21 @@ export default function StudentAuth() {
   const [error, setError] = useState<string | null>(null);
   const nav = useNavigate();
 
-  // If already authenticated, redirect by role
+  // If already authenticated, handle role: keep students, auto-logout teachers to allow student auth
   useEffect(() => {
     if (typeof window === "undefined") return;
     const t = localStorage.getItem("token");
     if (!t) return;
     let role: string | null = null;
     try { role = JSON.parse(localStorage.getItem("user") || "{}")?.role || null; } catch {}
-    nav(role === "student" ? "/student" : "/classes");
+    if (role === "student") {
+      nav("/student");
+      return;
+    }
+    // Logged in as teacher: clear and stay to allow student signup/login
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.dispatchEvent(new Event("auth-changed"));
   }, [nav]);
 
   async function handleSubmit(e: React.FormEvent) {
