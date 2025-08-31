@@ -17,7 +17,7 @@ export default function Index() {
             live. Download daily PDFs and keep everything saved in your database.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/student-auth" className="px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:opacity-90">
+            <Link to="/student" className="px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:opacity-90">
               Sign in as Student
             </Link>
             <Link to="/auth" className="px-5 py-3 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground">
