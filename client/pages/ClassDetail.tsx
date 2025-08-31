@@ -102,7 +102,10 @@ export default function ClassDetail() {
               </button>
               <button onClick={async ()=>{
                 const token = localStorage.getItem('token');
-                const res = await fetch(`/api/classes/${id}/attendance/pdf`, { headers: { Authorization: token?`Bearer ${token}`:'' } });
+                const headers: Record<string,string> = {};
+                if (token) headers.Authorization = `Bearer ${token}`;
+                const res = await fetch(`/api/classes/${id}/attendance/pdf`, { headers });
+                if (!res.ok) { alert('Failed to download'); return; }
                 const blob = await res.blob();
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
