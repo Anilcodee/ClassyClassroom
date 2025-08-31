@@ -82,7 +82,6 @@ export default function StudentDashboard() {
               <li key={(c as any).id || (c as any)._id} className="rounded-lg border border-border p-4">
                 <div className="font-semibold">{c.name}</div>
                 <div className="text-xs text-foreground/60">Joined</div>
-                {/* Optional: link to class details for students if needed */}
               </li>
             ))}
           </ul>
