@@ -2,8 +2,11 @@ import { RequestHandler } from "express";
 import { AuthRequest } from "../middleware/auth";
 import { ClassModel } from "../models/Class";
 import crypto from "crypto";
+import mongoose from "mongoose";
 
 export const listClasses: RequestHandler = async (req: AuthRequest, res) => {
+  if (mongoose.connection.readyState !== 1)
+    return res.status(503).json({ message: "Database not connected" });
   try {
     const classes = await ClassModel.find({ teacher: req.userId }).lean();
     res.json({ classes });
@@ -14,6 +17,8 @@ export const listClasses: RequestHandler = async (req: AuthRequest, res) => {
 };
 
 export const createClass: RequestHandler = async (req: AuthRequest, res) => {
+  if (mongoose.connection.readyState !== 1)
+    return res.status(503).json({ message: "Database not connected" });
   try {
     const { name, students } = req.body as { name: string; students?: { name: string; rollNo: string }[] };
     if (!name) return res.status(400).json({ message: "Name is required" });
