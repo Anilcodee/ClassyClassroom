@@ -9,11 +9,22 @@ export default function Header() {
   const navg = useNavigate();
 
   useEffect(() => {
-    try {
-      const u = localStorage.getItem("user");
-      setUser(u ? JSON.parse(u) : null);
-    } catch {}
-  }, [pathname]);
+    function readUser() {
+      try {
+        const u = localStorage.getItem("user");
+        setUser(u ? JSON.parse(u) : null);
+      } catch {}
+    }
+    readUser();
+    const onStorage = (e: StorageEvent) => { if (e.key === "user" || e.key === "token") readUser(); };
+    const onAuthChanged = () => readUser();
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("auth-changed", onAuthChanged as any);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("auth-changed", onAuthChanged as any);
+    };
+  }, []);
 
   const role = user?.role || null;
   const roleHome = role === "teacher" ? "/classes" : role === "student" ? "/student" : "/";
@@ -31,6 +42,7 @@ export default function Header() {
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    window.dispatchEvent(new Event("auth-changed"));
     setUser(null);
     navg("/");
   }
