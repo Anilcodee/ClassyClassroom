@@ -24,7 +24,7 @@ export default function Auth() {
         body: JSON.stringify(
           mode === "signup"
             ? { email: emailNorm, name: nameNorm, password, role: "teacher" }
-            : { email: emailNorm, password }
+            : { email: emailNorm, password, role: "teacher" }
         ),
       });
       let data: any = null;
