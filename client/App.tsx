@@ -14,6 +14,7 @@ import Classes from "./pages/Classes";
 import ClassDetail from "./pages/ClassDetail";
 import Session from "./pages/Session";
 import Attend from "./pages/Attend";
+import AttendanceHistory from "./pages/AttendanceHistory";
 
 const queryClient = new QueryClient();
 
