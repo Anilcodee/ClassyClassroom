@@ -58,10 +58,6 @@ export default function StudentAuth() {
         }
         throw new Error(`${res.status} ${msg}`);
       }
-      if (data?.user?.role !== "student") {
-        setError("Please use teacher login for teacher accounts");
-        return;
-      }
       localStorage.setItem("token", data?.token);
       localStorage.setItem("user", JSON.stringify(data?.user));
       nav("/student");
