@@ -12,12 +12,13 @@ export default function StudentDashboard() {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const userRaw = typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const role = userRaw ? (JSON.parse(userRaw)?.role || "teacher") : null;
+  const isStudent = role === "student";
 
   useEffect(() => {
     if (!token) { nav("/student-auth"); return; }
-    refresh();
+    if (isStudent) refresh();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isStudent]);
 
   async function refresh() {
     try {
@@ -34,6 +35,7 @@ export default function StudentDashboard() {
   async function handleJoin(e: React.FormEvent) {
     e.preventDefault();
     if (!joinCode.trim()) return;
+    if (!isStudent) { nav("/student-auth"); return; }
     setJoining(true); setError(null);
     try {
       const res = await fetch("/api/student/classes/join", {
@@ -57,6 +59,13 @@ export default function StudentDashboard() {
       <h1 className="text-2xl font-bold">Student dashboard</h1>
       <p className="text-foreground/70">Join your class with a code from your teacher and see your classes below.</p>
 
+      {!isStudent && (
+        <div className="mt-4 rounded-lg border border-border bg-card p-4 text-sm text-foreground/80">
+          You are signed in as a teacher. To join classes as a student, continue to
+          <Link to="/student-auth" className="ml-1 underline">student sign-in</Link>.
+        </div>
+      )}
+
       <form onSubmit={handleJoin} className="mt-6 flex flex-col sm:flex-row gap-3 max-w-xl">
         <input
           className="flex-1 rounded-lg border border-input bg-background px-3 py-2"
@@ -64,16 +73,19 @@ export default function StudentDashboard() {
           value={joinCode}
           onChange={(e) => setJoinCode(e.target.value)}
           required
+          disabled={!isStudent}
         />
-        <button disabled={joining} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-50">
+        <button disabled={joining || !isStudent} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-50">
           {joining ? "Joining…" : "Join class"}
         </button>
       </form>
-      {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
+      {isStudent && error && <p className="mt-2 text-sm text-destructive">{error}</p>}
 
       <div className="mt-10">
         <h2 className="text-xl font-semibold mb-3">Your classes</h2>
-        {classes.length === 0 ? (
+        {!isStudent ? (
+          <p className="text-foreground/70">Sign in as a student to see your joined classes.</p>
+        ) : classes.length === 0 ? (
           <p className="text-foreground/70">No classes yet. Join one using the code above.</p>
         ) : (
           <ul className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
