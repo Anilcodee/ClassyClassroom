@@ -13,9 +13,10 @@ export const signup: RequestHandler = async (req, res) => {
     const user = await User.create({ email, name, passwordHash });
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
     res.status(201).json({ token, user: { id: user.id, email: user.email, name: user.name } });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "Server error" });
+  } catch (e: any) {
+    console.error("Signup error:", e);
+    if (e?.code === 11000) return res.status(409).json({ message: "Email already in use" });
+    res.status(500).json({ message: e?.message || "Server error" });
   }
 };
 
@@ -29,8 +30,8 @@ export const login: RequestHandler = async (req, res) => {
     if (!ok) return res.status(401).json({ message: "Invalid credentials" });
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
     res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "Server error" });
+  } catch (e: any) {
+    console.error("Login error:", e);
+    res.status(500).json({ message: e?.message || "Server error" });
   }
 };
