@@ -26,7 +26,7 @@ export default function StudentAuth() {
     try {
       const emailNorm = email.trim().toLowerCase();
       const nameNorm = name.trim();
-      const res = await fetch(`/api/auth/${mode === "signup" ? "signup" : "login"}`, {
+      const res = await fetch(`/api/auth/${mode === "signup" ? "signup/student" : "login/student"}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
