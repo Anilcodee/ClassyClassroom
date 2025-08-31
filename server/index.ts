@@ -45,6 +45,7 @@ export function createServer() {
   app.get("/api/classes/:id/attendance/today", requireAuth, getTodayAttendance);
   app.get("/api/classes/:id/attendance/dates", requireAuth, listAttendanceDates);
   app.get("/api/classes/:id/attendance/pdf", requireAuth, classAttendancePdf);
+  app.get("/api/classes/:id/attendance/pdf/all", requireAuth, classAttendancePdfAll);
 
   // Attendance
   app.post("/api/classes/:id/activate", requireAuth, activateClass);
