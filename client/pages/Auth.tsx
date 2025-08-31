@@ -12,6 +12,7 @@ export default function Auth() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     setError(null);
     try {
@@ -22,13 +23,27 @@ export default function Auth() {
           mode === "signup" ? { email, name, password } : { email, password }
         ),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Request failed");
+      const clone = res.clone();
+      let data: any = null;
+      try {
+        // Parse from the clone so the original body remains untouched for any tooling
+        data = await clone.json();
+      } catch {
+        try {
+          const text = await clone.text();
+          data = text ? JSON.parse(text) : null;
+        } catch {
+          // ignore
+        }
+      }
+      if (!res.ok) {
+        throw new Error((data && (data.message || data.error)) || res.statusText || "Request failed");
+      }
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       nav("/classes");
     } catch (e: any) {
-      setError(e.message);
+      setError(e.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
