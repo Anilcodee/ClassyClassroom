@@ -24,13 +24,15 @@ export default function StudentAuth() {
     setLoading(true);
     setError(null);
     try {
+      const emailNorm = email.trim().toLowerCase();
+      const nameNorm = name.trim();
       const res = await fetch(`/api/auth/${mode === "signup" ? "signup" : "login"}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
           mode === "signup"
-            ? { email, name, password, role: "student", rollNo }
-            : { email, password, role: "student" }
+            ? { email: emailNorm, name: nameNorm, password, role: "student", rollNo }
+            : { email: emailNorm, password, role: "student" }
         ),
       });
       let data: any = null;
@@ -45,6 +47,11 @@ export default function StudentAuth() {
       }
       if (!res.ok) {
         const msg = (data && (data.message || data.error)) || raw || res.statusText || "Request failed";
+        if (res.status === 409) {
+          setMode("login");
+          setError("Email already in use. Please log in instead.");
+          return;
+        }
         throw new Error(`${res.status} ${msg}`);
       }
       if (data?.user?.role !== "student") {
