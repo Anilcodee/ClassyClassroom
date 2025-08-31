@@ -20,8 +20,8 @@ export const signup: RequestHandler = async (req, res) => {
     if (!emailNorm || !nameNorm || !password) return res.status(400).json({ message: "Missing fields" });
     if (role === "student" && !rollNo) return res.status(400).json({ message: "Roll number required for students" });
     const roleToUse: "teacher" | "student" = role === "student" ? "student" : "teacher";
-    const existing = await User.findOne({ email: emailNorm, role: roleToUse });
-    if (existing) return res.status(409).json({ message: "Email already in use for this role" });
+    const existing = await User.findOne({ email: emailNorm });
+    if (existing) return res.status(409).json({ message: "Email already in use" });
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({ email: emailNorm, name: nameNorm, passwordHash, role: roleToUse, rollNo });
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
