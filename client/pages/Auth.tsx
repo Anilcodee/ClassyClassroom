@@ -39,7 +39,8 @@ export default function Auth() {
       }
       localStorage.setItem("token", data?.token);
       localStorage.setItem("user", JSON.stringify(data?.user));
-      nav("/classes");
+      const role = data?.user?.role || "teacher";
+      nav(role === "student" ? "/student" : "/classes");
     } catch (e: any) {
       setError(e.message || "Something went wrong");
     } finally {
