@@ -2,6 +2,11 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import { connectDB } from "./db";
+import { signup, login } from "./routes/auth";
+import { requireAuth } from "./middleware/auth";
+import { listClasses, createClass } from "./routes/classes";
+import { activateClass, sessionStatus, markAttendance } from "./routes/attendance";
 
 export function createServer() {
   const app = express();
@@ -11,13 +16,29 @@ export function createServer() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  // Example API routes
+  // DB
+  void connectDB();
+
+  // Health/demo
   app.get("/api/ping", (_req, res) => {
     const ping = process.env.PING_MESSAGE ?? "ping";
     res.json({ message: ping });
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Auth
+  app.post("/api/auth/signup", signup);
+  app.post("/api/auth/login", login);
+
+  // Classes
+  app.get("/api/classes", requireAuth, listClasses);
+  app.post("/api/classes", requireAuth, createClass);
+
+  // Attendance
+  app.post("/api/classes/:id/activate", requireAuth, activateClass);
+  app.get("/api/session/:sessionId", sessionStatus);
+  app.post("/api/session/:sessionId/mark", markAttendance);
 
   return app;
 }
