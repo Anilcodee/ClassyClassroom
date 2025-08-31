@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 
 interface ClassItem { id: string; name: string; joinCode: string; isActive: boolean; }
 interface NewStudent { name: string; rollNo: string }
