@@ -15,12 +15,14 @@ export const signup: RequestHandler = async (req, res) => {
       role?: "teacher" | "student";
       rollNo?: string;
     };
-    if (!email || !name || !password) return res.status(400).json({ message: "Missing fields" });
+    const emailNorm = (email || "").trim().toLowerCase();
+    const nameNorm = (name || "").trim();
+    if (!emailNorm || !nameNorm || !password) return res.status(400).json({ message: "Missing fields" });
     if (role === "student" && !rollNo) return res.status(400).json({ message: "Roll number required for students" });
-    const existing = await User.findOne({ email });
+    const existing = await User.findOne({ email: emailNorm });
     if (existing) return res.status(409).json({ message: "Email already in use" });
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await User.create({ email, name, passwordHash, role: role || "teacher", rollNo });
+    const user = await User.create({ email: emailNorm, name: nameNorm, passwordHash, role: role || "teacher", rollNo });
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
     res.status(201).json({
       token,
@@ -38,11 +40,12 @@ export const login: RequestHandler = async (req, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { email, password } = req.body as { email: string; password: string };
-    if (!email || !password) return res.status(400).json({ message: "Missing fields" });
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: "Invalid credentials" });
+    const emailNorm = (email || "").trim().toLowerCase();
+    if (!emailNorm || !password) return res.status(400).json({ message: "Missing fields" });
+    const user = await User.findOne({ email: emailNorm });
+    if (!user) return res.status(401).json({ message: "Invalid email or password" });
     const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) return res.status(401).json({ message: "Invalid credentials" });
+    if (!ok) return res.status(401).json({ message: "Invalid email or password" });
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
     res.json({
       token,
