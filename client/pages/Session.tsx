@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { QRCode } from "qrcode.react";
+import QRCode from "qrcode.react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 export default function Session() {
