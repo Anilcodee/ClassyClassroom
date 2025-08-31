@@ -56,7 +56,19 @@ export default function ClassDetail() {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">{cls.name}</h1>
             <div className="flex items-center gap-3">
-              <button onClick={activate} className="px-3 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground">{cls.isActive ? "Active" : "Activate class"}</button>
+              <button disabled={cls.isActive} onClick={activate} className="px-3 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground disabled:opacity-50">
+                {cls.isActive ? "Inactive class" : "Activate class"}
+              </button>
+              <button onClick={async ()=>{
+                const token = localStorage.getItem('token');
+                const res = await fetch(`/api/classes/${id}/attendance/pdf`, { headers: { Authorization: token?`Bearer ${token}`:'' } });
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `${cls?.name||'class'}-${new Date().toISOString().slice(0,10)}.pdf`;
+                a.click(); URL.revokeObjectURL(url);
+              }} className="px-3 py-2 rounded-lg border border-border">Download today PDF</button>
+              <Link to={`/classes/${id}/history`} className="px-3 py-2 rounded-lg border border-border">PDF history</Link>
             </div>
           </div>
           <div className="mt-6">
