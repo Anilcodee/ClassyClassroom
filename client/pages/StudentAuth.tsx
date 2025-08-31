@@ -30,7 +30,7 @@ export default function StudentAuth() {
         body: JSON.stringify(
           mode === "signup"
             ? { email, name, password, role: "student", rollNo }
-            : { email, password }
+            : { email, password, role: "student" }
         ),
       });
       let data: any = null;
