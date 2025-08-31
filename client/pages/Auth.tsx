@@ -23,21 +23,13 @@ export default function Auth() {
           mode === "signup" ? { email, name, password } : { email, password }
         ),
       });
-      const clone = res.clone();
+      // Read body exactly once to avoid stream reuse issues
+      const raw = await res.text();
       let data: any = null;
-      try {
-        // Parse from the clone so the original body remains untouched for any tooling
-        data = await clone.json();
-      } catch {
-        try {
-          const text = await clone.text();
-          data = text ? JSON.parse(text) : null;
-        } catch {
-          // ignore
-        }
-      }
+      try { data = raw ? JSON.parse(raw) : null; } catch { /* not JSON */ }
       if (!res.ok) {
-        throw new Error((data && (data.message || data.error)) || res.statusText || "Request failed");
+        const msg = (data && (data.message || data.error)) || raw || res.statusText || "Request failed";
+        throw new Error(msg);
       }
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
