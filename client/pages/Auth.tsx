@@ -16,11 +16,15 @@ export default function Auth() {
     setLoading(true);
     setError(null);
     try {
+      const emailNorm = email.trim().toLowerCase();
+      const nameNorm = name.trim();
       const res = await fetch(`/api/auth/${mode === "signup" ? "signup" : "login"}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
-          mode === "signup" ? { email, name, password, role: "teacher" } : { email, password }
+          mode === "signup"
+            ? { email: emailNorm, name: nameNorm, password, role: "teacher" }
+            : { email: emailNorm, password }
         ),
       });
       let data: any = null;
