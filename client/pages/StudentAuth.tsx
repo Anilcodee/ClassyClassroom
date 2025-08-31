@@ -60,6 +60,7 @@ export default function StudentAuth() {
       }
       localStorage.setItem("token", data?.token);
       localStorage.setItem("user", JSON.stringify(data?.user));
+      window.dispatchEvent(new Event("auth-changed"));
       nav("/student");
     } catch (e: any) {
       setError(e.message || "Something went wrong");
