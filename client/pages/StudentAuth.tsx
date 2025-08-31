@@ -59,6 +59,11 @@ export default function StudentAuth() {
           setError("This email is a teacher account. Use Teacher login or a different email to sign up as student.");
           return;
         }
+        if (res.status === 401 && mode === "login") {
+          setMode("signup");
+          setError("No student account found for this email. Please sign up.");
+          return;
+        }
         throw new Error(`${res.status} ${msg}`);
       }
       if (!data?.user || data?.user?.role !== "student") {
