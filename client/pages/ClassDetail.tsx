@@ -10,6 +10,8 @@ export default function ClassDetail() {
   const [records, setRecords] = useState<{ student: { name: string; rollNo: string }; markedAt: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expiresAt, setExpiresAt] = useState<Date | null>(null);
+  const [now, setNow] = useState(Date.now());
   const token = useMemo(() => localStorage.getItem("token"), []);
 
   async function load() {
@@ -39,14 +41,23 @@ export default function ClassDetail() {
       try {
         const r = await fetch(`/api/session/${cls.activeSession}`);
         const d = await r.json();
+        if (d?.expiresAt) setExpiresAt(new Date(d.expiresAt));
         if (!stop && d && d.isActive === false) {
           setCls((prev) => (prev ? { ...prev, isActive: false, activeSession: null as any } : prev));
+          setExpiresAt(null);
         }
       } catch {}
     };
-    const i = setInterval(tick, 2000);
+    const i = setInterval(tick, 1000);
     return () => { stop = true; clearInterval(i); };
   }, [cls?.isActive, cls?.activeSession]);
+
+  // Local second tick for countdown display
+  useEffect(() => {
+    if (!expiresAt) return;
+    const i = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(i);
+  }, [expiresAt]);
 
   async function activate() {
     try {
@@ -58,6 +69,10 @@ export default function ClassDetail() {
       setError(e.message);
     }
   }
+
+  const remainingSec = expiresAt ? Math.max(0, Math.floor((expiresAt.getTime() - now) / 1000)) : null;
+  const mm = remainingSec != null ? String(Math.floor(remainingSec / 60)).padStart(2, "0") : null;
+  const ss = remainingSec != null ? String(remainingSec % 60).padStart(2, "0") : null;
 
   const presentKeys = new Set(records.map((r) => `${r.student.name}|${r.student.rollNo}`));
 
@@ -71,7 +86,12 @@ export default function ClassDetail() {
       ) : cls ? (
         <div className="mt-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">{cls.name}</h1>
+            <h1 className="text-2xl font-bold flex items-center gap-3">
+              {cls.name}
+              {cls.isActive && mm && ss && (
+                <span className="text-base font-mono px-2 py-1 rounded-md bg-muted text-foreground/80">{mm}:{ss}</span>
+              )}
+            </h1>
             <div className="flex items-center gap-3">
               <button disabled={cls.isActive} onClick={activate} className="px-3 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground disabled:opacity-50">
                 {cls.isActive ? "Inactive class" : "Activate class"}
