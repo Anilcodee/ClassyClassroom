@@ -41,7 +41,7 @@ export default function Classes() {
           ) : (
             <ul className="space-y-3">
               {classes.map((c) => (
-                <li key={c.id} className="rounded-xl border border-border p-4 flex items-center justify-between">
+                <li key={c.id} className="rounded-xl border border-border p-4 flex items-center justify-between hover:bg-accent cursor-pointer" onClick={() => (window.location.href = `/classes/${c.id}`)}>
                   <div>
                     <p className="font-medium">{c.name}</p>
                     <p className="text-xs text-foreground/60">Join code: {c.joinCode}</p>
