@@ -11,11 +11,14 @@ export default function StudentAuth() {
   const [error, setError] = useState<string | null>(null);
   const nav = useNavigate();
 
-  // If already authenticated, go to student dashboard
+  // If already authenticated, redirect by role
   useEffect(() => {
     if (typeof window === "undefined") return;
     const t = localStorage.getItem("token");
-    if (t) nav("/student");
+    if (!t) return;
+    let role: string | null = null;
+    try { role = JSON.parse(localStorage.getItem("user") || "{}")?.role || null; } catch {}
+    nav(role === "student" ? "/student" : "/classes");
   }, [nav]);
 
   async function handleSubmit(e: React.FormEvent) {
