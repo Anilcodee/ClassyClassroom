@@ -31,6 +31,23 @@ export default function ClassDetail() {
 
   useEffect(() => { void load(); }, [id]);
 
+  // Auto-refresh status while active so button re-enables after 4 minutes
+  useEffect(() => {
+    if (!cls?.isActive || !cls?.activeSession) return;
+    let stop = false;
+    const tick = async () => {
+      try {
+        const r = await fetch(`/api/session/${cls.activeSession}`);
+        const d = await r.json();
+        if (!stop && d && d.isActive === false) {
+          setCls((prev) => (prev ? { ...prev, isActive: false, activeSession: null as any } : prev));
+        }
+      } catch {}
+    };
+    const i = setInterval(tick, 2000);
+    return () => { stop = true; clearInterval(i); };
+  }, [cls?.isActive, cls?.activeSession]);
+
   async function activate() {
     try {
       const res = await fetch(`/api/classes/${id}/activate`, { method: "POST", headers: { Authorization: token ? `Bearer ${token}` : "" } });
