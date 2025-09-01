@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 
-interface ClassItem { id: string; name: string; joinCode: string; isActive: boolean; }
+interface ClassItem { id: string; name: string; joinCode: string; isActive: boolean; imageUrl?: string }
 interface NewStudent { name: string; rollNo: string }
 
 export default function Classes() {
