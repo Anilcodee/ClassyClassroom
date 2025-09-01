@@ -10,8 +10,11 @@ import { getClass } from "./routes/classes.get-by-id";
 import { activateClass, sessionStatus, markAttendance } from "./routes/attendance";
 import { getTodayAttendance } from "./routes/attendance.today";
 import { listAttendanceDates, classAttendancePdf, classAttendancePdfAll } from "./routes/attendance.pdf";
+import { getAttendanceForDate } from "./routes/attendance.view";
+import { listMessages, createMessage } from "./routes/messages";
 import { dbHealth } from "./routes/health";
 import { listStudentClasses, joinClass } from "./routes/student";
+import { updateClassDetails } from "./routes/classes.update";
 
 export function createServer() {
   const app = express();
