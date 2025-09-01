@@ -85,14 +85,16 @@ export default function ClassMessages() {
     try {
       const newAtts = await readFiles(editNewFiles);
       const combined = [...editAttachments, ...newAtts].slice(0, MAX_FILES);
+      // Optimistic update
+      setMessages(prev => prev.map(m => m.id === mid ? { ...m, title: editTitle || m.title, content: editContent, attachments: combined, updatedAt: new Date().toISOString() } : m));
       const r = await fetch(`/api/messages/${mid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ title: editTitle || undefined, content: editContent, attachments: combined }) });
       const d = await r.json();
       if (!r.ok) throw new Error(d?.message || r.statusText);
       setMessages(prev => prev.map(m => m.id === mid ? d.message : m));
       setEditingId(null); setEditTitle(""); setEditContent(""); setEditAttachments([]); setEditNewFiles([]);
-      await load();
     } catch (e: any) {
       setError(e.message);
+      await load();
     }
   }
 
