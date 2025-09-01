@@ -125,8 +125,7 @@ export default function Classes() {
               {classes.map((c) => (
                 <li
                   key={c.id}
-                  className="rounded-xl border border-border hover:bg-accent cursor-pointer overflow-hidden relative"
-                  onClick={() => (window.location.href = `/classes/${c.id}`)}
+                  className="rounded-xl border border-border hover:bg-accent overflow-hidden relative"
                   style={{ minHeight: "10rem" }}
 >
                   {!c.imageUrl && (
@@ -185,7 +184,7 @@ export default function Classes() {
                 {/* Action buttons bottom-right */}
                 <div className="absolute bottom-3 right-3 z-10 flex flex-row gap-2">
                   <Link
-                    to={`/classes/${c.id}/attendance`}
+                    to={`/classes/${c.id}`}
                     onClick={(e)=>e.stopPropagation()}
                     className="px-2.5 py-1.5 rounded-md text-xs bg-primary text-primary-foreground hover:opacity-90 text-center"
                     title="View attendance"

@@ -148,16 +148,7 @@ export default function ClassDetail() {
             </div>
           </div>
         </div>
-        ) : null}
-
-      {/* Floating actions */}
-      {cls && (
-        <div className="fixed bottom-6 right-6 flex flex-col gap-2 z-50">
-          <Link to={`/classes/${id}/attendance`} className="px-3 py-2 rounded-full shadow bg-primary text-primary-foreground hover:opacity-90 text-sm text-center">Attendance</Link>
-          <Link to={`/classes/${id}/messages`} className="px-3 py-2 rounded-full shadow bg-secondary text-secondary-foreground hover:opacity-90 text-sm text-center">Messages</Link>
-          <Link to={`/classes/${id}/modify`} className="px-3 py-2 rounded-full shadow border border-border bg-background hover:bg-accent hover:text-accent-foreground text-sm text-center">Modify Class</Link>
-        </div>
-      )}
+      ) : null}
     </main>
   );
 }
