@@ -90,6 +90,7 @@ export default function ClassMessages() {
       if (!r.ok) throw new Error(d?.message || r.statusText);
       setMessages(prev => prev.map(m => m.id === mid ? d.message : m));
       setEditingId(null); setEditTitle(""); setEditContent(""); setEditAttachments([]); setEditNewFiles([]);
+      await load();
     } catch (e: any) {
       setError(e.message);
     }
