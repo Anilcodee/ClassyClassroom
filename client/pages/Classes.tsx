@@ -33,8 +33,8 @@ export default function Classes() {
 
   return (
     <main className="container mx-auto py-10">
-      <div className="grid gap-6">
-        <div className="col-span-1">
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="md:col-span-2">
           <MakeClassCard onCreated={load} />
           <h2 className="mt-8 mb-3 text-lg font-semibold">Your classes</h2>
           {loading ? (
@@ -46,10 +46,22 @@ export default function Classes() {
           ) : (
             <ul className="space-y-3">
               {classes.map((c) => (
-                <li key={c.id} className="rounded-xl border border-border p-4 flex items-center justify-between hover:bg-accent cursor-pointer" onClick={() => (window.location.href = `/classes/${c.id}`)}>
-                  <div>
+                <li
+                  key={c.id}
+                  className="rounded-xl border border-border hover:bg-accent cursor-pointer overflow-hidden relative"
+                  onClick={() => (window.location.href = `/classes/${c.id}`)}
+                  style={{ minHeight: "10rem" }}
+                >
+                  {c.imageUrl ? (
+                    <div className="w-full h-28 md:h-40">
+                      <img src={c.imageUrl} alt="Class cover" className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="w-full h-10 bg-muted/50" />
+                  )}
+                  <div className="p-5">
                     <p className="font-medium">{c.name}</p>
-                    <p className="text-xs text-foreground/60 flex items-center gap-2">
+                    <div className="mt-2 text-xs text-foreground/60 flex items-center gap-2">
                       <span className="relative inline-flex items-center">
                         <button
                           className="p-1 rounded border border-border hover:bg-accent group"
@@ -69,8 +81,6 @@ export default function Classes() {
                           onMouseEnter={(e) => {
                             e.stopPropagation();
                             setShowCodeFor(c.id);
-                            const code = c.joinCode;
-                            navigator.clipboard.writeText(code).catch(()=>{});
                           }}
                           onMouseLeave={() => setShowCodeFor("")}
                           title="Copy join code"
@@ -83,9 +93,9 @@ export default function Classes() {
                           </span>
                         )}
                       </span>
-                    </p>
+                    </div>
                   </div>
-                  <span className={"text-xs px-2 py-1 rounded-full " + (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")}>{c.isActive ? "Active" : "Inactive"}</span>
+                  <span className={"absolute top-2 right-2 text-xs px-2 py-1 rounded-full " + (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")}>{c.isActive ? "Active" : "Inactive"}</span>
                 </li>
               ))}
             </ul>
@@ -135,7 +145,7 @@ export default function Classes() {
 function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [coverDataUrl, setCoverDataUrl] = useState<string>("");
   const [students, setStudents] = useState<NewStudent[]>([{ name: "", rollNo: "" }]);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -148,7 +158,7 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
     setSaving(true); setErr(null);
     try {
       const token = localStorage.getItem("token");
-      const body = { name, imageUrl: imageUrl || undefined, students: students.filter(s => s.name && s.rollNo) };
+      const body = { name, imageUrl: coverDataUrl || undefined, students: students.filter(s => s.name && s.rollNo) };
       const res = await fetch("/api/classes", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },
@@ -156,7 +166,7 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || res.statusText || "Failed to create");
-      setOpen(false); setName(""); setImageUrl(""); setStudents([{ name: "", rollNo: "" }]);
+      setOpen(false); setName(""); setCoverDataUrl(""); setStudents([{ name: "", rollNo: "" }]);
       await onCreated();
     } catch (e: any) {
       setErr(e.message || "Failed to create");
@@ -215,9 +225,24 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
               value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Physics 101" />
           </div>
           <div className="grid gap-3 mt-4">
-            <label className="text-sm">Cover image URL</label>
-            <input className="rounded-lg border border-input bg-background px-3 py-2 outline-none focus:ring-2 focus:ring-ring"
-              value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://.../image.jpg" />
+            <label className="text-sm">Cover image</label>
+            <input
+              type="file"
+              accept="image/*"
+              className="rounded-lg border border-input bg-background px-3 py-2"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (!f) { setCoverDataUrl(""); return; }
+                const reader = new FileReader();
+                reader.onload = () => setCoverDataUrl(String(reader.result || ""));
+                reader.readAsDataURL(f);
+              }}
+            />
+            {coverDataUrl && (
+              <div className="h-32 w-full rounded-lg overflow-hidden border border-border">
+                <img src={coverDataUrl} alt="Cover preview" className="w-full h-full object-cover" />
+              </div>
+            )}
           </div>
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
