@@ -197,6 +197,7 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
   const [name, setName] = React.useState("");
   const [coverDataUrl, setCoverDataUrl] = React.useState<string>("");
   const [students, setStudents] = React.useState<NewStudent[]>([{ name: "", rollNo: "" }]);
+  const [duration, setDuration] = React.useState<number>(4);
   const [saving, setSaving] = React.useState(false);
   const [err, setErr] = React.useState<string | null>(null);
 
@@ -208,7 +209,7 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
     setSaving(true); setErr(null);
     try {
       const token = localStorage.getItem("token");
-      const body = { name, imageUrl: coverDataUrl || undefined, students: students.filter(s => s.name && s.rollNo) };
+      const body = { name, imageUrl: coverDataUrl || undefined, durationMinutes: duration, students: students.filter(s => s.name && s.rollNo) };
       const res = await fetch("/api/classes", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },
@@ -293,6 +294,18 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
                 <img src={coverDataUrl} alt="Cover preview" className="w-full h-full object-cover" />
               </div>
             )}
+          </div>
+          <div className="grid gap-3 mt-4">
+            <label className="text-sm">Active session duration (minutes)</label>
+            <select
+              className="rounded-lg border border-input bg-background px-3 py-2"
+              value={duration}
+              onChange={(e)=> setDuration(Number(e.target.value))}
+            >
+              {Array.from({length:10}, (_,i)=>i+1).map(m => (
+                <option key={m} value={m}>{m} minute{m>1?"s":""}</option>
+              ))}
+            </select>
           </div>
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
