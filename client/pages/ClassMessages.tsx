@@ -54,19 +54,6 @@ export default function ClassMessages() {
     finally { setPosting(false); }
   }
 
-  async function postComment(mid: string) {
-    const txt = (commentText[mid] || "").trim();
-    if (!txt) return;
-    try {
-      const r = await fetch(`/api/messages/${mid}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ content: txt }) });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d?.message || r.statusText);
-      setMessages(prev => prev.map(m => m.id === mid ? { ...m, comments: [...(m.comments||[]), d.comment] } : m));
-      setCommentText(prev => ({ ...prev, [mid]: "" }));
-    } catch (e: any) {
-      setError(e.message);
-    }
-  }
 
   return (
     <main className="container mx-auto py-8">
