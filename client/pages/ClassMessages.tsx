@@ -113,10 +113,13 @@ export default function ClassMessages() {
                 onChange={(e)=>{
                   const picked = Array.from(e.target.files || []);
                   const valid = picked.filter(f => f.size <= MAX_SIZE);
+                  const rejected = picked.length - valid.length;
                   setFiles(prev => {
-                    const merged = [...prev, ...valid];
+                    const remaining = MAX_FILES - prev.length;
+                    const merged = [...prev, ...valid.slice(0, Math.max(0, remaining))];
                     return merged.slice(0, MAX_FILES);
                   });
+                  if (rejected > 0) setError(`Some files were too large (max ${(MAX_SIZE/1024/1024).toFixed(1)}MB each).`);
                   if (e.target) (e.target as HTMLInputElement).value = "";
                 }}
               />
@@ -197,9 +200,12 @@ export default function ClassMessages() {
                         multiple
                         className="hidden"
                         onChange={(e)=>{
-                          const picked = Array.from(e.target.files || []).filter(f => f.size <= MAX_SIZE);
+                          const incoming = Array.from(e.target.files || []);
+                          const valid = incoming.filter(f => f.size <= MAX_SIZE);
+                          const rejected = incoming.length - valid.length;
                           const remaining = Math.max(0, MAX_FILES - editAttachments.length - editNewFiles.length);
-                          setEditNewFiles(prev => [...prev, ...picked.slice(0, remaining)]);
+                          setEditNewFiles(prev => [...prev, ...valid.slice(0, remaining)]);
+                          if (rejected > 0) setError(`Some files were too large (max ${(MAX_SIZE/1024/1024).toFixed(1)}MB each).`);
                           if (e.target) (e.target as HTMLInputElement).value = "";
                         }}
                       />
