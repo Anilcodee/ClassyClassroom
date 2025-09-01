@@ -125,6 +125,7 @@ export default function Classes() {
 function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [students, setStudents] = useState<NewStudent[]>([{ name: "", rollNo: "" }]);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
