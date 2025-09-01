@@ -120,3 +120,17 @@ export const addComment: RequestHandler = async (req: AuthRequest, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const deleteMessage: RequestHandler = async (req: AuthRequest, res) => {
+  if (mongoose.connection.readyState !== 1)
+    return res.status(503).json({ message: "Database not connected" });
+  try {
+    const { messageId } = req.params as { messageId: string };
+    const deleted = await Message.findOneAndDelete({ _id: messageId, teacherId: (req as any).userId }).lean();
+    if (!deleted) return res.status(404).json({ message: "Message not found or unauthorized" });
+    res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Server error" });
+  }
+};
