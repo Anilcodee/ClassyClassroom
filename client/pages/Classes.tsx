@@ -21,7 +21,7 @@ export default function Classes() {
       const res = await fetch("/api/classes", { headers });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || (res.status === 401 ? "Please log in" : "Failed to load"));
-      setClasses(data.classes.map((c: any) => ({ id: c._id, name: c.name, joinCode: c.joinCode, isActive: c.isActive })));
+      setClasses(data.classes.map((c: any) => ({ id: c._id, name: c.name, joinCode: c.joinCode, isActive: c.isActive, imageUrl: c.imageUrl })));
     } catch (e: any) {
       setError(e.message || "Network error");
     } finally {
