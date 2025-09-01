@@ -74,6 +74,72 @@ export default function Classes() {
             </div>
           </div>
         </aside>
+        <div className="md:col-span-3">
+          <h2 className="mt-8 mb-3 text-lg font-semibold">Your classes</h2>
+          {loading ? (
+            <p className="text-sm text-foreground/70">Loading…</p>
+          ) : error ? (
+            <p className="text-sm text-destructive">{error}</p>
+          ) : classes.length === 0 ? (
+            <p className="text-sm text-foreground/70">No classes yet. Create one to get started.</p>
+          ) : (
+            <ul className="space-y-3">
+              {classes.map((c) => (
+                <li
+                  key={c.id}
+                  className="rounded-xl border border-border hover:bg-accent cursor-pointer overflow-hidden relative"
+                  onClick={() => (window.location.href = `/classes/${c.id}`)}
+                  style={{ minHeight: "10rem" }}
+                >
+                  {c.imageUrl ? (
+                    <div className="w-full h-28 md:h-40">
+                      <img src={c.imageUrl} alt="Class cover" className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="w-full h-10 bg-muted/50" />
+                  )}
+                  <div className="p-5">
+                    <p className="font-medium">{c.name}</p>
+                    <div className="mt-2 text-xs text-foreground/60 flex items-center gap-2">
+                      <span className="relative inline-flex items-center">
+                        <button
+                          className="p-1 rounded border border-border hover:bg-accent group"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const code = c.joinCode;
+                            navigator.clipboard.writeText(code).then(() => {
+                              toast({ title: "Copied", description: "Join code copied" });
+                            }).catch(() => {
+                              try {
+                                const ta = document.createElement("textarea");
+                                ta.value = code; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+                                toast({ title: "Copied", description: "Join code copied" });
+                              } catch {}
+                            });
+                          }}
+                          onMouseEnter={(e) => {
+                            e.stopPropagation();
+                            setShowCodeFor(c.id);
+                          }}
+                          onMouseLeave={() => setShowCodeFor("")}
+                          title="Copy join code"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        {showCodeFor === c.id && (
+                          <span className="absolute left-full ml-2 font-mono px-1.5 py-0.5 rounded bg-muted text-foreground/80 shadow">
+                            {c.joinCode}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                  <span className={"absolute top-2 right-2 text-xs px-2 py-1 rounded-full " + (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")}>{c.isActive ? "Active" : "Inactive"}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </main>
   );
