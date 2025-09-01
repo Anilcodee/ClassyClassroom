@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { toast } from "@/hooks/use-toast";
 
 interface ClassItem { id: string; name: string; joinCode: string; isActive: boolean; imageUrl?: string }
@@ -30,7 +30,7 @@ export default function Classes() {
     }
   }
 
-  useEffect(() => { void load(); }, []);
+  React.useEffect(() => { void load(); }, []);
 
   const [imagePickFor, setImagePickFor] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
