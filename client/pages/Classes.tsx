@@ -36,7 +36,6 @@ export default function Classes() {
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
           <MakeClassCard onCreated={load} />
-          <h2 className="mt-8 mb-3 text-lg font-semibold">Your classes</h2>
         </div>
         <aside className="md:col-span-1">
           <div className="rounded-2xl border border-border p-5 bg-card shadow">
