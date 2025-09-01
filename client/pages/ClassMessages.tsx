@@ -83,11 +83,13 @@ export default function ClassMessages() {
 
   async function saveEdit(mid: string) {
     try {
-      const r = await fetch(`/api/messages/${mid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ title: editTitle || undefined, content: editContent }) });
+      const newAtts = await readFiles(editNewFiles);
+      const combined = [...editAttachments, ...newAtts].slice(0, MAX_FILES);
+      const r = await fetch(`/api/messages/${mid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ title: editTitle || undefined, content: editContent, attachments: combined }) });
       const d = await r.json();
       if (!r.ok) throw new Error(d?.message || r.statusText);
       setMessages(prev => prev.map(m => m.id === mid ? d.message : m));
-      setEditingId(null); setEditTitle(""); setEditContent("");
+      setEditingId(null); setEditTitle(""); setEditContent(""); setEditAttachments([]); setEditNewFiles([]);
     } catch (e: any) {
       setError(e.message);
     }
