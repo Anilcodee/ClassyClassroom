@@ -31,8 +31,40 @@ export default function Classes() {
 
   useEffect(() => { void load(); }, []);
 
+  const [imagePickFor, setImagePickFor] = useState<string | null>(null);
+  const fileRef = (typeof window !== "undefined" ? (require("react") as typeof import("react")).useRef<HTMLInputElement>(null) : { current: null });
+
+  async function handlePickedFile(file: File, classId: string) {
+    const reader = new FileReader();
+    const dataUrl: string = await new Promise((resolve, reject) => {
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => reject(new Error("Read failed"));
+      reader.readAsDataURL(file);
+    });
+    try {
+      const token = localStorage.getItem("token");
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const res = await fetch(`/api/classes/${classId}/image`, { method: "PATCH", headers, body: JSON.stringify({ imageUrl: dataUrl }) });
+      const d = await res.json().catch(()=>({}));
+      if (!res.ok) throw new Error(d?.message || res.statusText);
+      toast({ title: "Image added" });
+      await load();
+    } catch (e: any) {
+      toast({ title: "Failed to add image", description: e.message || "" });
+    } finally {
+      setImagePickFor(null);
+      if ((fileRef as any).current) (fileRef as any).current.value = "";
+    }
+  }
+
   return (
     <main className="container mx-auto py-10">
+      <input ref={fileRef as any} type="file" accept="image/*" className="hidden" onChange={(e)=>{
+        const f = e.target.files?.[0];
+        if (!f || !imagePickFor) return;
+        void handlePickedFile(f, imagePickFor);
+      }} />
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
           <MakeClassCard onCreated={load} />
