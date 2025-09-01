@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import React, { useRef, useState } from "react";
+import React from "react";
 import { toast } from "@/hooks/use-toast";
 
 interface ClassItem { id: string; name: string; joinCode: string; isActive: boolean; imageUrl?: string }
 interface NewStudent { name: string; rollNo: string }
 
 export default function Classes() {
-  const [classes, setClasses] = useState<ClassItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedId, setSelectedId] = useState<string>("");
-  const [showCodeFor, setShowCodeFor] = useState<string>("");
+  const [classes, setClasses] = React.useState<ClassItem[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+  const [selectedId, setSelectedId] = React.useState<string>("");
+  const [showCodeFor, setShowCodeFor] = React.useState<string>("");
 
   async function load() {
     setLoading(true);
@@ -30,10 +30,10 @@ export default function Classes() {
     }
   }
 
-  React.useEffect(() => { void load(); }, []);
+  React.React.useEffect(() => { void load(); }, []);
 
-  const [imagePickFor, setImagePickFor] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [imagePickFor, setImagePickFor] = React.useState<string | null>(null);
+  const fileRef = React.useRef<HTMLInputElement>(null);
 
   async function handlePickedFile(file: File, classId: string) {
     const reader = new FileReader();
@@ -187,12 +187,12 @@ export default function Classes() {
 }
 
 function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void }) {
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [coverDataUrl, setCoverDataUrl] = useState<string>("");
-  const [students, setStudents] = useState<NewStudent[]>([{ name: "", rollNo: "" }]);
-  const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
+  const [open, setOpen] = React.useState(false);
+  const [name, setName] = React.useState("");
+  const [coverDataUrl, setCoverDataUrl] = React.useState<string>("");
+  const [students, setStudents] = React.useState<NewStudent[]>([{ name: "", rollNo: "" }]);
+  const [saving, setSaving] = React.useState(false);
+  const [err, setErr] = React.useState<string | null>(null);
 
   function setStudent(i: number, patch: Partial<NewStudent>) {
     setStudents((prev) => prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
