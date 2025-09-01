@@ -100,7 +100,7 @@ export default function ClassMessages() {
 
   return (
     <main className="container mx-auto py-8">
-      <Link to="/" className="text-sm text-foreground/70 hover:text-foreground">← Back to home</Link>
+      <Link to="/classes" className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
       <h1 className="mt-2 text-2xl font-bold">Messages</h1>
       <div className="mt-4 rounded-xl border border-border p-4">
         <div className="grid gap-2">
