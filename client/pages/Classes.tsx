@@ -10,6 +10,7 @@ export default function Classes() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string>("");
+  const [showCodeFor, setShowCodeFor] = useState<string>("");
 
   async function load() {
     setLoading(true);
