@@ -11,7 +11,7 @@ import { activateClass, sessionStatus, markAttendance } from "./routes/attendanc
 import { getTodayAttendance } from "./routes/attendance.today";
 import { listAttendanceDates, classAttendancePdf, classAttendancePdfAll } from "./routes/attendance.pdf";
 import { getAttendanceForDate } from "./routes/attendance.view";
-import { listMessages, createMessage } from "./routes/messages";
+import { listMessages, createMessage, addComment } from "./routes/messages";
 import { dbHealth } from "./routes/health";
 import { listStudentClasses, joinClass } from "./routes/student";
 import { updateClassDetails } from "./routes/classes.update";
