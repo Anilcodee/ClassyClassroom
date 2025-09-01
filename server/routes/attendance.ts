@@ -28,7 +28,8 @@ export const activateClass: RequestHandler = async (req: AuthRequest, res) => {
       await cls.save();
     }
 
-    const expiresAt = new Date(Date.now() + 4 * 60 * 1000);
+    const minutes = Math.max(1, Math.min(10, (cls as any).durationMinutes || 4));
+    const expiresAt = new Date(Date.now() + minutes * 60 * 1000);
     const session = await AttendanceSession.create({ classId: cls.id, expiresAt, isActive: true });
     cls.isActive = true;
     cls.activeSession = session._id;
