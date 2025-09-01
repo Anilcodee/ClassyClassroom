@@ -31,6 +31,7 @@ const ClassSchema = new Schema<IClass>(
     students: { type: [StudentSchema], default: [] },
     isActive: { type: Boolean, default: false },
     activeSession: { type: Schema.Types.ObjectId, ref: "AttendanceSession", default: null },
+    imageUrl: { type: String },
   },
   { timestamps: true }
 );
