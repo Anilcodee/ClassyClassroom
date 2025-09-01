@@ -127,14 +127,22 @@ export default function ClassMessages() {
               {m.attachments && m.attachments.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {m.attachments.map((a, idx) => (
-                    <a key={idx} href={a.dataUrl} download={a.name} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-border text-xs hover:bg-accent">
-                      {a.type.startsWith('image/') ? (
-                        <img src={a.dataUrl} alt={a.name} className="h-10 w-10 object-cover rounded" />
-                      ) : (
-                        <span className="px-2 py-1 rounded bg-muted text-foreground/80">File</span>
-                      )}
-                      <span className="max-w-[12rem] truncate">{a.name}</span>
-                    </a>
+                    <div key={idx} className="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-border text-xs hover:bg-accent">
+                      <button
+                        type="button"
+                        onClick={() => setPreview({ name: a.name, type: a.type, url: a.dataUrl })}
+                        className="inline-flex items-center gap-2"
+                        title="Preview"
+                      >
+                        {a.type.startsWith('image/') ? (
+                          <img src={a.dataUrl} alt={a.name} className="h-10 w-10 object-cover rounded" />
+                        ) : (
+                          <span className="px-2 py-1 rounded bg-muted text-foreground/80">File</span>
+                        )}
+                        <span className="max-w-[12rem] truncate text-left">{a.name}</span>
+                      </button>
+                      <a href={a.dataUrl} download={a.name} className="px-1.5 py-0.5 rounded border border-border">Download</a>
+                    </div>
                   ))}
                 </div>
               )}
