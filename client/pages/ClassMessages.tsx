@@ -15,6 +15,8 @@ export default function ClassMessages() {
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const MAX_FILES = 4;
+  const MAX_SIZE = 1.5 * 1024 * 1024; // ~1.5MB per file
 
   async function load() {
     setLoading(true); setError(null);
@@ -30,8 +32,7 @@ export default function ClassMessages() {
   useEffect(() => { void load(); }, [id, token]);
 
   async function readFiles(fs: File[]): Promise<Attachment[]> {
-    const MAX = 4; const MAX_SIZE = 1.5 * 1024 * 1024;
-    const picked = fs.slice(0, MAX).filter(f => f.size <= MAX_SIZE);
+    const picked = fs.slice(0, MAX_FILES).filter(f => f.size <= MAX_SIZE);
     const res: Attachment[] = await Promise.all(picked.map(f => new Promise<Attachment>((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve({ name: f.name, type: f.type || "application/octet-stream", size: f.size, dataUrl: String(reader.result || "") });
@@ -66,7 +67,20 @@ export default function ClassMessages() {
           <div className="flex items-center gap-2">
             <label className="px-3 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground cursor-pointer text-sm">
               Attach files
-              <input type="file" multiple className="hidden" onChange={(e)=> setFiles(Array.from(e.target.files || []))} />
+              <input
+                type="file"
+                multiple
+                className="hidden"
+                onChange={(e)=>{
+                  const picked = Array.from(e.target.files || []);
+                  const valid = picked.filter(f => f.size <= MAX_SIZE);
+                  setFiles(prev => {
+                    const merged = [...prev, ...valid];
+                    return merged.slice(0, MAX_FILES);
+                  });
+                  if (e.target) (e.target as HTMLInputElement).value = "";
+                }}
+              />
             </label>
             <button disabled={!content.trim() || posting} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-50" onClick={post}>{posting? 'Posting…' : 'Post'}</button>
             {error && <span className="text-sm text-destructive">{error}</span>}
@@ -74,7 +88,17 @@ export default function ClassMessages() {
           {files.length > 0 && (
             <div className="flex flex-wrap gap-2 text-xs text-foreground/70">
               {files.map((f,i)=> (
-                <span key={i} className="px-2 py-1 rounded border border-border bg-muted/50">{f.name} ({Math.round(f.size/1024)} KB)</span>
+                <span key={i} className="inline-flex items-center gap-2 px-2 py-1 rounded border border-border bg-muted/50">
+                  <span className="max-w-[12rem] truncate">{f.name} ({Math.round(f.size/1024)} KB)</span>
+                  <button
+                    type="button"
+                    aria-label="Remove file"
+                    className="h-5 w-5 leading-none grid place-items-center rounded hover:bg-destructive/10 text-destructive"
+                    onClick={()=> setFiles(prev => prev.filter((_, idx) => idx !== i))}
+                  >
+                    ×
+                  </button>
+                </span>
               ))}
             </div>
           )}
