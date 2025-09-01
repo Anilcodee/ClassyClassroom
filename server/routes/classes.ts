@@ -20,10 +20,11 @@ export const createClass: RequestHandler = async (req: AuthRequest, res) => {
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
   try {
-    const { name, students, imageUrl } = req.body as { name: string; students?: { name: string; rollNo: string }[]; imageUrl?: string };
+    const { name, students, imageUrl, durationMinutes } = req.body as { name: string; students?: { name: string; rollNo: string }[]; imageUrl?: string; durationMinutes?: number };
     if (!name) return res.status(400).json({ message: "Name is required" });
     const joinCode = crypto.randomBytes(4).toString("hex");
-    const cls = await ClassModel.create({ name, teacher: req.userId, students: students || [], joinCode, imageUrl });
+    const dm = Math.max(1, Math.min(10, Number(durationMinutes || 4)));
+    const cls = await ClassModel.create({ name, teacher: req.userId, students: students || [], joinCode, imageUrl, durationMinutes: dm });
     res.status(201).json({ class: cls });
   } catch (e) {
     console.error(e);
