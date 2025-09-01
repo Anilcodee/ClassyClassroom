@@ -21,7 +21,7 @@ export default function ClassMessages() {
   const [editAttachments, setEditAttachments] = useState<Attachment[]>([]);
   const [editNewFiles, setEditNewFiles] = useState<File[]>([]);
   const MAX_FILES = 4;
-  const MAX_SIZE = 1.5 * 1024 * 1024; // ~1.5MB per file
+  const MAX_SIZE = 4 * 1024 * 1024; // ~4MB per file
 
   const [preview, setPreview] = useState<{ name: string; type: string; url: string; text?: string } | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
