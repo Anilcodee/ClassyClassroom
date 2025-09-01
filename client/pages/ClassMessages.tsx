@@ -115,10 +115,6 @@ export default function ClassMessages() {
                   ))}
                   {(m.comments||[]).length === 0 && <li className="text-sm text-foreground/60">No comments yet.</li>}
                 </ul>
-                <div className="mt-2 flex items-center gap-2">
-                  <input className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm" placeholder="Write a comment" value={commentText[m.id] || ""} onChange={(e)=> setCommentText(prev => ({ ...prev, [m.id]: e.target.value }))} />
-                  <button className="px-3 py-2 rounded-lg border border-border text-sm" onClick={()=> postComment(m.id)}>Comment</button>
-                </div>
               </div>
             </li>
           ))}
