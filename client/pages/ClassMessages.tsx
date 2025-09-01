@@ -18,6 +18,8 @@ export default function ClassMessages() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
+  const [editAttachments, setEditAttachments] = useState<Attachment[]>([]);
+  const [editNewFiles, setEditNewFiles] = useState<File[]>([]);
   const MAX_FILES = 4;
   const MAX_SIZE = 1.5 * 1024 * 1024; // ~1.5MB per file
 
