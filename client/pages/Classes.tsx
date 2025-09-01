@@ -30,7 +30,7 @@ export default function Classes() {
     }
   }
 
-  React.React.useEffect(() => { void load(); }, []);
+  React.useEffect(() => { void load(); }, []);
 
   const [imagePickFor, setImagePickFor] = React.useState<string | null>(null);
   const fileRef = React.useRef<HTMLInputElement>(null);
