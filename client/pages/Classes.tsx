@@ -19,7 +19,7 @@ export default function Classes() {
       const token = localStorage.getItem("token");
       const headers: Record<string, string> = {};
       if (token) headers.Authorization = `Bearer ${token}`;
-      const res = await fetch("/api/classes", { headers });
+      const res = await fetch("/api/classes", { headers, cache: "no-store" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || (res.status === 401 ? "Please log in" : "Failed to load"));
       setClasses(data.classes.map((c: any) => ({ id: c._id, name: c.name, joinCode: c.joinCode, isActive: c.isActive, imageUrl: c.imageUrl })));
@@ -50,7 +50,8 @@ export default function Classes() {
       const d = await res.json().catch(()=>({}));
       if (!res.ok) throw new Error(d?.message || res.statusText);
       toast({ title: "Image added" });
-      await load();
+      // Optimistically update UI
+      setClasses((prev) => prev.map((c) => (c.id === classId ? { ...c, imageUrl: dataUrl } : c)));
     } catch (e: any) {
       toast({ title: "Failed to add image", description: e.message || "" });
     } finally {
