@@ -22,13 +22,57 @@ export const signup: RequestHandler = async (req, res) => {
     const roleToUse: "teacher" | "student" = isStudentPath || role === "student" ? "student" : "teacher";
     if (roleToUse === "student" && !rollNo) return res.status(400).json({ message: "Roll number required for students" });
     const existing = await User.findOne({ email: emailNorm });
-    if (existing) return res.status(409).json({ message: "Email already in use" });
+    if (existing) {
+      // User exists: require matching password, then enable the requested role flag
+      const ok = await bcrypt.compare(password, existing.passwordHash);
+      if (!ok) return res.status(401).json({ message: "Invalid password for existing account" });
+      if (roleToUse === "student") {
+        if (existing.isStudent || (existing as any).role === "student")
+          return res.status(409).json({ message: "Student account already exists for this email" });
+        existing.isStudent = true;
+        if (rollNo) existing.rollNo = rollNo;
+      } else {
+        if (existing.isTeacher || (existing as any).role === "teacher")
+          return res.status(409).json({ message: "Teacher account already exists for this email" });
+        existing.isTeacher = true;
+      }
+      await existing.save();
+      const token = jwt.sign({ id: existing.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
+      return res.status(201).json({
+        token,
+        user: {
+          id: existing.id,
+          email: existing.email,
+          name: existing.name,
+          role: roleToUse,
+          isTeacher: !!existing.isTeacher,
+          isStudent: !!existing.isStudent,
+          rollNo: existing.rollNo || null,
+        },
+      });
+    }
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await User.create({ email: emailNorm, name: nameNorm, passwordHash, role: roleToUse, rollNo });
+    const user = await User.create({
+      email: emailNorm,
+      name: nameNorm,
+      passwordHash,
+      role: roleToUse,
+      isTeacher: roleToUse === "teacher",
+      isStudent: roleToUse === "student",
+      rollNo: roleToUse === "student" ? rollNo : undefined,
+    } as any);
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
     res.status(201).json({
       token,
-      user: { id: user.id, email: user.email, name: user.name, role: user.role, rollNo: user.rollNo || null },
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: roleToUse,
+        isTeacher: !!user.isTeacher,
+        isStudent: !!user.isStudent,
+        rollNo: user.rollNo || null,
+      },
     });
   } catch (e: any) {
     console.error("Signup error:", e);
@@ -46,18 +90,33 @@ export const login: RequestHandler = async (req, res) => {
     if (!emailNorm || !password) return res.status(400).json({ message: "Missing fields" });
     const user = await User.findOne({ email: emailNorm });
     if (!user) return res.status(401).json({ message: "Invalid email or password" });
-    const userRole = ((user as any).role || "teacher") as "teacher" | "student";
-    const isStudentLogin = (req.originalUrl || "").includes("/login/student");
-    const isTeacherLogin = (req.originalUrl || "").includes("/login/teacher");
-    if ((isStudentLogin && userRole !== "student") || (isTeacherLogin && userRole !== "teacher") || (role && role !== userRole)) {
-      return res.status(403).json({ message: `Please use the ${userRole} login` });
-    }
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) return res.status(401).json({ message: "Invalid email or password" });
+
+    const isStudentLogin = (req.originalUrl || "").includes("/login/student") || role === "student";
+    const isTeacherLogin = (req.originalUrl || "").includes("/login/teacher") || role === "teacher";
+    const hasStudent = !!(user as any).isStudent || (user as any).role === "student";
+    const hasTeacher = !!(user as any).isTeacher || (user as any).role === "teacher";
+
+    if (isStudentLogin && !hasStudent) {
+      return res.status(404).json({ message: "No student account found for this email" });
+    }
+    if (isTeacherLogin && !hasTeacher) {
+      return res.status(404).json({ message: "No teacher account found for this email" });
+    }
+
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
     res.json({
       token,
-      user: { id: user.id, email: user.email, name: user.name, role: (user as any).role, rollNo: (user as any).rollNo || null },
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: isStudentLogin ? "student" : isTeacherLogin ? "teacher" : ((user as any).role || "teacher"),
+        isTeacher: hasTeacher,
+        isStudent: hasStudent,
+        rollNo: (user as any).rollNo || null,
+      },
     });
   } catch (e: any) {
     console.error("Login error:", e);
