@@ -5,7 +5,7 @@ import { handleDemo } from "./routes/demo";
 import { connectDB } from "./db";
 import { signup, login, signupStudent, signupTeacher, loginStudent, loginTeacher } from "./routes/auth";
 import { requireAuth } from "./middleware/auth";
-import { listClasses, createClass } from "./routes/classes";
+import { listClasses, createClass, updateClassImage } from "./routes/classes";
 import { getClass } from "./routes/classes.get-by-id";
 import { activateClass, sessionStatus, markAttendance } from "./routes/attendance";
 import { getTodayAttendance } from "./routes/attendance.today";
