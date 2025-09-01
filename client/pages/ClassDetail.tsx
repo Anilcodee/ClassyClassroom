@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
-interface ClassDoc { _id: string; name: string; students: { name: string; rollNo: string }[]; isActive: boolean; activeSession?: string | null; }
+interface ClassDoc { _id: string; name: string; students: { name: string; rollNo: string }[]; isActive: boolean; activeSession?: string | null; imageUrl?: string }
 
 export default function ClassDetail() {
   const { id } = useParams();
