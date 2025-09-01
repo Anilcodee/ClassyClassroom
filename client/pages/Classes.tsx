@@ -33,8 +33,8 @@ export default function Classes() {
 
   return (
     <main className="container mx-auto py-10">
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
+      <div className="grid gap-6">
+        <div className="col-span-1">
           <MakeClassCard onCreated={load} />
           <h2 className="mt-8 mb-3 text-lg font-semibold">Your classes</h2>
           {loading ? (
