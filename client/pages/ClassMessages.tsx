@@ -79,9 +79,21 @@ export default function ClassMessages() {
   }
 
 
+  async function saveEdit(mid: string) {
+    try {
+      const r = await fetch(`/api/messages/${mid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ title: editTitle || undefined, content: editContent }) });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d?.message || r.statusText);
+      setMessages(prev => prev.map(m => m.id === mid ? d.message : m));
+      setEditingId(null); setEditTitle(""); setEditContent("");
+    } catch (e: any) {
+      setError(e.message);
+    }
+  }
+
   return (
     <main className="container mx-auto py-8">
-      <Link to={`/classes/${id}`} className="text-sm text-foreground/70 hover:text-foreground">← Back to class</Link>
+      <Link to="/" className="text-sm text-foreground/70 hover:text-foreground">← Back to home</Link>
       <h1 className="mt-2 text-2xl font-bold">Messages</h1>
       <div className="mt-4 rounded-xl border border-border p-4">
         <div className="grid gap-2">
@@ -145,8 +157,31 @@ export default function ClassMessages() {
         <ul className="mt-4 space-y-3">
           {messages.map((m) => (
             <li key={m.id} className="rounded-xl border border-border p-4">
-              {m.title && <p className="font-semibold">{m.title}</p>}
-              <p className="whitespace-pre-wrap text-foreground/90">{m.content}</p>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  {editingId === m.id ? (
+                    <>
+                      <input className="w-full rounded-lg border border-input bg-background px-3 py-2 mb-2" placeholder="Title (optional)" value={editTitle} onChange={(e)=>setEditTitle(e.target.value)} />
+                      <textarea className="w-full rounded-lg border border-input bg-background px-3 py-2 min-h-24" value={editContent} onChange={(e)=>setEditContent(e.target.value)} />
+                    </>
+                  ) : (
+                    <>
+                      {m.title && <p className="font-semibold">{m.title}</p>}
+                      <p className="whitespace-pre-wrap text-foreground/90">{m.content}</p>
+                    </>
+                  )}
+                </div>
+                <div className="shrink-0">
+                  {editingId === m.id ? (
+                    <div className="flex items-center gap-2">
+                      <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>saveEdit(m.id)}>Save</button>
+                      <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(null); setEditTitle(""); setEditContent(""); }}>Cancel</button>
+                    </div>
+                  ) : (
+                    <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(m.id); setEditTitle(m.title || ""); setEditContent(m.content); }}>Edit post</button>
+                  )}
+                </div>
+              </div>
               {m.attachments && m.attachments.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {m.attachments.map((a, idx) => (
@@ -169,7 +204,7 @@ export default function ClassMessages() {
                   ))}
                 </div>
               )}
-              <p className="mt-1 text-xs text-foreground/60">{new Date(m.createdAt).toLocaleString()}</p>
+              <p className="mt-1 text-xs text-foreground/60">{m.updatedAt && new Date(m.updatedAt).getTime() > new Date(m.createdAt).getTime() ? `${new Date(m.updatedAt).toLocaleString()} (edited)` : new Date(m.createdAt).toLocaleString()}</p>
 
               <div className="mt-3 border-t border-border pt-3">
                 <p className="text-sm font-medium">Comments</p>
