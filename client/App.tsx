@@ -18,6 +18,9 @@ import AttendanceHistory from "./pages/AttendanceHistory";
 import StudentAuth from "./pages/StudentAuth";
 import StudentDashboard from "./pages/StudentDashboard";
 import GetStarted from "./pages/GetStarted";
+import ClassAttendance from "./pages/ClassAttendance";
+import ClassMessages from "./pages/ClassMessages";
+import ModifyClass from "./pages/ModifyClass";
 
 const queryClient = new QueryClient();
 
