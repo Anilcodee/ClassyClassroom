@@ -101,7 +101,19 @@ export default function ClassMessages() {
             <div className="flex flex-wrap gap-2 text-xs text-foreground/70">
               {files.map((f,i)=> (
                 <span key={i} className="inline-flex items-center gap-2 px-2 py-1 rounded border border-border bg-muted/50">
-                  <span className="max-w-[12rem] truncate">{f.name} ({Math.round(f.size/1024)} KB)</span>
+                  <button
+                    type="button"
+                    className="max-w-[12rem] truncate text-left hover:underline"
+                    onClick={() => {
+                      const url = f.type.startsWith('image/') || f.type === 'application/pdf' || f.type.startsWith('text/') || f.type === 'application/json'
+                        ? URL.createObjectURL(f)
+                        : URL.createObjectURL(f);
+                      setPreview({ name: f.name, type: f.type || 'application/octet-stream', url });
+                    }}
+                    title="Preview"
+                  >
+                    {f.name} ({Math.round(f.size/1024)} KB)
+                  </button>
                   <button
                     type="button"
                     aria-label="Remove file"
