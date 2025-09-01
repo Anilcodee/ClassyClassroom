@@ -125,7 +125,7 @@ export default function Classes() {
               {classes.map((c) => (
                 <li
                   key={c.id}
-                  className="rounded-xl border border-border hover:bg-accent overflow-hidden relative"
+                  className="rounded-xl border border-border overflow-hidden relative"
                   style={{ minHeight: "10rem" }}
 >
                   {!c.imageUrl && (
