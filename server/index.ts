@@ -69,6 +69,7 @@ export function createServer() {
   app.get("/api/classes/:id/messages", requireAuth, listMessages);
   app.post("/api/classes/:id/messages", requireAuth, createMessage);
   app.patch("/api/messages/:messageId", requireAuth, updateMessage);
+  app.delete("/api/messages/:messageId", requireAuth, deleteMessage);
   app.post("/api/messages/:messageId/comments", requireAuth, addComment);
 
   // Student
