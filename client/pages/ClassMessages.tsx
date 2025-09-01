@@ -98,6 +98,20 @@ export default function ClassMessages() {
     }
   }
 
+  async function del(mid: string) {
+    if (!confirm("Delete this post?")) return;
+    try {
+      const r = await fetch(`/api/messages/${mid}`, { method: 'DELETE', headers: { Authorization: token ? `Bearer ${token}` : "" } });
+      if (!r.ok) {
+        const d = await r.json().catch(()=>({}));
+        throw new Error(d?.message || r.statusText);
+      }
+      setMessages(prev => prev.filter(m => m.id !== mid));
+    } catch (e: any) {
+      setError(e.message);
+    }
+  }
+
   return (
     <main className="container mx-auto py-8">
       <Link to="/classes" className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
