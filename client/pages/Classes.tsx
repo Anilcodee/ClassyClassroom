@@ -182,6 +182,33 @@ export default function Classes() {
                     </div>
                   </div>
                   <span className={"absolute top-2 right-2 text-xs px-2 py-1 rounded-full " + (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")}>{c.isActive ? "Active" : "Inactive"}</span>
+                {/* Action buttons bottom-right */}
+                <div className="absolute bottom-3 right-3 z-10 flex flex-col gap-2">
+                  <Link
+                    to={`/classes/${c.id}/attendance`}
+                    onClick={(e)=>e.stopPropagation()}
+                    className="px-2.5 py-1.5 rounded-md text-xs bg-primary text-primary-foreground hover:opacity-90 text-center"
+                    title="View attendance"
+                  >
+                    Attendance
+                  </Link>
+                  <Link
+                    to={`/classes/${c.id}/messages`}
+                    onClick={(e)=>e.stopPropagation()}
+                    className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground hover:opacity-90 text-center"
+                    title="Messages"
+                  >
+                    Messages
+                  </Link>
+                  <Link
+                    to={`/classes/${c.id}/modify`}
+                    onClick={(e)=>e.stopPropagation()}
+                    className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background hover:bg-accent hover:text-accent-foreground text-center"
+                    title="Modify class"
+                  >
+                    Modify
+                  </Link>
+                </div>
                 </li>
               ))}
             </ul>
