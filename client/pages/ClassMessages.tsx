@@ -18,6 +18,18 @@ export default function ClassMessages() {
   const MAX_FILES = 4;
   const MAX_SIZE = 1.5 * 1024 * 1024; // ~1.5MB per file
 
+  const [preview, setPreview] = useState<{ name: string; type: string; url: string; text?: string } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    if (!preview) return;
+    if (preview.type.startsWith("text/") || preview.type === "application/json") {
+      // Fetch text if data URL or object URL
+      fetch(preview.url).then(r => r.text()).then(t => { if (active) setPreview(prev => prev ? { ...prev, text: t } : prev); }).catch(()=>{});
+    }
+    return () => { active = false; };
+  }, [preview?.url, preview?.type]);
+
   async function load() {
     setLoading(true); setError(null);
     try {
