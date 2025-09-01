@@ -13,6 +13,7 @@ export interface IClass extends Document {
   isActive: boolean;
   activeSession?: Types.ObjectId | null;
   imageUrl?: string;
+  durationMinutes: number;
 }
 
 const StudentSchema = new Schema<IStudent>(
@@ -32,6 +33,7 @@ const ClassSchema = new Schema<IClass>(
     isActive: { type: Boolean, default: false },
     activeSession: { type: Schema.Types.ObjectId, ref: "AttendanceSession", default: null },
     imageUrl: { type: String },
+    durationMinutes: { type: Number, default: 4, min: 1, max: 10 },
   },
   { timestamps: true }
 );
