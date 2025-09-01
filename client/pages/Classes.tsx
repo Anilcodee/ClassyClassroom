@@ -138,7 +138,7 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
     setSaving(true); setErr(null);
     try {
       const token = localStorage.getItem("token");
-      const body = { name, students: students.filter(s => s.name && s.rollNo) };
+      const body = { name, imageUrl: imageUrl || undefined, students: students.filter(s => s.name && s.rollNo) };
       const res = await fetch("/api/classes", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },
