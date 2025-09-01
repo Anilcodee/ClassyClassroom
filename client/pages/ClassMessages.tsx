@@ -90,7 +90,11 @@ export default function ClassMessages() {
       const r = await fetch(`/api/messages/${mid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ title: editTitle || undefined, content: editContent, attachments: combined }) });
       const d = await r.json();
       if (!r.ok) throw new Error(d?.message || r.statusText);
-      setMessages(prev => prev.map(m => m.id === mid ? d.message : m));
+      const serverMsg = d.message;
+      const finalMsg = (serverMsg && Array.isArray(serverMsg.attachments) && serverMsg.attachments.length >= combined.length)
+        ? serverMsg
+        : { ...serverMsg, attachments: combined };
+      setMessages(prev => prev.map(m => m.id === mid ? finalMsg : m));
       setEditingId(null); setEditTitle(""); setEditContent(""); setEditAttachments([]); setEditNewFiles([]);
       await load();
     } catch (e: any) {
