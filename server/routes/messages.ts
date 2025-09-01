@@ -57,26 +57,26 @@ export const updateMessage: RequestHandler = async (req: AuthRequest, res) => {
     const { messageId } = req.params as { messageId: string };
     const { title, content, attachments } = req.body as { title?: string; content?: string; attachments?: Array<{ name: string; type: string; size: number; dataUrl: string }>; };
 
-    const $set: any = {};
-    if (typeof title === 'string') $set.title = title || undefined;
+    const update: any = {};
+    if (typeof title === 'string') update.$set = { ...(update.$set||{}), title: title || undefined };
     if (typeof content === 'string') {
       const trimmed = content.trim();
       if (!trimmed) return res.status(400).json({ message: "Content is required" });
-      $set.content = trimmed;
+      update.$set = { ...(update.$set||{}), content: trimmed };
     }
-    if (attachments) {
-      const atts = Array.isArray(attachments) ? attachments.slice(0, 5).map(a => ({
+    if (attachments && Array.isArray(attachments) && attachments.length > 0) {
+      const atts = attachments.slice(0, 5).map(a => ({
         name: String(a.name || "file"),
         type: String(a.type || "application/octet-stream"),
         size: Number(a.size || 0),
         dataUrl: String(a.dataUrl || ""),
-      })) : [];
-      $set.attachments = atts;
+      }));
+      update.$push = { attachments: { $each: atts } };
     }
 
     const updated = await Message.findOneAndUpdate(
       { _id: messageId, teacherId: (req as any).userId },
-      { $set },
+      update,
       { new: true }
     ).lean();
     if (!updated) return res.status(404).json({ message: "Message not found or unauthorized" });
