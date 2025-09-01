@@ -50,29 +50,39 @@ export default function Classes() {
                   <div>
                     <p className="font-medium">{c.name}</p>
                     <p className="text-xs text-foreground/60 flex items-center gap-2">
-                      <span>Join code:</span>
-                      <span className="font-mono px-1.5 py-0.5 rounded bg-muted text-foreground/80">{c.joinCode}</span>
-                      <button
-                        className="text-xs px-2 py-0.5 rounded border border-border hover:bg-accent hover:text-accent-foreground"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const code = c.joinCode;
-                          navigator.clipboard.writeText(code).then(() => {
-                            toast({ title: "Copied", description: "Join code copied to clipboard" });
-                          }).catch(async () => {
-                            try {
-                              const ta = document.createElement("textarea");
-                              ta.value = code; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
-                              toast({ title: "Copied", description: "Join code copied to clipboard" });
-                            } catch {
-                              toast({ title: "Could not copy", description: code });
-                            }
-                          });
-                        }}
-                        title="Copy join code"
-                      >
-                        Copy
-                      </button>
+                      <span className="relative inline-flex items-center">
+                        <button
+                          className="p-1 rounded border border-border hover:bg-accent group"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const code = c.joinCode;
+                            navigator.clipboard.writeText(code).then(() => {
+                              toast({ title: "Copied", description: "Join code copied" });
+                            }).catch(() => {
+                              try {
+                                const ta = document.createElement("textarea");
+                                ta.value = code; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+                                toast({ title: "Copied", description: "Join code copied" });
+                              } catch {}
+                            });
+                          }}
+                          onMouseEnter={(e) => {
+                            e.stopPropagation();
+                            setShowCodeFor(c.id);
+                            const code = c.joinCode;
+                            navigator.clipboard.writeText(code).catch(()=>{});
+                          }}
+                          onMouseLeave={() => setShowCodeFor("")}
+                          title="Copy join code"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                        {showCodeFor === c.id && (
+                          <span className="absolute left-full ml-2 font-mono px-1.5 py-0.5 rounded bg-muted text-foreground/80 shadow">
+                            {c.joinCode}
+                          </span>
+                        )}
+                      </span>
                     </p>
                   </div>
                   <span className={"text-xs px-2 py-1 rounded-full " + (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")}>{c.isActive ? "Active" : "Inactive"}</span>
