@@ -12,6 +12,7 @@ export interface IClass extends Document {
   students: IStudent[];
   isActive: boolean;
   activeSession?: Types.ObjectId | null;
+  imageUrl?: string;
 }
 
 const StudentSchema = new Schema<IStudent>(
