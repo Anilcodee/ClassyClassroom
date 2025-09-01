@@ -177,6 +177,43 @@ export default function ClassMessages() {
           {messages.length === 0 && <p className="text-sm text-foreground/70">No messages yet.</p>}
         </ul>
       )}
+      {preview && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" onClick={()=> setPreview(null)}>
+          <div className="w-full max-w-3xl max-h-[90vh] overflow-auto rounded-lg bg-background border border-border" onClick={(e)=>e.stopPropagation()}>
+            <div className="flex items-center justify-between p-3 border-b border-border">
+              <div className="text-sm font-medium truncate pr-2">{preview.name}</div>
+              <div className="flex items-center gap-2">
+                <a href={preview.url} download={preview.name} className="px-2 py-1 text-xs rounded border border-border">Download</a>
+                <button className="px-2 py-1 text-xs rounded border border-border" onClick={()=> setPreview(null)}>Close</button>
+              </div>
+            </div>
+            <div className="p-3">
+              {preview.type.startsWith('image/') && (
+                <img src={preview.url} alt={preview.name} className="max-h-[70vh] w-auto object-contain mx-auto" />
+              )}
+              {preview.type === 'application/pdf' && (
+                <iframe title="pdf" src={preview.url} className="w-full h-[70vh] rounded border border-border" />
+              )}
+              {(preview.type.startsWith('text/') || preview.type === 'application/json') && (
+                <pre className="w-full max-h-[70vh] overflow-auto rounded bg-muted p-3 text-xs whitespace-pre-wrap break-all">{preview.text ?? 'Loading…'}</pre>
+              )}
+              {preview.type.startsWith('audio/') && (
+                <audio controls className="w-full">
+                  <source src={preview.url} />
+                </audio>
+              )}
+              {preview.type.startsWith('video/') && (
+                <video controls className="w-full max-h-[70vh]">
+                  <source src={preview.url} />
+                </video>
+              )}
+              {!preview.type.match(/^(image|audio|video)\//) && !['application/pdf','application/json'].includes(preview.type) && !preview.type.startsWith('text/') && (
+                <div className="text-sm text-foreground/70">Preview not supported. Use Download.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
