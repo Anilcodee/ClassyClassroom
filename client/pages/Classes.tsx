@@ -183,7 +183,7 @@ export default function Classes() {
                   </div>
                   <span className={"absolute top-2 right-2 text-xs px-2 py-1 rounded-full " + (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")}>{c.isActive ? "Active" : "Inactive"}</span>
                 {/* Action buttons bottom-right */}
-                <div className="absolute bottom-3 right-3 z-10 flex flex-col gap-2">
+                <div className="absolute bottom-3 right-3 z-10 flex flex-row gap-2">
                   <Link
                     to={`/classes/${c.id}/attendance`}
                     onClick={(e)=>e.stopPropagation()}
