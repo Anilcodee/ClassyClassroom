@@ -179,34 +179,101 @@ export default function ClassMessages() {
                   {editingId === m.id ? (
                     <div className="flex items-center gap-2">
                       <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>saveEdit(m.id)}>Save</button>
-                      <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(null); setEditTitle(""); setEditContent(""); }}>Cancel</button>
+                      <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(null); setEditTitle(""); setEditContent(""); setEditAttachments([]); setEditNewFiles([]); }}>Cancel</button>
                     </div>
                   ) : (
-                    <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(m.id); setEditTitle(m.title || ""); setEditContent(m.content); }}>Edit post</button>
+                    <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(m.id); setEditTitle(m.title || ""); setEditContent(m.content); setEditAttachments([...(m.attachments||[])]); setEditNewFiles([]); }}>Edit post</button>
                   )}
                 </div>
               </div>
-              {m.attachments && m.attachments.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {m.attachments.map((a, idx) => (
-                    <div key={idx} className="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-border text-xs hover:bg-accent">
-                      <button
-                        type="button"
-                        onClick={() => setPreview({ name: a.name, type: a.type, url: a.dataUrl })}
-                        className="inline-flex items-center gap-2"
-                        title="Preview"
-                      >
-                        {a.type.startsWith('image/') ? (
-                          <img src={a.dataUrl} alt={a.name} className="h-10 w-10 object-cover rounded" />
-                        ) : (
-                          <span className="px-2 py-1 rounded bg-muted text-foreground/80">File</span>
-                        )}
-                        <span className="max-w-[12rem] truncate text-left">{a.name}</span>
-                      </button>
-                      <a href={a.dataUrl} download={a.name} className="px-1.5 py-0.5 rounded border border-border">Download</a>
+
+              {editingId === m.id ? (
+                <div className="mt-2">
+                  <div className="flex items-center gap-2">
+                    <label className="px-3 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground cursor-pointer text-xs">
+                      Attach files
+                      <input
+                        type="file"
+                        multiple
+                        className="hidden"
+                        onChange={(e)=>{
+                          const picked = Array.from(e.target.files || []).filter(f => f.size <= MAX_SIZE);
+                          const remaining = Math.max(0, MAX_FILES - editAttachments.length - editNewFiles.length);
+                          setEditNewFiles(prev => [...prev, ...picked.slice(0, remaining)]);
+                          if (e.target) (e.target as HTMLInputElement).value = "";
+                        }}
+                      />
+                    </label>
+                    <span className="text-[11px] text-foreground/60">{editAttachments.length + editNewFiles.length}/{MAX_FILES} files</span>
+                  </div>
+
+                  {editAttachments.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-foreground/70">
+                      {editAttachments.map((a, i) => (
+                        <span key={i} className="inline-flex items-center gap-2 px-2 py-1 rounded border border-border bg-muted/50">
+                          <button type="button" className="max-w-[12rem] truncate text-left hover:underline" onClick={()=> setPreview({ name: a.name, type: a.type, url: a.dataUrl })}>{a.name}</button>
+                          <button
+                            type="button"
+                            className="h-5 w-5 leading-none grid place-items-center rounded hover:bg-destructive/10 text-destructive"
+                            onClick={()=> setEditAttachments(prev => prev.filter((_, idx) => idx !== i))}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  {editNewFiles.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs text-foreground/70">
+                      {editNewFiles.map((f, i) => (
+                        <span key={i} className="inline-flex items-center gap-2 px-2 py-1 rounded border border-border bg-muted/50">
+                          <button
+                            type="button"
+                            className="max-w-[12rem] truncate text-left hover:underline"
+                            onClick={() => {
+                              const url = URL.createObjectURL(f);
+                              setPreview({ name: f.name, type: f.type || 'application/octet-stream', url });
+                            }}
+                          >
+                            {f.name} ({Math.round(f.size/1024)} KB)
+                          </button>
+                          <button
+                            type="button"
+                            className="h-5 w-5 leading-none grid place-items-center rounded hover:bg-destructive/10 text-destructive"
+                            onClick={()=> setEditNewFiles(prev => prev.filter((_, idx) => idx !== i))}
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
+              ) : (
+                <>
+                  {m.attachments && m.attachments.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {m.attachments.map((a, idx) => (
+                        <div key={idx} className="inline-flex items-center gap-2 px-2 py-1 rounded-md border border-border text-xs hover:bg-accent">
+                          <button
+                            type="button"
+                            onClick={() => setPreview({ name: a.name, type: a.type, url: a.dataUrl })}
+                            className="inline-flex items-center gap-2"
+                            title="Preview"
+                          >
+                            {a.type.startsWith('image/') ? (
+                              <img src={a.dataUrl} alt={a.name} className="h-10 w-10 object-cover rounded" />
+                            ) : (
+                              <span className="px-2 py-1 rounded bg-muted text-foreground/80">File</span>
+                            )}
+                            <span className="max-w-[12rem] truncate text-left">{a.name}</span>
+                          </button>
+                          <a href={a.dataUrl} download={a.name} className="px-1.5 py-0.5 rounded border border-border">Download</a>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
               <p className="mt-1 text-xs text-foreground/60">{m.updatedAt && new Date(m.updatedAt).getTime() > new Date(m.createdAt).getTime() ? `${new Date(m.updatedAt).toLocaleString()} (edited)` : new Date(m.createdAt).toLocaleString()}</p>
 
