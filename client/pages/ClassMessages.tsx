@@ -84,17 +84,12 @@ export default function ClassMessages() {
   async function saveEdit(mid: string) {
     try {
       const newAtts = await readFiles(editNewFiles);
-      const combined = [...editAttachments, ...newAtts].slice(0, MAX_FILES);
-      // Optimistic update
-      setMessages(prev => prev.map(m => m.id === mid ? { ...m, title: editTitle || m.title, content: editContent, attachments: combined, updatedAt: new Date().toISOString() } : m));
-      const r = await fetch(`/api/messages/${mid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ title: editTitle || undefined, content: editContent, attachments: combined }) });
+      // Optimistic: show appended files locally
+      setMessages(prev => prev.map(m => m.id === mid ? { ...m, title: editTitle || m.title, content: editContent, attachments: [...(m.attachments||[]), ...newAtts].slice(0, MAX_FILES), updatedAt: new Date().toISOString() } : m));
+      const r = await fetch(`/api/messages/${mid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ title: editTitle || undefined, content: editContent, attachments: newAtts }) });
       const d = await r.json();
       if (!r.ok) throw new Error(d?.message || r.statusText);
-      const serverMsg = d.message;
-      const finalMsg = (serverMsg && Array.isArray(serverMsg.attachments) && serverMsg.attachments.length >= combined.length)
-        ? serverMsg
-        : { ...serverMsg, attachments: combined };
-      setMessages(prev => prev.map(m => m.id === mid ? finalMsg : m));
+      setMessages(prev => prev.map(m => m.id === mid ? d.message : m));
       setEditingId(null); setEditTitle(""); setEditContent(""); setEditAttachments([]); setEditNewFiles([]);
       await load();
     } catch (e: any) {
