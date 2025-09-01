@@ -64,6 +64,11 @@ export default function Classes() {
       <input ref={fileRef as any} type="file" accept="image/*" className="hidden" onChange={(e)=>{
         const f = e.target.files?.[0];
         if (!f || !imagePickFor) return;
+        if (f.size > 2 * 1024 * 1024) {
+          toast({ title: "Image too large", description: "Please select an image under 2MB." });
+          (fileRef as any).current && ((fileRef as any).current.value = "");
+          return;
+        }
         void handlePickedFile(f, imagePickFor);
       }} />
       <div className="grid md:grid-cols-3 gap-6">
