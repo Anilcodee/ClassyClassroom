@@ -186,9 +186,13 @@ export default function ClassMessages() {
                     <div className="flex items-center gap-2">
                       <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>saveEdit(m.id)}>Save</button>
                       <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(null); setEditTitle(""); setEditContent(""); setEditAttachments([]); setEditNewFiles([]); }}>Cancel</button>
+                      <button className="px-2 py-1 rounded border border-border text-xs text-destructive" onClick={()=>del(m.id)}>Delete</button>
                     </div>
                   ) : (
-                    <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(m.id); setEditTitle(m.title || ""); setEditContent(m.content); setEditAttachments([...(m.attachments||[])]); setEditNewFiles([]); }}>Edit post</button>
+                    <div className="flex items-center gap-2">
+                      <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(m.id); setEditTitle(m.title || ""); setEditContent(m.content); setEditAttachments([...(m.attachments||[])]); setEditNewFiles([]); }}>Edit post</button>
+                      <button className="px-2 py-1 rounded border border-border text-xs text-destructive" onClick={()=>del(m.id)}>Delete</button>
+                    </div>
                   )}
                 </div>
               </div>
