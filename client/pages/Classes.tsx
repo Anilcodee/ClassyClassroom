@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
 import { toast } from "@/hooks/use-toast";
 
 interface ClassItem { id: string; name: string; joinCode: string; isActive: boolean; imageUrl?: string }
