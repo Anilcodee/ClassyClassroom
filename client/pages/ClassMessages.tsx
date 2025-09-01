@@ -15,7 +15,6 @@ export default function ClassMessages() {
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
-  const [commentText, setCommentText] = useState<Record<string, string>>({});
 
   async function load() {
     setLoading(true); setError(null);
