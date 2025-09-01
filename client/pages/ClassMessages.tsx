@@ -31,7 +31,7 @@ export default function ClassMessages() {
   useEffect(() => { void load(); }, [id, token]);
 
   async function readFiles(fs: File[]): Promise<Attachment[]> {
-    const MAX = 5; const MAX_SIZE = 2 * 1024 * 1024;
+    const MAX = 4; const MAX_SIZE = 1.5 * 1024 * 1024;
     const picked = fs.slice(0, MAX).filter(f => f.size <= MAX_SIZE);
     const res: Attachment[] = await Promise.all(picked.map(f => new Promise<Attachment>((resolve, reject) => {
       const reader = new FileReader();
