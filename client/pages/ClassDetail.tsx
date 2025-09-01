@@ -95,6 +95,11 @@ export default function ClassDetail() {
         <p className="mt-4 text-sm text-destructive">{error}</p>
       ) : cls ? (
         <div className="mt-4">
+          {cls.imageUrl && (
+            <div className="w-full h-48 md:h-64 rounded-xl overflow-hidden mb-4">
+              <img src={cls.imageUrl} alt="Class cover" className="w-full h-full object-cover" />
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold flex items-center gap-3">
               {cls.name}
