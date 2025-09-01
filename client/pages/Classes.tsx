@@ -121,13 +121,22 @@ export default function Classes() {
                   className="rounded-xl border border-border hover:bg-accent cursor-pointer overflow-hidden relative"
                   onClick={() => (window.location.href = `/classes/${c.id}`)}
                   style={{ minHeight: "10rem" }}
-                >
+>
+                  {!c.imageUrl && (
+                    <button
+                      className="absolute top-2 left-2 z-10 text-xs px-2 py-1 rounded-md border border-border bg-background/80 hover:bg-accent"
+                      onClick={(e)=>{ e.stopPropagation(); setImagePickFor(c.id); (fileRef as any).current?.click(); }}
+                      title="Add image"
+                    >
+                      + Add image
+                    </button>
+                  )}
                   {c.imageUrl ? (
                     <div className="w-full h-28 md:h-40">
                       <img src={c.imageUrl} alt="Class cover" className="w-full h-full object-cover" />
                     </div>
                   ) : (
-                    <div className="w-full h-10 bg-muted/50" />
+                    <div className="w-full h-28 md:h-40 bg-muted/50" />
                   )}
                   <div className="p-5">
                     <p className="font-medium">{c.name}</p>
