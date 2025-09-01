@@ -204,6 +204,11 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
             <input className="rounded-lg border border-input bg-background px-3 py-2 outline-none focus:ring-2 focus:ring-ring"
               value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Physics 101" />
           </div>
+          <div className="grid gap-3 mt-4">
+            <label className="text-sm">Cover image URL</label>
+            <input className="rounded-lg border border-input bg-background px-3 py-2 outline-none focus:ring-2 focus:ring-ring"
+              value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://.../image.jpg" />
+          </div>
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
               <label className="text-sm font-medium">Students</label>
