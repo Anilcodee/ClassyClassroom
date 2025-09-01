@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 interface Attachment { name: string; type: string; size: number; dataUrl: string }
@@ -19,6 +19,8 @@ export default function ClassMessages() {
   const MAX_SIZE = 1.5 * 1024 * 1024; // ~1.5MB per file
 
   const [preview, setPreview] = useState<{ name: string; type: string; url: string; text?: string } | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isFs, setIsFs] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -29,6 +31,12 @@ export default function ClassMessages() {
     }
     return () => { active = false; };
   }, [preview?.url, preview?.type]);
+
+  useEffect(() => {
+    const onFs = () => setIsFs(Boolean(document.fullscreenElement));
+    document.addEventListener('fullscreenchange', onFs);
+    return () => document.removeEventListener('fullscreenchange', onFs);
+  }, []);
 
   async function load() {
     setLoading(true); setError(null);
@@ -179,23 +187,36 @@ export default function ClassMessages() {
       )}
       {preview && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" onClick={()=> setPreview(null)}>
-          <div className="w-full max-w-3xl max-h-[90vh] overflow-auto rounded-lg bg-background border border-border" onClick={(e)=>e.stopPropagation()}>
+          <div
+            ref={contentRef}
+            className={(isFs ? "w-screen h-screen max-w-none max-h-none rounded-none" : "w-full max-w-3xl max-h-[90vh] rounded-lg") + " overflow-auto bg-background border border-border"}
+            onClick={(e)=>e.stopPropagation()}
+          >
             <div className="flex items-center justify-between p-3 border-b border-border">
               <div className="text-sm font-medium truncate pr-2">{preview.name}</div>
               <div className="flex items-center gap-2">
+                <button
+                  className="px-2 py-1 text-xs rounded border border-border"
+                  onClick={async ()=>{
+                    if (!document.fullscreenElement && contentRef.current) await contentRef.current.requestFullscreen().catch(()=>{});
+                    else await document.exitFullscreen().catch(()=>{});
+                  }}
+                >
+                  {isFs ? 'Exit full screen' : 'Full screen'}
+                </button>
                 <a href={preview.url} download={preview.name} className="px-2 py-1 text-xs rounded border border-border">Download</a>
                 <button className="px-2 py-1 text-xs rounded border border-border" onClick={()=> setPreview(null)}>Close</button>
               </div>
             </div>
             <div className="p-3">
               {preview.type.startsWith('image/') && (
-                <img src={preview.url} alt={preview.name} className="max-h-[70vh] w-auto object-contain mx-auto" />
+                <img src={preview.url} alt={preview.name} className={(isFs ? "max-h-[90vh]" : "max-h-[70vh]") + " w-auto object-contain mx-auto"} />
               )}
               {preview.type === 'application/pdf' && (
-                <iframe title="pdf" src={preview.url} className="w-full h-[70vh] rounded border border-border" />
+                <iframe title="pdf" src={preview.url} className={(isFs ? "h-[90vh]" : "h-[70vh]") + " w-full rounded border border-border"} allowFullScreen />
               )}
               {(preview.type.startsWith('text/') || preview.type === 'application/json') && (
-                <pre className="w-full max-h-[70vh] overflow-auto rounded bg-muted p-3 text-xs whitespace-pre-wrap break-all">{preview.text ?? 'Loading…'}</pre>
+                <pre className={(isFs ? "max-h-[90vh]" : "max-h-[70vh]") + " w-full overflow-auto rounded bg-muted p-3 text-xs whitespace-pre-wrap break-all"}>{preview.text ?? 'Loading…'}</pre>
               )}
               {preview.type.startsWith('audio/') && (
                 <audio controls className="w-full">
@@ -203,7 +224,7 @@ export default function ClassMessages() {
                 </audio>
               )}
               {preview.type.startsWith('video/') && (
-                <video controls className="w-full max-h-[70vh]">
+                <video controls className={(isFs ? "max-h-[90vh]" : "max-h-[70vh]") + " w-full"}>
                   <source src={preview.url} />
                 </video>
               )}
