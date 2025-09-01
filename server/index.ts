@@ -50,16 +50,24 @@ export function createServer() {
   app.get("/api/classes", requireAuth, listClasses);
   app.post("/api/classes", requireAuth, createClass);
   app.patch("/api/classes/:id/image", requireAuth, updateClassImage);
+  app.patch("/api/classes/:id", requireAuth, updateClassDetails);
   app.get("/api/classes/:id", requireAuth, getClass);
+
+  // Attendance (teacher view)
   app.get("/api/classes/:id/attendance/today", requireAuth, getTodayAttendance);
+  app.get("/api/classes/:id/attendance", requireAuth, getAttendanceForDate);
   app.get("/api/classes/:id/attendance/dates", requireAuth, listAttendanceDates);
   app.get("/api/classes/:id/attendance/pdf", requireAuth, classAttendancePdf);
   app.get("/api/classes/:id/attendance/pdf/all", requireAuth, classAttendancePdfAll);
 
-  // Attendance
+  // Attendance (session)
   app.post("/api/classes/:id/activate", requireAuth, activateClass);
   app.get("/api/session/:sessionId", sessionStatus);
   app.post("/api/session/:sessionId/mark", markAttendance);
+
+  // Messages
+  app.get("/api/classes/:id/messages", requireAuth, listMessages);
+  app.post("/api/classes/:id/messages", requireAuth, createMessage);
 
   // Student
   app.get("/api/student/classes", requireAuth, listStudentClasses);
