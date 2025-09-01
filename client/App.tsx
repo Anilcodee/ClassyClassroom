@@ -40,6 +40,9 @@ const App = () => (
           <Route path="/get-started" element={<GetStarted />} />
           <Route path="/classes/:id" element={<ClassDetail />} />
           <Route path="/classes/:id/history" element={<AttendanceHistory />} />
+          <Route path="/classes/:id/attendance" element={<ClassAttendance />} />
+          <Route path="/classes/:id/messages" element={<ClassMessages />} />
+          <Route path="/classes/:id/modify" element={<ModifyClass />} />
           <Route path="/session/:sessionId" element={<Session />} />
           <Route path="/attend/:sessionId" element={<Attend />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
