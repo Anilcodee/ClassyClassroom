@@ -33,7 +33,7 @@ export default function Classes() {
   useEffect(() => { void load(); }, []);
 
   const [imagePickFor, setImagePickFor] = useState<string | null>(null);
-  const fileRef = (typeof window !== "undefined" ? (require("react") as typeof import("react")).useRef<HTMLInputElement>(null) : { current: null });
+  const fileRef = useRef<HTMLInputElement>(null);
 
   async function handlePickedFile(file: File, classId: string) {
     const reader = new FileReader();
