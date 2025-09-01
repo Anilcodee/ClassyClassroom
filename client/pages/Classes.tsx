@@ -146,7 +146,7 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || res.statusText || "Failed to create");
-      setOpen(false); setName(""); setStudents([{ name: "", rollNo: "" }]);
+      setOpen(false); setName(""); setImageUrl(""); setStudents([{ name: "", rollNo: "" }]);
       await onCreated();
     } catch (e: any) {
       setErr(e.message || "Failed to create");
