@@ -14,7 +14,7 @@ export const listStudentClasses: RequestHandler = async (req: AuthRequest, res) 
     if (role !== "student") return res.status(403).json({ message: "Forbidden" });
     const classIds = (user as any).enrolledClasses || [];
     const classes = await ClassModel.find({ _id: { $in: classIds } })
-      .select("name joinCode teacher createdAt updatedAt")
+      .select("name joinCode teacher createdAt updatedAt isActive imageUrl")
       .lean();
     res.json({ classes });
   } catch (e) {
