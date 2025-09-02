@@ -34,6 +34,8 @@ export default function Classes() {
 
   const [imagePickFor, setImagePickFor] = React.useState<string | null>(null);
   const fileRef = React.useRef<HTMLInputElement>(null);
+  const [query, setQuery] = React.useState("");
+  const [showActiveOnly, setShowActiveOnly] = React.useState(false);
 
   async function handlePickedFile(file: File, classId: string) {
     const reader = new FileReader();
@@ -114,6 +116,19 @@ export default function Classes() {
         </aside>
         <div className="md:col-span-3">
           <h2 className="mt-8 mb-3 text-lg font-semibold">Your classes</h2>
+          <div className="mb-4 flex flex-col sm:flex-row gap-3 sm:items-center">
+            <input
+              type="search"
+              value={query}
+              onChange={(e)=>setQuery(e.target.value)}
+              placeholder="Search classes by name…"
+              className="w-full sm:max-w-sm rounded-lg border border-input bg-background px-3 py-2 outline-none focus:ring-2 focus:ring-ring"
+            />
+            <label className="inline-flex items-center gap-2 text-sm text-foreground/80">
+              <input type="checkbox" className="rounded border border-input" checked={showActiveOnly} onChange={(e)=>setShowActiveOnly(e.target.checked)} />
+              Active only
+            </label>
+          </div>
           {loading ? (
             <p className="text-sm text-foreground/70">Loading…</p>
           ) : error ? (
@@ -121,8 +136,18 @@ export default function Classes() {
           ) : classes.length === 0 ? (
             <p className="text-sm text-foreground/70">No classes yet. Create one to get started.</p>
           ) : (
-            <ul className="space-y-3">
-              {classes.map((c) => (
+            (() => {
+              const filtered = classes.filter(c => {
+                const matchesQuery = !query || c.name.toLowerCase().includes(query.toLowerCase());
+                const matchesActive = !showActiveOnly || c.isActive;
+                return matchesQuery && matchesActive;
+              });
+              if (classes.length > 0 && filtered.length === 0) {
+                return <p className="text-sm text-foreground/70">No matching classes.</p>;
+              }
+              return (
+                <ul className="space-y-3">
+                  {filtered.map((c) => (
                 <li
                   key={c.id}
                   className="rounded-xl border border-border overflow-hidden relative"
@@ -209,8 +234,10 @@ export default function Classes() {
                   </Link>
                 </div>
                 </li>
-              ))}
-            </ul>
+                  ))}
+                </ul>
+              );
+            })()
           )}
         </div>
       </div>
