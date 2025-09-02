@@ -52,6 +52,11 @@ export const createMessage: RequestHandler = async (req: AuthRequest, res) => {
       dataUrl: String(a.dataUrl || ""),
     })) : [];
 
+    const cls = await ClassModel.findById(id).select("teacher coTeachers").lean();
+    const userId = String((req as any).userId || "");
+    const isOwnerOrCo = cls ? (String(cls.teacher) === userId || (cls.coTeachers||[]).some((t:any)=> String(t) === userId)) : false;
+    if (!isOwnerOrCo) return res.status(403).json({ message: "Unauthorized" });
+
     const msg = await Message.create({ classId: id, teacherId: (req as any).userId, title: title || undefined, content: content.trim(), pinned: !!pinned, attachments: atts, comments: [] });
     res.status(201).json({ message: { id: msg.id, title: msg.title || "", content: msg.content, createdAt: msg.createdAt, updatedAt: msg.updatedAt, pinned: !!msg.pinned, attachments: atts, comments: [], canEdit: true, canComment: false } });
   } catch (e) {
