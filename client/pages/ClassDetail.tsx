@@ -60,11 +60,22 @@ export default function ClassDetail() {
     return () => { stop = true; clearInterval(i); };
   }, [cls?.isActive, cls?.activeSession]);
 
-  // Local second tick for countdown display
+  // Local second tick for countdown display (aligned to second boundaries)
   useEffect(() => {
     if (!expiresAt) return;
-    const i = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(i);
+    let cancelled = false;
+    const schedule = () => {
+      const delay = Math.max(0, 1000 - (Date.now() % 1000)) + 5;
+      const t = setTimeout(() => {
+        if (!cancelled) {
+          setNow(Date.now());
+          schedule();
+        }
+      }, delay);
+      return t;
+    };
+    const handle = schedule();
+    return () => { cancelled = true; clearTimeout(handle as any); };
   }, [expiresAt]);
 
   async function activate() {
