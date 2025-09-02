@@ -48,7 +48,7 @@ export const createMessage: RequestHandler = async (req: AuthRequest, res) => {
     })) : [];
 
     const msg = await Message.create({ classId: id, teacherId: (req as any).userId, title: title || undefined, content: content.trim(), pinned: !!pinned, attachments: atts, comments: [] });
-    res.status(201).json({ message: { id: msg.id, title: msg.title || "", content: msg.content, createdAt: msg.createdAt, updatedAt: msg.updatedAt, pinned: !!msg.pinned, attachments: atts, comments: [] } });
+    res.status(201).json({ message: { id: msg.id, title: msg.title || "", content: msg.content, createdAt: msg.createdAt, updatedAt: msg.updatedAt, pinned: !!msg.pinned, attachments: atts, comments: [], canEdit: true } });
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Server error" });
