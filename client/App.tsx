@@ -20,6 +20,7 @@ import StudentAuth from "./pages/StudentAuth";
 import StudentDashboard from "./pages/StudentDashboard";
 import GetStarted from "./pages/GetStarted";
 import ClassMessages from "./pages/ClassMessages";
+import ClassMessageCompose from "./pages/ClassMessageCompose";
 import ModifyClass from "./pages/ModifyClass";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/classes/:id/history" element={<AttendanceHistory />} />
           <Route path="/student/classes/:id/attendance" element={<StudentAttendance />} />
           <Route path="/classes/:id/messages" element={<ClassMessages />} />
+          <Route path="/classes/:id/messages/new" element={<ClassMessageCompose />} />
           <Route path="/classes/:id/modify" element={<ModifyClass />} />
           <Route path="/session/:sessionId" element={<Session />} />
           <Route path="/attend/:sessionId" element={<Attend />} />
