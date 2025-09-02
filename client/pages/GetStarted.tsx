@@ -32,10 +32,10 @@ export default function GetStarted() {
             <div className="mt-3 w-full max-w-md mx-auto">
               <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Teachers</h3>
               <ul className="text-sm text-foreground/70 space-y-2 mx-auto">
-                <li className="flex items-center gap-2 justify-center"><span>✅</span> Create and manage classes with cover images</li>
-                <li className="flex items-center gap-2 justify-center"><span>✅</span> Start timed QR attendance sessions</li>
-                <li className="flex items-center gap-2 justify-center"><span>✅</span> Download PDFs and view attendance history</li>
-                <li className="flex items-center gap-2 justify-center"><span>✅</span> Post announcements; edit/delete your posts</li>
+                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Create and manage classes with cover images</span></li>
+                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Start timed QR attendance sessions</span></li>
+                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Download PDFs and view attendance history</span></li>
+                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Post announcements; edit/delete your posts</span></li>
               </ul>
             </div>
           </div>
@@ -44,10 +44,10 @@ export default function GetStarted() {
             <div className="mt-3 w-full max-w-md mx-auto">
               <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Students</h3>
               <ul className="text-sm text-foreground/70 space-y-2 mx-auto">
-                <li className="flex items-center gap-2 justify-center"><span>✅</span> Join classes via secure code</li>
-                <li className="flex items-center gap-2 justify-center"><span>✅</span> See your classes and attendance days</li>
-                <li className="flex items-center gap-2 justify-center"><span>✅</span> Comment on announcements (except your own)</li>
-                <li className="flex items-center gap-2 justify-center"><span>✅</span> Clean, mobile‑friendly experience</li>
+                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Join classes via secure code</span></li>
+                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>See your classes and attendance days</span></li>
+                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Comment on announcements (except your own)</span></li>
+                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Clean, mobile‑friendly experience</span></li>
               </ul>
             </div>
           </div>
