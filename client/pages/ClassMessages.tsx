@@ -72,6 +72,16 @@ export default function ClassMessages() {
 
   useEffect(() => { void load(); }, [id, token]);
 
+  const userRole = useMemo(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw).role : undefined;
+    } catch {
+      return undefined;
+    }
+  }, []);
+  const backHref = userRole === "student" ? "/student" : "/classes";
+
   async function readFiles(fs: File[]): Promise<Attachment[]> {
     const picked = fs.slice(0, MAX_FILES).filter(f => f.size <= MAX_SIZE);
     const res: Attachment[] = await Promise.all(picked.map(f => new Promise<Attachment>((resolve, reject) => {
@@ -140,7 +150,7 @@ export default function ClassMessages() {
 
   return (
     <main className="container mx-auto py-8">
-      <Link to="/classes" className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
+      <Link to={backHref} className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
       <h1 className="mt-2 text-2xl font-bold">Messages</h1>
       <div className="mt-4 rounded-xl border border-border p-4">
         <div className="grid gap-2">
