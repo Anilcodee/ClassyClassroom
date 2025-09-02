@@ -225,6 +225,14 @@ export default function Classes() {
                     Messages
                   </Link>
                   <Link
+                    to={`/classes/${c.id}/assignments`}
+                    onClick={(e)=>e.stopPropagation()}
+                    className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background hover:bg-accent hover:text-accent-foreground text-center"
+                    title="Assignments"
+                  >
+                    Assignments
+                  </Link>
+                  <Link
                     to={`/classes/${c.id}/modify`}
                     onClick={(e)=>e.stopPropagation()}
                     className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background hover:bg-accent hover:text-accent-foreground text-center"
