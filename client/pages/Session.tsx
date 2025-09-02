@@ -9,30 +9,47 @@ export default function Session() {
   const nav = useNavigate();
 
   useEffect(() => {
-    const i = setInterval(() => {
-      fetch(`/api/session/${sessionId}`)
-        .then((r) => r.json())
-        .then((d) => {
-          setIsActive(Boolean(d.isActive));
-          if (d.expiresAt) setExpiresAt(new Date(d.expiresAt));
-        })
-        .catch(() => {});
-    }, 1000);
-    return () => clearInterval(i);
+    if (!sessionId) return;
+    let cancelled = false;
+    const poll = async () => {
+      try {
+        const r = await fetch(`/api/session/${sessionId}`);
+        if (!r.ok) {
+          // stop polling on not found/invalid
+          if (r.status === 404 || r.status === 400) { setIsActive(false); return; }
+          return; // transient
+        }
+        const d = await r.json();
+        if (cancelled) return;
+        setIsActive(Boolean(d.isActive));
+        if (d.expiresAt) setExpiresAt(new Date(d.expiresAt));
+      } catch {
+        // network issue; ignore and retry on next tick
+      } finally {
+        if (!cancelled && isActive) setTimeout(poll, 1000);
+      }
+    };
+    poll();
+    return () => { cancelled = true; };
   }, [sessionId]);
 
   useEffect(() => {
     if (expiresAt && Date.now() > expiresAt.getTime()) setIsActive(false);
   }, [expiresAt]);
 
-  const link = useMemo(() => `${window.location.origin}/attend/${sessionId}`, [sessionId]);
+  const link = useMemo(() => `${window.location.origin}/attend/${sessionId ?? ""}`, [sessionId]);
   const remaining = expiresAt ? Math.max(0, Math.floor((expiresAt.getTime() - Date.now()) / 1000)) : null;
   const mm = remaining != null ? Math.floor(remaining / 60).toString().padStart(2, "0") : "--";
   const ss = remaining != null ? (remaining % 60).toString().padStart(2, "0") : "--";
 
+  const userRole = useMemo(() => {
+    try { const raw = localStorage.getItem("user"); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; }
+  }, []);
+  const backHref = userRole === "student" ? "/student" : "/classes";
+
   return (
     <main className="container mx-auto py-10 text-center">
-      <Link to="/classes" className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
+      <Link to={backHref} className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
       <h1 className="mt-2 text-2xl font-bold">Scan to mark attendance</h1>
       <p className="text-foreground/70">Share this QR or link with students.</p>
       <div className="mt-6 grid place-items-center">
