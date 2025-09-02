@@ -14,7 +14,7 @@ import {
 
 interface Attachment { name: string; type: string; size: number; dataUrl: string }
 interface CommentItem { userId: string; name: string; content: string; createdAt: string }
-interface MessageItem { id: string; title?: string; content: string; createdAt: string; updatedAt?: string; pinned?: boolean; attachments?: Attachment[]; comments?: CommentItem[]; canEdit?: boolean }
+interface MessageItem { id: string; title?: string; content: string; createdAt: string; updatedAt?: string; pinned?: boolean; attachments?: Attachment[]; comments?: CommentItem[]; canEdit?: boolean; canComment?: boolean }
 
 export default function ClassMessages() {
   const { id } = useParams();
@@ -38,6 +38,8 @@ export default function ClassMessages() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const [preview, setPreview] = useState<{ name: string; type: string; url: string; text?: string } | null>(null);
+  const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
+  const [commentLoading, setCommentLoading] = useState<Record<string, boolean>>({});
   const contentRef = useRef<HTMLDivElement>(null);
   const [isFs, setIsFs] = useState(false);
 
@@ -343,6 +345,40 @@ export default function ClassMessages() {
                   ))}
                   {(m.comments||[]).length === 0 && <li className="text-sm text-foreground/60">No comments yet.</li>}
                 </ul>
+                {m.canComment ? (
+                  <div className="mt-2 flex items-center gap-2">
+                    <input
+                      className="flex-1 rounded-lg border border-input bg-background px-3 py-1.5 text-sm"
+                      placeholder="Write a comment"
+                      value={commentInputs[m.id] || ""}
+                      onChange={(e)=> setCommentInputs((p)=> ({ ...p, [m.id]: e.target.value }))}
+                    />
+                    <button
+                      className="px-2.5 py-1.5 rounded-md border border-border text-sm disabled:opacity-50"
+                      disabled={commentLoading[m.id] || !(commentInputs[m.id]||"").trim()}
+                      onClick={async ()=>{
+                        const text = (commentInputs[m.id] || "").trim();
+                        if (!text) return;
+                        setCommentLoading((p)=> ({ ...p, [m.id]: true }));
+                        try {
+                          const r = await fetch(`/api/messages/${m.id}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ content: text }) });
+                          const d = await r.json().catch(()=>({}));
+                          if (!r.ok) throw new Error(d?.message || r.statusText);
+                          setMessages((prev)=> prev.map(mm => mm.id === m.id ? { ...mm, comments: [...(mm.comments||[]), d.comment] } : mm));
+                          setCommentInputs((p)=> ({ ...p, [m.id]: "" }));
+                        } catch (e: any) {
+                          setError(e.message || "Failed to comment");
+                        } finally {
+                          setCommentLoading((p)=> ({ ...p, [m.id]: false }));
+                        }
+                      }}
+                    >
+                      {commentLoading[m.id] ? 'Posting…' : 'Post'}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="mt-2 text-xs text-foreground/60">Only class members can comment. The poster cannot comment on their own message.</p>
+                )}
               </div>
             </li>
           ))}
