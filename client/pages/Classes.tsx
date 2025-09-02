@@ -253,6 +253,8 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
   const [duration, setDuration] = React.useState<number>(4);
   const [saving, setSaving] = React.useState(false);
   const [err, setErr] = React.useState<string | null>(null);
+  const [joinCode, setJoinCode] = React.useState("");
+  const [joining, setJoining] = React.useState(false);
 
   function setStudent(i: number, patch: Partial<NewStudent>) {
     setStudents((prev) => prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
