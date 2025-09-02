@@ -77,7 +77,7 @@ export default function StudentDashboard() {
         {classes.length === 0 ? (
           <p className="text-foreground/70">No classes yet. Join one using the code above.</p>
         ) : (
-          <ul className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <ul className="grid grid-cols-1 gap-4">
             {classes.map((c) => {
               const cid = (c as any).id || (c as any)._id;
               return (
