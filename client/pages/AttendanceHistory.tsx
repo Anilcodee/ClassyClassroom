@@ -6,6 +6,15 @@ export default function AttendanceHistory() {
   const token = useMemo(() => localStorage.getItem("token"), []);
   const [dates, setDates] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const userRole = useMemo(() => {
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw).role : undefined;
+    } catch {
+      return undefined;
+    }
+  }, []);
+  const backHref = userRole === "student" ? "/student" : `/classes/${id}`;
 
   useEffect(() => {
     (async () => {
@@ -28,7 +37,7 @@ export default function AttendanceHistory() {
 
   return (
     <main className="container mx-auto py-8">
-      <Link to={`/classes/${id}`} className="text-sm text-foreground/70 hover:text-foreground">← Back to class</Link>
+      <Link to={backHref} className="text-sm text-foreground/70 hover:text-foreground">← Back to class</Link>
       <h1 className="mt-2 text-2xl font-bold">Attendance PDFs</h1>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <ul className="mt-4 space-y-2">
