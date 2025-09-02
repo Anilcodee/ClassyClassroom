@@ -47,13 +47,20 @@ export const createAssignment: RequestHandler = async (req: AuthRequest, res) =>
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { id } = req.params as { id: string }; // class id
-    const { title, description, type, questions, dueAt, publishAt, isDraft, allowLate, allowedRollNos } = req.body as any;
+    const { title, description, type, questions, dueAt, publishAt, isDraft, allowLate, allowedRollNos, attachments } = req.body as any;
 
     const cls = await ClassModel.findById(id).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
     if (!isOwnerOrCo(cls, userId)) return res.status(403).json({ message: "Unauthorized" });
 
     if (!title || !String(title).trim()) return res.status(400).json({ message: "Title is required" });
+
+    const atts = Array.isArray(attachments) ? attachments.slice(0, 5).map((a:any)=> ({
+      name: String(a.name || 'file'),
+      type: String(a.type || 'application/octet-stream'),
+      size: Number(a.size || 0),
+      dataUrl: String(a.dataUrl || ''),
+    })) : [];
 
     const doc = await Assignment.create({
       classId: id,
@@ -62,6 +69,7 @@ export const createAssignment: RequestHandler = async (req: AuthRequest, res) =>
       description: description ? String(description) : undefined,
       type: type === "quiz" ? "quiz" : "assignment",
       questions: Array.isArray(questions) ? questions : [],
+      attachments: atts,
       dueAt: dueAt ? new Date(dueAt) : null,
       publishAt: publishAt ? new Date(publishAt) : null,
       isDraft: Boolean(isDraft),
@@ -92,6 +100,12 @@ export const updateAssignment: RequestHandler = async (req: AuthRequest, res) =>
     if (typeof payload.description === 'string') a.description = payload.description;
     if (typeof payload.type === 'string') a.type = payload.type === 'quiz' ? 'quiz' : 'assignment';
     if (Array.isArray(payload.questions)) a.questions = payload.questions;
+    if (Array.isArray(payload.attachments) && payload.attachments.length > 0) {
+      const atts = payload.attachments.slice(0,5).map((a:any)=> ({
+        name: String(a.name || 'file'), type: String(a.type || 'application/octet-stream'), size: Number(a.size || 0), dataUrl: String(a.dataUrl || '')
+      }));
+      (a as any).attachments = [ ...((a as any).attachments || []), ...atts ].slice(0, 5);
+    }
     if (payload.dueAt !== undefined) a.dueAt = payload.dueAt ? new Date(payload.dueAt) : null;
     if (payload.publishAt !== undefined) a.publishAt = payload.publishAt ? new Date(payload.publishAt) : null;
     if (typeof payload.isDraft === 'boolean') a.isDraft = payload.isDraft;
