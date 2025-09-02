@@ -15,6 +15,7 @@ import ClassDetail from "./pages/ClassDetail";
 import Session from "./pages/Session";
 import Attend from "./pages/Attend";
 import AttendanceHistory from "./pages/AttendanceHistory";
+import StudentAttendance from "./pages/StudentAttendance";
 import StudentAuth from "./pages/StudentAuth";
 import StudentDashboard from "./pages/StudentDashboard";
 import GetStarted from "./pages/GetStarted";
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/get-started" element={<GetStarted />} />
           <Route path="/classes/:id" element={<ClassDetail />} />
           <Route path="/classes/:id/history" element={<AttendanceHistory />} />
+          <Route path="/student/classes/:id/attendance" element={<StudentAttendance />} />
           <Route path="/classes/:id/messages" element={<ClassMessages />} />
           <Route path="/classes/:id/modify" element={<ModifyClass />} />
           <Route path="/session/:sessionId" element={<Session />} />
