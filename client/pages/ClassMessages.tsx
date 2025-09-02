@@ -1,5 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Attachment { name: string; type: string; size: number; dataUrl: string }
 interface CommentItem { userId: string; name: string; content: string; createdAt: string }
@@ -22,6 +33,9 @@ export default function ClassMessages() {
   const [editNewFiles, setEditNewFiles] = useState<File[]>([]);
   const MAX_FILES = 4;
   const MAX_SIZE = 4 * 1024 * 1024; // ~4MB per file
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const [preview, setPreview] = useState<{ name: string; type: string; url: string; text?: string } | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -99,16 +113,26 @@ export default function ClassMessages() {
   }
 
   async function del(mid: string) {
-    if (!confirm("Delete this post?")) return;
+    setDeleteId(mid);
+    setIsDeleteDialogOpen(true);
+  }
+
+  async function confirmDelete() {
+    if (!deleteId) return;
     try {
-      const r = await fetch(`/api/messages/${mid}`, { method: 'DELETE', headers: { Authorization: token ? `Bearer ${token}` : "" } });
+      const r = await fetch(`/api/messages/${deleteId}`, { method: 'DELETE', headers: { Authorization: token ? `Bearer ${token}` : "" } });
       if (!r.ok) {
         const d = await r.json().catch(()=>({}));
         throw new Error(d?.message || r.statusText);
       }
-      setMessages(prev => prev.filter(m => m.id !== mid));
+      setMessages(prev => prev.filter(m => m.id !== deleteId));
+      toast({ title: "Message deleted", description: "The post has been removed." });
     } catch (e: any) {
       setError(e.message);
+      toast({ title: "Failed to delete message", description: e.message || "" });
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setDeleteId(null);
     }
   }
 
@@ -371,6 +395,20 @@ export default function ClassMessages() {
           </div>
         </div>
       )}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={(o)=>{ setIsDeleteDialogOpen(o); if(!o) setDeleteId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this post?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently remove the post and its attachments.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={confirmDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
