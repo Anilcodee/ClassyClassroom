@@ -285,7 +285,7 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
         <div className="flex-1">
           <h2 className="text-2xl font-bold">Make your class</h2>
           <p className="text-foreground/70 mt-1">Name it, add students manually, via join link, or import a spreadsheet.</p>
-          <div className="mt-4 flex gap-3">
+          <div className="mt-4 flex flex-col md:flex-row gap-3">
             <button onClick={() => setOpen(true)} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90">Create class</button>
             <label className="px-4 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground cursor-pointer">
               Import spreadsheet (CSV)
