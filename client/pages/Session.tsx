@@ -6,6 +6,7 @@ export default function Session() {
   const { sessionId } = useParams();
   const [expiresAt, setExpiresAt] = useState<Date | null>(null);
   const [isActive, setIsActive] = useState(true);
+  const [now, setNow] = useState(Date.now());
   const nav = useNavigate();
 
   useEffect(() => {
@@ -37,8 +38,26 @@ export default function Session() {
     if (expiresAt && Date.now() > expiresAt.getTime()) setIsActive(false);
   }, [expiresAt]);
 
+  // Local aligned 1s ticker for smooth countdown
+  useEffect(() => {
+    if (!expiresAt || !isActive) return;
+    let cancelled = false;
+    const schedule = () => {
+      const delay = Math.max(0, 1000 - (Date.now() % 1000)) + 5;
+      const t = setTimeout(() => {
+        if (!cancelled) {
+          setNow(Date.now());
+          schedule();
+        }
+      }, delay);
+      return t;
+    };
+    const handle = schedule();
+    return () => { cancelled = true; clearTimeout(handle as any); };
+  }, [expiresAt, isActive]);
+
   const link = useMemo(() => `${window.location.origin}/attend/${sessionId ?? ""}`, [sessionId]);
-  const remaining = expiresAt ? Math.max(0, Math.floor((expiresAt.getTime() - Date.now()) / 1000)) : null;
+  const remaining = expiresAt ? Math.max(0, Math.floor((expiresAt.getTime() - now) / 1000)) : null;
   const mm = remaining != null ? Math.floor(remaining / 60).toString().padStart(2, "0") : "--";
   const ss = remaining != null ? (remaining % 60).toString().padStart(2, "0") : "--";
 
