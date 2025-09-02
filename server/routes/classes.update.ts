@@ -15,7 +15,7 @@ export const updateClassDetails: RequestHandler = async (req: AuthRequest, res) 
       imageUrl?: string | null;
     };
 
-    const cls = await ClassModel.findOne({ _id: id, teacher: (req as any).userId });
+    const cls = await ClassModel.findOne({ _id: id, $or: [ { teacher: (req as any).userId }, { coTeachers: (req as any).userId } ] });
     if (!cls) return res.status(404).json({ message: "Class not found" });
 
     if (typeof name === 'string' && name.trim()) cls.name = name.trim();
