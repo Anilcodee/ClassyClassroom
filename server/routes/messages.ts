@@ -132,12 +132,12 @@ export const addComment: RequestHandler = async (req: AuthRequest, res) => {
     if (String(msg.teacherId) === userId)
       return res.status(403).json({ message: "Poster cannot comment on own message" });
 
-    const cls = await ClassModel.findById(msg.classId).select("teacher students").lean();
+    const cls = await ClassModel.findById(msg.classId).select("teacher coTeachers students").lean();
     const user = await User.findById(userId).select("name enrolledClasses rollNo").lean();
-    const isOwner = cls ? String(cls.teacher) === userId : false;
+    const isOwnerOrCo = cls ? (String(cls.teacher) === userId || (cls.coTeachers||[]).some((t:any)=> String(t) === userId)) : false;
     const enrolled = new Set((user?.enrolledClasses || []).map((x: any) => String(x)));
     const inRoster = (cls?.students || []).some((s: any) => String(s.rollNo) === String((user as any)?.rollNo || ""));
-    const isMember = isOwner || enrolled.has(String(msg.classId)) || inRoster;
+    const isMember = isOwnerOrCo || enrolled.has(String(msg.classId)) || inRoster;
     if (!isMember) return res.status(403).json({ message: "Not a class member" });
 
     const name = user?.name || "User";
