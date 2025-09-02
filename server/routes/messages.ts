@@ -97,7 +97,8 @@ export const updateMessage: RequestHandler = async (req: AuthRequest, res) => {
       updatedAt: updated!.updatedAt,
       pinned: !!updated!.pinned,
       attachments: (updated!.attachments || []).map(a => ({ name: a.name, type: a.type, size: a.size, dataUrl: a.dataUrl })),
-      comments: (updated!.comments || []).map(c => ({ userId: c.userId, name: c.name, content: c.content, createdAt: c.createdAt }))
+      comments: (updated!.comments || []).map(c => ({ userId: c.userId, name: c.name, content: c.content, createdAt: c.createdAt })),
+      canEdit: true
     }});
   } catch (e) {
     console.error(e);
