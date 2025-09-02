@@ -30,9 +30,13 @@ export default function GetStarted() {
           <div className="flex flex-col items-center">
             <TeacherAnimation />
             <div className="mt-3 w-full max-w-md mx-auto">
-              <p className="text-sm text-foreground/70 text-center">
-                Create and manage classes with cover images ✅ Start timed QR attendance sessions ✅ Download PDFs and view attendance history ✅ Post announcements; edit/delete your posts
-              </p>
+              <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Teachers</h3>
+              <ul className="text-sm text-foreground/70 space-y-2 mx-auto inline-block text-left">
+                <li className="flex items-center gap-2"><span>✅</span> Create and manage classes with cover images</li>
+                <li className="flex items-center gap-2"><span>✅</span> Start timed QR attendance sessions</li>
+                <li className="flex items-center gap-2"><span>✅</span> Download PDFs and view attendance history</li>
+                <li className="flex items-center gap-2"><span>✅</span> Post announcements; edit/delete your posts</li>
+              </ul>
             </div>
           </div>
           <div className="flex flex-col items-center">
