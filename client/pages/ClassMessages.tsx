@@ -198,7 +198,12 @@ export default function ClassMessages() {
   return (
     <main className="container mx-auto py-8">
       <Link to={backHref} className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
-      <h1 className="mt-2 text-2xl font-bold">Messages</h1>
+      <div className="mt-2 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Messages</h1>
+        <Link to={`/classes/${id}/assignments`}>
+          <Button variant="outline" size="sm">Assignments</Button>
+        </Link>
+      </div>
       <div className="mt-4">
         <Link to={`/classes/${id}/messages/new`} className="block">
           <Button className="w-full justify-center gap-2 bg-blue-600 hover:bg-blue-600/90 text-white py-5 text-base" variant="default">
