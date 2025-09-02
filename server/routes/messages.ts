@@ -91,11 +91,11 @@ export const updateMessage: RequestHandler = async (req: AuthRequest, res) => {
 
     const msg = await Message.findById(messageId).lean();
     if (!msg) return res.status(404).json({ message: "Message not found" });
-    const cls = await ClassModel.findById(msg.classId).select("teacher").lean();
+    const cls = await ClassModel.findById(msg.classId).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
     const isPoster = String(msg.teacherId) === userId;
-    const isOwner = cls ? String(cls.teacher) === userId : false;
-    if (!isPoster && !isOwner) return res.status(403).json({ message: "Unauthorized" });
+    const isOwnerOrCo = cls ? (String(cls.teacher) === userId || (cls.coTeachers||[]).some((t:any)=> String(t) === userId)) : false;
+    if (!isPoster && !isOwnerOrCo) return res.status(403).json({ message: "Unauthorized" });
 
     const updated = await Message.findByIdAndUpdate(messageId, update, { new: true }).lean();
 
@@ -161,11 +161,11 @@ export const deleteMessage: RequestHandler = async (req: AuthRequest, res) => {
     const { messageId } = req.params as { messageId: string };
     const msg = await Message.findById(messageId).lean();
     if (!msg) return res.status(404).json({ message: "Message not found" });
-    const cls = await ClassModel.findById(msg.classId).select("teacher").lean();
+    const cls = await ClassModel.findById(msg.classId).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
     const isPoster = String(msg.teacherId) === userId;
-    const isOwner = cls ? String(cls.teacher) === userId : false;
-    if (!isPoster && !isOwner) return res.status(403).json({ message: "Unauthorized" });
+    const isOwnerOrCo = cls ? (String(cls.teacher) === userId || (cls.coTeachers||[]).some((t:any)=> String(t) === userId)) : false;
+    if (!isPoster && !isOwnerOrCo) return res.status(403).json({ message: "Unauthorized" });
 
     await Message.findByIdAndDelete(messageId).lean();
     res.json({ ok: true });
