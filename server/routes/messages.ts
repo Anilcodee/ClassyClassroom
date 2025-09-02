@@ -11,12 +11,13 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
   try {
     const { id } = req.params as { id: string };
     const msgs = await Message.find({ classId: id }).sort({ createdAt: -1 }).lean();
-    const cls = await ClassModel.findById(id).select("teacher").lean();
+    const cls = await ClassModel.findById(id).select("teacher students").lean();
     const userId = String((req as any).userId || "");
     const classOwnerId = cls ? String(cls.teacher) : "";
-    const user = await User.findById(userId).select("enrolledClasses").lean();
+    const user = await User.findById(userId).select("enrolledClasses rollNo").lean();
     const enrolled = new Set((user?.enrolledClasses || []).map((x: any) => String(x)));
-    const isMember = Boolean(userId) && (classOwnerId === userId || enrolled.has(String(id)));
+    const inRoster = (cls?.students || []).some((s: any) => String(s.rollNo) === String((user as any)?.rollNo || ""));
+    const isMember = Boolean(userId) && (classOwnerId === userId || enrolled.has(String(id)) || inRoster);
     res.json({ messages: msgs.map(m => ({
       id: m._id,
       title: m.title || "",
@@ -126,11 +127,12 @@ export const addComment: RequestHandler = async (req: AuthRequest, res) => {
     if (String(msg.teacherId) === userId)
       return res.status(403).json({ message: "Poster cannot comment on own message" });
 
-    const cls = await ClassModel.findById(msg.classId).select("teacher").lean();
-    const user = await User.findById(userId).select("name enrolledClasses").lean();
+    const cls = await ClassModel.findById(msg.classId).select("teacher students").lean();
+    const user = await User.findById(userId).select("name enrolledClasses rollNo").lean();
     const isOwner = cls ? String(cls.teacher) === userId : false;
     const enrolled = new Set((user?.enrolledClasses || []).map((x: any) => String(x)));
-    const isMember = isOwner || enrolled.has(String(msg.classId));
+    const inRoster = (cls?.students || []).some((s: any) => String(s.rollNo) === String((user as any)?.rollNo || ""));
+    const isMember = isOwner || enrolled.has(String(msg.classId)) || inRoster;
     if (!isMember) return res.status(403).json({ message: "Not a class member" });
 
     const name = user?.name || "User";
