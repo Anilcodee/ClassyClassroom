@@ -7,6 +7,8 @@ export interface IQuestion {
   correct?: number[]; // indices for mcq
 }
 
+export interface IAttachment { name: string; type: string; size: number; dataUrl: string }
+
 export interface IAssignment extends Document {
   classId: Types.ObjectId;
   teacherId: Types.ObjectId;
@@ -14,6 +16,7 @@ export interface IAssignment extends Document {
   description?: string;
   type: "assignment" | "quiz";
   questions: IQuestion[];
+  attachments: IAttachment[];
   dueAt?: Date | null;
   publishAt?: Date | null;
   isDraft: boolean;
@@ -35,6 +38,7 @@ const AssignmentSchema = new Schema<IAssignment>({
   description: { type: String },
   type: { type: String, enum: ["assignment", "quiz"], default: "assignment" },
   questions: { type: [QuestionSchema], default: [] },
+  attachments: { type: [{ name: String, type: String, size: Number, dataUrl: String }], default: [] },
   dueAt: { type: Date, default: null },
   publishAt: { type: Date, default: null },
   isDraft: { type: Boolean, default: true },
