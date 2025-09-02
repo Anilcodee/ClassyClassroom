@@ -46,6 +46,8 @@ export default function ClassMessages() {
   const [commentLoading, setCommentLoading] = useState<Record<string, boolean>>({});
   const contentRef = useRef<HTMLDivElement>(null);
   const [isFs, setIsFs] = useState(false);
+  const mountedRef = useRef(true);
+  const controllersRef = useRef<AbortController[]>([]);
 
   useEffect(() => {
     let active = true;
@@ -58,13 +60,19 @@ export default function ClassMessages() {
   }, [preview?.url, preview?.type]);
 
   useEffect(() => {
-    const onFs = () => setIsFs(Boolean(document.fullscreenElement));
+    mountedRef.current = true;
+    const onFs = () => mountedRef.current && setIsFs(Boolean(document.fullscreenElement));
     document.addEventListener('fullscreenchange', onFs);
-    return () => document.removeEventListener('fullscreenchange', onFs);
+    return () => {
+      mountedRef.current = false;
+      document.removeEventListener('fullscreenchange', onFs);
+      controllersRef.current.forEach((c)=>{ try { c.abort(); } catch {} });
+      controllersRef.current = [];
+    };
   }, []);
 
   async function load(signal?: AbortSignal) {
-    setLoading(true); setError(null);
+    if (mountedRef.current) { setLoading(true); setError(null); }
     const headers: Record<string,string> = {};
     if (token) headers.Authorization = `Bearer ${token}`;
     try {
@@ -75,7 +83,7 @@ export default function ClassMessages() {
         throw new Error(d?.message || r.statusText);
       }
       const d = await r.json();
-      setMessages(d.messages || []);
+      if (mountedRef.current) setMessages(d.messages || []);
     } catch (e: any) {
       if (e?.name === 'AbortError') return;
       // Retry once for transient network errors
@@ -88,11 +96,11 @@ export default function ClassMessages() {
           throw new Error(d2?.message || r2.statusText);
         }
         const d2 = await r2.json();
-        setMessages(d2.messages || []);
+        if (mountedRef.current) setMessages(d2.messages || []);
       } catch (e2: any) {
-        setError(e2.message || 'Failed to load');
+        if (mountedRef.current) setError(e2.message || 'Failed to load');
       }
-    } finally { setLoading(false); }
+    } finally { if (mountedRef.current) setLoading(false); }
   }
 
   useEffect(() => {
@@ -103,7 +111,7 @@ export default function ClassMessages() {
     }
     const ac = new AbortController();
     void load(ac.signal);
-    return () => ac.abort();
+    return () => { try { ac.abort(); } catch {} };
   }, [id, token]);
 
   const backHref = userRole === "student" ? "/student" : "/classes";
@@ -120,33 +128,44 @@ export default function ClassMessages() {
   }
 
   async function post() {
-    setPosting(true); setError(null);
+    if (mountedRef.current) { setPosting(true); setError(null); }
     try {
       const attachments = await readFiles(files);
       const r = await fetch(`/api/classes/${id}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ title: title || undefined, content, attachments }) });
       const d = await r.json();
       if (!r.ok) throw new Error(d?.message || r.statusText);
-      setTitle(""); setContent(""); setFiles([]);
-      setMessages((prev) => [d.message, ...prev]);
-    } catch (e: any) { setError(e.message); }
-    finally { setPosting(false); }
+      if (mountedRef.current) {
+        setTitle(""); setContent(""); setFiles([]);
+        setMessages((prev) => [d.message, ...prev]);
+      }
+    } catch (e: any) { if (e?.name !== 'AbortError' && mountedRef.current) setError(e.message); }
+    finally { if (mountedRef.current) setPosting(false); }
   }
 
 
   async function saveEdit(mid: string) {
+    const ac = new AbortController();
+    controllersRef.current.push(ac);
     try {
       const newAtts = await readFiles(editNewFiles);
-      // Optimistic: show appended files locally
-      setMessages(prev => prev.map(m => m.id === mid ? { ...m, title: editTitle || m.title, content: editContent, attachments: [...(m.attachments||[]), ...newAtts].slice(0, MAX_FILES), updatedAt: new Date().toISOString() } : m));
-      const r = await fetch(`/api/messages/${mid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ title: editTitle || undefined, content: editContent, attachments: newAtts }) });
-      const d = await r.json();
+      if (mountedRef.current) {
+        // Optimistic: show appended files locally
+        setMessages(prev => prev.map(m => m.id === mid ? { ...m, title: editTitle || m.title, content: editContent, attachments: [...(m.attachments||[]), ...newAtts].slice(0, MAX_FILES), updatedAt: new Date().toISOString() } : m));
+      }
+      const r = await fetch(`/api/messages/${mid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ title: editTitle || undefined, content: editContent, attachments: newAtts }), signal: ac.signal });
+      const d = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
-      setMessages(prev => prev.map(m => m.id === mid ? d.message : m));
-      setEditingId(null); setEditTitle(""); setEditContent(""); setEditAttachments([]); setEditNewFiles([]);
+      if (mountedRef.current) {
+        setMessages(prev => prev.map(m => m.id === mid ? d.message : m));
+        setEditingId(null); setEditTitle(""); setEditContent(""); setEditAttachments([]); setEditNewFiles([]);
+      }
       await load();
     } catch (e: any) {
-      setError(e.message);
+      if (e?.name !== 'AbortError' && mountedRef.current) setError(e.message);
       await load();
+    } finally {
+      controllersRef.current = controllersRef.current.filter(c => c !== ac);
+      try { ac.abort(); } catch {}
     }
   }
 
@@ -163,13 +182,15 @@ export default function ClassMessages() {
         const d = await r.json().catch(()=>({}));
         throw new Error(d?.message || r.statusText);
       }
-      setMessages(prev => prev.filter(m => m.id !== deleteId));
+      if (mountedRef.current) {
+        setMessages(prev => prev.filter(m => m.id !== deleteId));
+      }
       toast({ title: "Message deleted", description: "The post has been removed." });
     } catch (e: any) {
-      setError(e.message);
+      if (mountedRef.current) setError(e.message);
       toast({ title: "Failed to delete message", description: e.message || "" });
     } finally {
-      setIsDeleteDialogOpen(false);
+      if (mountedRef.current) setIsDeleteDialogOpen(false);
       setDeleteId(null);
     }
   }
