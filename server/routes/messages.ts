@@ -17,7 +17,7 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
     const user = await User.findById(userId).select("enrolledClasses rollNo").lean();
     const enrolled = new Set((user?.enrolledClasses || []).map((x: any) => String(x)));
     const inRoster = (cls?.students || []).some((s: any) => String(s.rollNo) === String((user as any)?.rollNo || ""));
-    const isMember = Boolean(userId) && (classOwnerId === userId || enrolled.has(String(id)) || inRoster);
+    const isMember = Boolean(userId) && (isOwnerOrCo || enrolled.has(String(id)) || inRoster);
     res.json({ messages: msgs.map(m => ({
       id: m._id,
       title: m.title || "",
@@ -27,7 +27,7 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
       pinned: !!m.pinned,
       attachments: (m.attachments || []).map(a => ({ name: a.name, type: a.type, size: a.size, dataUrl: a.dataUrl })),
       comments: (m.comments || []).map(c => ({ userId: c.userId, name: c.name, content: c.content, createdAt: c.createdAt })),
-      canEdit: Boolean(userId) && (String(m.teacherId) === userId || classOwnerId === userId),
+      canEdit: Boolean(userId) && (String(m.teacherId) === userId || isOwnerOrCo),
       canComment: isMember && String(m.teacherId) !== userId
     })) });
   } catch (e) {
