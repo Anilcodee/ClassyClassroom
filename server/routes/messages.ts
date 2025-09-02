@@ -14,6 +14,9 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
     const cls = await ClassModel.findById(id).select("teacher").lean();
     const userId = String((req as any).userId || "");
     const classOwnerId = cls ? String(cls.teacher) : "";
+    const user = await User.findById(userId).select("enrolledClasses").lean();
+    const enrolled = new Set((user?.enrolledClasses || []).map((x: any) => String(x)));
+    const isMember = Boolean(userId) && (classOwnerId === userId || enrolled.has(String(id)));
     res.json({ messages: msgs.map(m => ({
       id: m._id,
       title: m.title || "",
@@ -23,7 +26,8 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
       pinned: !!m.pinned,
       attachments: (m.attachments || []).map(a => ({ name: a.name, type: a.type, size: a.size, dataUrl: a.dataUrl })),
       comments: (m.comments || []).map(c => ({ userId: c.userId, name: c.name, content: c.content, createdAt: c.createdAt })),
-      canEdit: userId && (String(m.teacherId) === userId || classOwnerId === userId)
+      canEdit: Boolean(userId) && (String(m.teacherId) === userId || classOwnerId === userId),
+      canComment: isMember && String(m.teacherId) !== userId
     })) });
   } catch (e) {
     console.error(e);
@@ -48,7 +52,7 @@ export const createMessage: RequestHandler = async (req: AuthRequest, res) => {
     })) : [];
 
     const msg = await Message.create({ classId: id, teacherId: (req as any).userId, title: title || undefined, content: content.trim(), pinned: !!pinned, attachments: atts, comments: [] });
-    res.status(201).json({ message: { id: msg.id, title: msg.title || "", content: msg.content, createdAt: msg.createdAt, updatedAt: msg.updatedAt, pinned: !!msg.pinned, attachments: atts, comments: [], canEdit: true } });
+    res.status(201).json({ message: { id: msg.id, title: msg.title || "", content: msg.content, createdAt: msg.createdAt, updatedAt: msg.updatedAt, pinned: !!msg.pinned, attachments: atts, comments: [], canEdit: true, canComment: false } });
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Server error" });
@@ -98,7 +102,8 @@ export const updateMessage: RequestHandler = async (req: AuthRequest, res) => {
       pinned: !!updated!.pinned,
       attachments: (updated!.attachments || []).map(a => ({ name: a.name, type: a.type, size: a.size, dataUrl: a.dataUrl })),
       comments: (updated!.comments || []).map(c => ({ userId: c.userId, name: c.name, content: c.content, createdAt: c.createdAt })),
-      canEdit: true
+      canEdit: true,
+      canComment: isOwner && !isPoster
     }});
   } catch (e) {
     console.error(e);
@@ -113,16 +118,28 @@ export const addComment: RequestHandler = async (req: AuthRequest, res) => {
     const { messageId } = req.params as { messageId: string };
     const { content } = req.body as { content?: string };
     if (!content || !content.trim()) return res.status(400).json({ message: "Content is required" });
-    const userId = (req as any).userId as string;
-    const user = await User.findById(userId).select("name").lean();
+    const userId = String((req as any).userId || "");
+
+    const msg = await Message.findById(messageId).select("classId teacherId").lean();
+    if (!msg) return res.status(404).json({ message: "Message not found" });
+    // Poster cannot comment
+    if (String(msg.teacherId) === userId)
+      return res.status(403).json({ message: "Poster cannot comment on own message" });
+
+    const cls = await ClassModel.findById(msg.classId).select("teacher").lean();
+    const user = await User.findById(userId).select("name enrolledClasses").lean();
+    const isOwner = cls ? String(cls.teacher) === userId : false;
+    const enrolled = new Set((user?.enrolledClasses || []).map((x: any) => String(x)));
+    const isMember = isOwner || enrolled.has(String(msg.classId));
+    if (!isMember) return res.status(403).json({ message: "Not a class member" });
+
     const name = user?.name || "User";
     const ret = await Message.findByIdAndUpdate(
       messageId,
       { $push: { comments: { userId, name, content: content.trim(), createdAt: new Date() } } },
       { new: true }
     ).lean();
-    if (!ret) return res.status(404).json({ message: "Message not found" });
-    const added = ret.comments[ret.comments.length - 1];
+    const added = ret!.comments[ret!.comments.length - 1];
     res.status(201).json({ comment: added });
   } catch (e) {
     console.error(e);
