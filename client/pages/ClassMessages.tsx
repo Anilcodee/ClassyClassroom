@@ -221,16 +221,20 @@ export default function ClassMessages() {
                 </div>
                 <div className="shrink-0">
                   {editingId === m.id ? (
-                    <div className="flex items-center gap-2">
-                      <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>saveEdit(m.id)}>Save</button>
-                      <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(null); setEditTitle(""); setEditContent(""); setEditAttachments([]); setEditNewFiles([]); }}>Cancel</button>
-                      <button className="px-2 py-1 rounded border border-border text-xs text-destructive" onClick={()=>del(m.id)}>Delete</button>
-                    </div>
+                    m.canEdit ? (
+                      <div className="flex items-center gap-2">
+                        <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>saveEdit(m.id)}>Save</button>
+                        <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(null); setEditTitle(""); setEditContent(""); setEditAttachments([]); setEditNewFiles([]); }}>Cancel</button>
+                        <button className="px-2 py-1 rounded border border-border text-xs text-destructive" onClick={()=>del(m.id)}>Delete</button>
+                      </div>
+                    ) : null
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(m.id); setEditTitle(m.title || ""); setEditContent(m.content); setEditAttachments([...(m.attachments||[])]); setEditNewFiles([]); }}>Edit post</button>
-                      <button className="px-2 py-1 rounded border border-border text-xs text-destructive" onClick={()=>del(m.id)}>Delete</button>
-                    </div>
+                    m.canEdit ? (
+                      <div className="flex items-center gap-2">
+                        <button className="px-2 py-1 rounded border border-border text-xs" onClick={()=>{ setEditingId(m.id); setEditTitle(m.title || ""); setEditContent(m.content); setEditAttachments([...(m.attachments||[])]); setEditNewFiles([]); }}>Edit post</button>
+                        <button className="px-2 py-1 rounded border border-border text-xs text-destructive" onClick={()=>del(m.id)}>Delete</button>
+                      </div>
+                    ) : null
                   )}
                 </div>
               </div>
