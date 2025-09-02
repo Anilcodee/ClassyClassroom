@@ -130,7 +130,7 @@ export default function ClassAssignments(){
                 {role === 'student' ? (
                   <Link to={`/assign/${a.id}`} className="px-3 py-1.5 rounded-md border border-border text-sm">Open</Link>
                 ) : (
-                  <Link to={`/assign/${a.id}/submissions`} className="px-3 py-1.5 rounded-md border border-border text-sm">Submissions</Link>
+                  <Link to={`/assign/${a.id}`} className="px-3 py-1.5 rounded-md border border-border text-sm">Open</Link>
                 )}
               </div>
             </li>
