@@ -21,6 +21,8 @@ interface MessageItem { id: string; title?: string; content: string; createdAt: 
 export default function ClassMessages() {
   const { id } = useParams();
   const token = useMemo(() => localStorage.getItem("token"), []);
+  const nav = (require("react-router-dom") as any).useNavigate?.() ?? (()=>{});
+  const userRole = useMemo(() => { try { const raw = localStorage.getItem("user"); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -61,18 +63,48 @@ export default function ClassMessages() {
     return () => document.removeEventListener('fullscreenchange', onFs);
   }, []);
 
-  async function load() {
+  async function load(signal?: AbortSignal) {
     setLoading(true); setError(null);
+    const headers: Record<string,string> = {};
+    if (token) headers.Authorization = `Bearer ${token}`;
     try {
-      const r = await fetch(`/api/classes/${id}/messages`, { headers: { Authorization: token ? `Bearer ${token}` : "" }, cache: 'no-store' });
+      const r = await fetch(`/api/classes/${id}/messages`, { headers, cache: 'no-store', signal });
+      if (!r.ok) {
+        let d: any = {};
+        try { d = await r.json(); } catch {}
+        throw new Error(d?.message || r.statusText);
+      }
       const d = await r.json();
-      if (!r.ok) throw new Error(d?.message || r.statusText);
       setMessages(d.messages || []);
-    } catch (e: any) { setError(e.message); }
-    finally { setLoading(false); }
+    } catch (e: any) {
+      if (e?.name === 'AbortError') return;
+      // Retry once for transient network errors
+      try {
+        await new Promise(res => setTimeout(res, 500));
+        const r2 = await fetch(`/api/classes/${id}/messages`, { headers, cache: 'no-store', signal });
+        if (!r2.ok) {
+          let d2: any = {};
+          try { d2 = await r2.json(); } catch {}
+          throw new Error(d2?.message || r2.statusText);
+        }
+        const d2 = await r2.json();
+        setMessages(d2.messages || []);
+      } catch (e2: any) {
+        setError(e2.message || 'Failed to load');
+      }
+    } finally { setLoading(false); }
   }
 
-  useEffect(() => { void load(); }, [id, token]);
+  useEffect(() => {
+    if (!token) {
+      // Redirect to appropriate auth if not logged in
+      if (userRole === 'student') nav('/student-auth'); else nav('/auth');
+      return;
+    }
+    const ac = new AbortController();
+    void load(ac.signal);
+    return () => ac.abort();
+  }, [id, token]);
 
   const userRole = useMemo(() => {
     try {
