@@ -17,6 +17,7 @@ import { dbHealth } from "./routes/health";
 import { listStudentClasses, joinClass } from "./routes/student";
 import { updateClassDetails } from "./routes/classes.update";
 import { joinClassAsTeacher } from "./routes/classes.join-teacher";
+import { listAssignments, createAssignment, updateAssignment, getAssignment, submitAssignment, listSubmissions } from "./routes/assignments";
 
 export function createServer() {
   const app = express();
@@ -73,6 +74,14 @@ export function createServer() {
   app.patch("/api/messages/:messageId", requireAuth, updateMessage);
   app.delete("/api/messages/:messageId", requireAuth, deleteMessage);
   app.post("/api/messages/:messageId/comments", requireAuth, addComment);
+
+  // Assignments
+  app.get("/api/classes/:id/assignments", requireAuth, listAssignments);
+  app.post("/api/classes/:id/assignments", requireAuth, createAssignment);
+  app.get("/api/assignments/:assignmentId", requireAuth, getAssignment);
+  app.patch("/api/assignments/:assignmentId", requireAuth, updateAssignment);
+  app.post("/api/assignments/:assignmentId/submit", requireAuth, submitAssignment);
+  app.get("/api/assignments/:assignmentId/submissions", requireAuth, listSubmissions);
 
   // Student
   app.get("/api/student/classes", requireAuth, listStudentClasses);
