@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import {
   AlertDialog,
@@ -152,64 +154,13 @@ export default function ClassMessages() {
     <main className="container mx-auto py-8">
       <Link to={backHref} className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
       <h1 className="mt-2 text-2xl font-bold">Messages</h1>
-      <div className="mt-4 rounded-xl border border-border p-4">
-        <div className="grid gap-2">
-          <input className="rounded-lg border border-input bg-background px-3 py-2" placeholder="Title (optional)" value={title} onChange={(e)=>setTitle(e.target.value)} />
-          <textarea className="rounded-lg border border-input bg-background px-3 py-2 min-h-24" placeholder="Write a message for your students" value={content} onChange={(e)=>setContent(e.target.value)} />
-          <div className="flex items-center gap-2">
-            <label className="px-3 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground cursor-pointer text-sm">
-              Attach files
-              <input
-                type="file"
-                multiple
-                className="hidden"
-                onChange={(e)=>{
-                  const picked = Array.from(e.target.files || []);
-                  const valid = picked.filter(f => f.size <= MAX_SIZE);
-                  const rejected = picked.length - valid.length;
-                  setFiles(prev => {
-                    const remaining = MAX_FILES - prev.length;
-                    const merged = [...prev, ...valid.slice(0, Math.max(0, remaining))];
-                    return merged.slice(0, MAX_FILES);
-                  });
-                  if (rejected > 0) setError(`Some files were too large (max ${(MAX_SIZE/1024/1024).toFixed(1)}MB each).`);
-                  if (e.target) (e.target as HTMLInputElement).value = "";
-                }}
-              />
-            </label>
-            <button disabled={!content.trim() || posting} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-50" onClick={post}>{posting? 'Posting…' : 'Post'}</button>
-            {error && <span className="text-sm text-destructive">{error}</span>}
-          </div>
-          {files.length > 0 && (
-            <div className="flex flex-wrap gap-2 text-xs text-foreground/70">
-              {files.map((f,i)=> (
-                <span key={i} className="inline-flex items-center gap-2 px-2 py-1 rounded border border-border bg-muted/50">
-                  <button
-                    type="button"
-                    className="max-w-[12rem] truncate text-left hover:underline"
-                    onClick={() => {
-                      const url = f.type.startsWith('image/') || f.type === 'application/pdf' || f.type.startsWith('text/') || f.type === 'application/json'
-                        ? URL.createObjectURL(f)
-                        : URL.createObjectURL(f);
-                      setPreview({ name: f.name, type: f.type || 'application/octet-stream', url });
-                    }}
-                    title="Preview"
-                  >
-                    {f.name} ({Math.round(f.size/1024)} KB)
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Remove file"
-                    className="h-5 w-5 leading-none grid place-items-center rounded hover:bg-destructive/10 text-destructive"
-                    onClick={()=> setFiles(prev => prev.filter((_, idx) => idx !== i))}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
+      <div className="mt-4">
+        <Link to={`/classes/${id}/messages/new`} className="block">
+          <Button className="w-full justify-start gap-2" variant="outline">
+            <Pencil className="h-4 w-4" />
+            Write an announcement
+          </Button>
+        </Link>
       </div>
       {loading ? (
         <p className="mt-4 text-sm text-foreground/70">Loading…</p>
