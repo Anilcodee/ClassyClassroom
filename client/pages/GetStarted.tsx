@@ -7,17 +7,18 @@ export default function GetStarted() {
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-foreground/70 mb-4">
             <span className="h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
-            Fast, secure, classroom attendance
+            Fast, secure classroom platform for teachers and students
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-            Attendance in 4 minutes. QR powered.
+            All‑in‑one classroom: attendance, messages, and more.
           </h1>
           <p className="mt-4 text-lg text-foreground/70 max-w-xl">
-            Create classes, share a join link or QR, and watch students tick in
-            live. Download daily PDFs and keep everything saved in your database.
+            Teachers can create classes, run timed QR attendance, and post announcements.
+            Students join with a code, comment on posts, and track their own attendance.
+            PDFs, history, class covers, and role‑based access included.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/student" className="px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:opacity-90">
+            <Link to="/student-auth" className="px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:opacity-90">
               Sign in as Student
             </Link>
             <Link to="/auth" className="px-5 py-3 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground">
@@ -25,10 +26,12 @@ export default function GetStarted() {
             </Link>
           </div>
           <ul className="mt-8 grid sm:grid-cols-2 gap-4 text-sm text-foreground/80">
-            <li className="flex items-center gap-2"><span>✅</span> Login & Sign‑up for teachers</li>
-            <li className="flex items-center gap-2"><span>✅</span> Add students manually, via link, or spreadsheet</li>
-            <li className="flex items-center gap-2"><span>✅</span> 4‑minute active sessions with auto‑close</li>
-            <li className="flex items-center gap-2"><span>✅</span> Live status with green ticks + PDF exports</li>
+            <li className="flex items-center gap-2"><span>✅</span> Login & Sign‑up for teachers and students</li>
+            <li className="flex items-center gap-2"><span>✅</span> Join via code, manage roster (name + roll no.)</li>
+            <li className="flex items-center gap-2"><span>✅</span> Timed QR attendance sessions with auto‑close</li>
+            <li className="flex items-center gap-2"><span>✅</span> Live present ticks, per‑student attendance view</li>
+            <li className="flex items-center gap-2"><span>✅</span> Messages & announcements with comments</li>
+            <li className="flex items-center gap-2"><span>✅</span> Class cover images, PDF exports, history</li>
           </ul>
         </div>
         <div className="relative">
