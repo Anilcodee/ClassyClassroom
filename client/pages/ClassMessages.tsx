@@ -86,10 +86,10 @@ export default function ClassMessages() {
       if (mountedRef.current) setMessages(d.messages || []);
     } catch (e: any) {
       if (e?.name === 'AbortError') return;
-      // Retry once for transient network errors
+      // Retry once for transient network errors; don't reuse possibly aborted signal
       try {
         await new Promise(res => setTimeout(res, 500));
-        const r2 = await fetch(`/api/classes/${id}/messages`, { headers, cache: 'no-store', signal });
+        const r2 = await fetch(`/api/classes/${id}/messages`, { headers, cache: 'no-store' });
         if (!r2.ok) {
           let d2: any = {};
           try { d2 = await r2.json(); } catch {}
@@ -98,7 +98,7 @@ export default function ClassMessages() {
         const d2 = await r2.json();
         if (mountedRef.current) setMessages(d2.messages || []);
       } catch (e2: any) {
-        if (mountedRef.current) setError(e2.message || 'Failed to load');
+        if (mountedRef.current) setError(e2?.message || 'Network error. Please retry.');
       }
     } finally { if (mountedRef.current) setLoading(false); }
   }
