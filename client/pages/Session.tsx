@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 export default function Session() {
   const { sessionId } = useParams();
@@ -64,11 +64,13 @@ export default function Session() {
   const userRole = useMemo(() => {
     try { const raw = localStorage.getItem("user"); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; }
   }, []);
-  const backHref = userRole === "student" ? "/student" : "/classes";
+  const location = useLocation();
+  const classIdFromState = (location.state as any)?.classId as string | undefined;
+  const backHref = classIdFromState ? `/classes/${classIdFromState}` : (userRole === "student" ? "/student" : "/classes");
 
   return (
     <main className="container mx-auto py-10 text-center">
-      <Link to={backHref} className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
+      <Link to={backHref} className="text-sm text-foreground/70 hover:text-foreground">← Back to class</Link>
       <h1 className="mt-2 text-2xl font-bold">Scan to mark attendance</h1>
       <p className="text-foreground/70">Share this QR or link with students.</p>
       <div className="mt-6 grid place-items-center">
