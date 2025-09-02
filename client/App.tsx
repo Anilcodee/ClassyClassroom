@@ -44,6 +44,8 @@ const App = () => (
           <Route path="/student/classes/:id/attendance" element={<StudentAttendance />} />
           <Route path="/classes/:id/messages" element={<ClassMessages />} />
           <Route path="/classes/:id/messages/new" element={<ClassMessageCompose />} />
+          <Route path="/classes/:id/assignments" element={<ClassAssignments />} />
+          <Route path="/assign/:assignmentId" element={<AssignmentSubmit />} />
           <Route path="/classes/:id/modify" element={<ModifyClass />} />
           <Route path="/session/:sessionId" element={<Session />} />
           <Route path="/attend/:sessionId" element={<Attend />} />
