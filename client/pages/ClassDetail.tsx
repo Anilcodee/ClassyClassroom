@@ -84,7 +84,7 @@ export default function ClassDetail() {
       const res = await fetch(`/api/classes/${id}/activate`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.message || res.statusText);
-      nav(`/session/${data.sessionId}`);
+      nav(`/session/${data.sessionId}` , { state: { classId: id } });
     } catch (e: any) {
       setError(e.message);
       if (e.message === "Please log in") nav("/auth");
