@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-interface ClassItem { id?: string; _id?: string; name: string; joinCode?: string; }
+interface ClassItem { id?: string; _id?: string; name: string; joinCode?: string; imageUrl?: string; isActive?: boolean }
 
 export default function StudentDashboard() {
   const nav = useNavigate();
@@ -78,12 +78,45 @@ export default function StudentDashboard() {
           <p className="text-foreground/70">No classes yet. Join one using the code above.</p>
         ) : (
           <ul className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {classes.map((c) => (
-              <li key={(c as any).id || (c as any)._id} className="rounded-lg border border-border p-4">
-                <div className="font-semibold">{c.name}</div>
-                <div className="text-xs text-foreground/60">Joined</div>
-              </li>
-            ))}
+            {classes.map((c) => {
+              const cid = (c as any).id || (c as any)._id;
+              return (
+                <li
+                  key={cid}
+                  className="rounded-xl border border-border overflow-hidden relative"
+                  style={{ minHeight: "10rem" }}
+                >
+                  {c.imageUrl ? (
+                    <div className="w-full h-28 md:h-40">
+                      <img src={c.imageUrl} alt="Class cover" className="w-full h-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="w-full h-28 md:h-40 bg-muted/50" />
+                  )}
+                  <div className="p-5">
+                    <p className="font-medium">{c.name}</p>
+                    <div className="mt-2 text-xs text-foreground/60">Joined</div>
+                  </div>
+                  <span className={"absolute top-2 right-2 text-xs px-2 py-1 rounded-full " + (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")}>{c.isActive ? "Active" : "Inactive"}</span>
+                  <div className="absolute bottom-3 right-3 z-10 flex flex-row gap-2">
+                    <Link
+                      to={`/classes/${cid}/messages`}
+                      className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground hover:opacity-90 text-center"
+                      title="Messages"
+                    >
+                      Messages
+                    </Link>
+                    <Link
+                      to={`/classes/${cid}/attendance/history`}
+                      className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background hover:bg-accent hover:text-accent-foreground text-center"
+                      title="Attendance PDFs"
+                    >
+                      Attendance
+                    </Link>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
