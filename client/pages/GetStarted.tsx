@@ -25,25 +25,17 @@ export default function GetStarted() {
               Sign in as Teacher
             </Link>
           </div>
-          <ul className="mt-8 grid sm:grid-cols-2 gap-4 text-sm text-foreground/80">
-            <li className="flex items-center gap-2"><span>✅</span> Login & Sign‑up for teachers and students</li>
-            <li className="flex items-center gap-2"><span>✅</span> Join via code, manage roster (name + roll no.)</li>
-            <li className="flex items-center gap-2"><span>✅</span> Timed QR attendance sessions with auto‑close</li>
-            <li className="flex items-center gap-2"><span>✅</span> Live present ticks, per‑student attendance view</li>
-            <li className="flex items-center gap-2"><span>✅</span> Messages & announcements with comments</li>
-            <li className="flex items-center gap-2"><span>✅</span> Class cover images, PDF exports, history</li>
-          </ul>
         </div>
-        <div className="relative space-y-6">
+        <div className="grid sm:grid-cols-2 gap-6">
           <div>
             <TeacherAnimation />
             <div className="mt-3">
               <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Teachers</h3>
-              <ul className="text-sm text-foreground/70 space-y-1 list-disc list-inside">
-                <li>Create and manage classes with cover images</li>
-                <li>Start timed QR attendance sessions</li>
-                <li>Download PDFs and view attendance history</li>
-                <li>Post announcements; edit/delete your posts</li>
+              <ul className="text-sm text-foreground/70 space-y-2">
+                <li className="flex items-center gap-2"><span>✅</span> Create and manage classes with cover images</li>
+                <li className="flex items-center gap-2"><span>✅</span> Start timed QR attendance sessions</li>
+                <li className="flex items-center gap-2"><span>✅</span> Download PDFs and view attendance history</li>
+                <li className="flex items-center gap-2"><span>✅</span> Post announcements; edit/delete your posts</li>
               </ul>
             </div>
           </div>
@@ -51,11 +43,11 @@ export default function GetStarted() {
             <StudentAnimation />
             <div className="mt-3">
               <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Students</h3>
-              <ul className="text-sm text-foreground/70 space-y-1 list-disc list-inside">
-                <li>Join classes via secure code</li>
-                <li>See your classes and attendance days</li>
-                <li>Comment on announcements (except your own)</li>
-                <li>Clean, mobile‑friendly experience</li>
+              <ul className="text-sm text-foreground/70 space-y-2">
+                <li className="flex items-center gap-2"><span>✅</span> Join classes via secure code</li>
+                <li className="flex items-center gap-2"><span>✅</span> See your classes and attendance days</li>
+                <li className="flex items-center gap-2"><span>✅</span> Comment on announcements (except your own)</li>
+                <li className="flex items-center gap-2"><span>✅</span> Clean, mobile‑friendly experience</li>
               </ul>
             </div>
           </div>
