@@ -107,7 +107,7 @@ export default function StudentDashboard() {
                       Messages
                     </Link>
                     <Link
-                      to={`/classes/${cid}/attendance/history`}
+                      to={`/classes/${cid}/history`}
                       className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background hover:bg-accent hover:text-accent-foreground text-center"
                       title="Attendance PDFs"
                     >
