@@ -314,6 +314,42 @@ function MakeClassCard({ onCreated }: { onCreated: () => Promise<void> | void })
               }} />
             </label>
           </div>
+          <div className="mt-3 rounded-xl border border-border p-3 bg-background/50">
+            <p className="text-sm font-medium mb-2">Join class as co‑teacher</p>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                className="flex-1 rounded-lg border border-input bg-background px-3 py-2"
+                placeholder="Enter class code"
+                value={joinCode}
+                onChange={(e)=> setJoinCode(e.target.value)}
+              />
+              <button
+                className="px-4 py-2 rounded-lg border border-border disabled:opacity-50"
+                disabled={joining || !joinCode}
+                onClick={async ()=>{
+                  setJoining(true); setErr(null);
+                  try {
+                    const token = localStorage.getItem("token");
+                    const res = await fetch("/api/classes/join-as-teacher", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },
+                      body: JSON.stringify({ joinCode: joinCode.trim() })
+                    });
+                    const d = await res.json().catch(()=>({}));
+                    if (!res.ok) throw new Error(d?.message || res.statusText);
+                    toast({ title: "Joined as co‑teacher", description: d?.class?.name || "" });
+                    setJoinCode("");
+                    await onCreated();
+                  } catch (e: any) {
+                    setErr(e.message || "Failed to join");
+                    toast({ title: "Failed to join", description: e.message || "" });
+                  } finally { setJoining(false); }
+                }}
+              >
+                {joining ? "Joining…" : "Join"}
+              </button>
+            </div>
+          </div>
         </div>
         <div className="w-48 h-48 relative">
           <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-brand-400/30 to-brand-700/30 blur-2xl" />
