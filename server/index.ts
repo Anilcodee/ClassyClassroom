@@ -79,5 +79,8 @@ export function createServer() {
   app.post("/api/student/classes/join", requireAuth, joinClass);
   app.get("/api/student/classes/:id/attendance", requireAuth, getStudentAttendance);
 
+  // Teachers: join as co-teacher
+  app.post("/api/classes/join-as-teacher", requireAuth, joinClassAsTeacher);
+
   return app;
 }
