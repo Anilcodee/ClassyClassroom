@@ -14,7 +14,7 @@ import {
 
 interface Attachment { name: string; type: string; size: number; dataUrl: string }
 interface CommentItem { userId: string; name: string; content: string; createdAt: string }
-interface MessageItem { id: string; title?: string; content: string; createdAt: string; updatedAt?: string; pinned?: boolean; attachments?: Attachment[]; comments?: CommentItem[] }
+interface MessageItem { id: string; title?: string; content: string; createdAt: string; updatedAt?: string; pinned?: boolean; attachments?: Attachment[]; comments?: CommentItem[]; canEdit?: boolean }
 
 export default function ClassMessages() {
   const { id } = useParams();
