@@ -8,6 +8,7 @@ export interface IStudent {
 export interface IClass extends Document {
   name: string;
   teacher: Types.ObjectId;
+  coTeachers?: Types.ObjectId[];
   joinCode: string;
   students: IStudent[];
   isActive: boolean;
@@ -28,6 +29,7 @@ const ClassSchema = new Schema<IClass>(
   {
     name: { type: String, required: true },
     teacher: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    coTeachers: { type: [Schema.Types.ObjectId], ref: "User", default: [] },
     joinCode: { type: String, required: true, unique: true, index: true },
     students: { type: [StudentSchema], default: [] },
     isActive: { type: Boolean, default: false },
