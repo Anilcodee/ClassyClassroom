@@ -11,7 +11,8 @@ export const listStudentClasses: RequestHandler = async (req: AuthRequest, res) 
     const user = await User.findById(req.userId);
     if (!user) return res.status(401).json({ message: "Unauthorized" });
     const role = (user as any).role || "teacher";
-    if (role !== "student") return res.status(403).json({ message: "Forbidden" });
+    const isStudent = (user as any).isStudent === true || role === "student";
+    if (!isStudent) return res.status(403).json({ message: "Forbidden" });
     const classIds = (user as any).enrolledClasses || [];
     const classes = await ClassModel.find({ _id: { $in: classIds } })
       .select("name joinCode teacher createdAt updatedAt isActive imageUrl")
@@ -33,7 +34,8 @@ export const joinClass: RequestHandler = async (req: AuthRequest, res) => {
     const user = await User.findById(req.userId);
     if (!user) return res.status(401).json({ message: "Unauthorized" });
     const role = (user as any).role || "teacher";
-    if (role !== "student") return res.status(403).json({ message: "Forbidden" });
+    const isStudent = (user as any).isStudent === true || role === "student";
+    if (!isStudent) return res.status(403).json({ message: "Forbidden" });
 
     const cls = await ClassModel.findOne({ joinCode });
     if (!cls) return res.status(404).json({ message: "Class not found" });
