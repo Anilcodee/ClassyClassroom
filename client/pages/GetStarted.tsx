@@ -35,8 +35,30 @@ export default function GetStarted() {
           </ul>
         </div>
         <div className="relative space-y-6">
-          <TeacherAnimation />
-          <StudentAnimation />
+          <div>
+            <TeacherAnimation />
+            <div className="mt-3">
+              <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Teachers</h3>
+              <ul className="text-sm text-foreground/70 space-y-1 list-disc list-inside">
+                <li>Create and manage classes with cover images</li>
+                <li>Start timed QR attendance sessions</li>
+                <li>Download PDFs and view attendance history</li>
+                <li>Post announcements; edit/delete your posts</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <StudentAnimation />
+            <div className="mt-3">
+              <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Students</h3>
+              <ul className="text-sm text-foreground/70 space-y-1 list-disc list-inside">
+                <li>Join classes via secure code</li>
+                <li>See your classes and attendance days</li>
+                <li>Comment on announcements (except your own)</li>
+                <li>Clean, mobile‑friendly experience</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
     </main>
