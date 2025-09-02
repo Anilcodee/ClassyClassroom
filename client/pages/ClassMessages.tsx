@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -21,7 +21,7 @@ interface MessageItem { id: string; title?: string; content: string; createdAt: 
 export default function ClassMessages() {
   const { id } = useParams();
   const token = useMemo(() => localStorage.getItem("token"), []);
-  const nav = (require("react-router-dom") as any).useNavigate?.() ?? (()=>{});
+  const nav = useNavigate();
   const userRole = useMemo(() => { try { const raw = localStorage.getItem("user"); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [title, setTitle] = useState("");
@@ -106,14 +106,6 @@ export default function ClassMessages() {
     return () => ac.abort();
   }, [id, token]);
 
-  const userRole = useMemo(() => {
-    try {
-      const raw = localStorage.getItem("user");
-      return raw ? JSON.parse(raw).role : undefined;
-    } catch {
-      return undefined;
-    }
-  }, []);
   const backHref = userRole === "student" ? "/student" : "/classes";
 
   async function readFiles(fs: File[]): Promise<Attachment[]> {
