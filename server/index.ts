@@ -16,6 +16,7 @@ import { listMessages, createMessage, addComment, updateMessage, deleteMessage }
 import { dbHealth } from "./routes/health";
 import { listStudentClasses, joinClass } from "./routes/student";
 import { updateClassDetails } from "./routes/classes.update";
+import { joinClassAsTeacher } from "./routes/classes.join-teacher";
 
 export function createServer() {
   const app = express();
