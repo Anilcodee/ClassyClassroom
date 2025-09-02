@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import mongoose from "mongoose";
 import { Message } from "../models/Message";
+import { ClassModel } from "../models/Class";
 import { AuthRequest } from "../middleware/auth";
 import { User } from "../models/User";
 
@@ -10,6 +11,9 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
   try {
     const { id } = req.params as { id: string };
     const msgs = await Message.find({ classId: id }).sort({ createdAt: -1 }).lean();
+    const cls = await ClassModel.findById(id).select("teacher").lean();
+    const userId = String((req as any).userId || "");
+    const classOwnerId = cls ? String(cls.teacher) : "";
     res.json({ messages: msgs.map(m => ({
       id: m._id,
       title: m.title || "",
@@ -18,7 +22,8 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
       updatedAt: m.updatedAt,
       pinned: !!m.pinned,
       attachments: (m.attachments || []).map(a => ({ name: a.name, type: a.type, size: a.size, dataUrl: a.dataUrl })),
-      comments: (m.comments || []).map(c => ({ userId: c.userId, name: c.name, content: c.content, createdAt: c.createdAt }))
+      comments: (m.comments || []).map(c => ({ userId: c.userId, name: c.name, content: c.content, createdAt: c.createdAt })),
+      canEdit: userId && (String(m.teacherId) === userId || classOwnerId === userId)
     })) });
   } catch (e) {
     console.error(e);
@@ -74,22 +79,25 @@ export const updateMessage: RequestHandler = async (req: AuthRequest, res) => {
       update.$push = { attachments: { $each: atts } };
     }
 
-    const updated = await Message.findOneAndUpdate(
-      { _id: messageId, teacherId: (req as any).userId },
-      update,
-      { new: true }
-    ).lean();
-    if (!updated) return res.status(404).json({ message: "Message not found or unauthorized" });
+    const msg = await Message.findById(messageId).lean();
+    if (!msg) return res.status(404).json({ message: "Message not found" });
+    const cls = await ClassModel.findById(msg.classId).select("teacher").lean();
+    const userId = String((req as any).userId || "");
+    const isPoster = String(msg.teacherId) === userId;
+    const isOwner = cls ? String(cls.teacher) === userId : false;
+    if (!isPoster && !isOwner) return res.status(403).json({ message: "Unauthorized" });
+
+    const updated = await Message.findByIdAndUpdate(messageId, update, { new: true }).lean();
 
     res.json({ message: {
-      id: updated._id,
-      title: updated.title || "",
-      content: updated.content,
-      createdAt: updated.createdAt,
-      updatedAt: updated.updatedAt,
-      pinned: !!updated.pinned,
-      attachments: (updated.attachments || []).map(a => ({ name: a.name, type: a.type, size: a.size, dataUrl: a.dataUrl })),
-      comments: (updated.comments || []).map(c => ({ userId: c.userId, name: c.name, content: c.content, createdAt: c.createdAt }))
+      id: updated!._id,
+      title: updated!.title || "",
+      content: updated!.content,
+      createdAt: updated!.createdAt,
+      updatedAt: updated!.updatedAt,
+      pinned: !!updated!.pinned,
+      attachments: (updated!.attachments || []).map(a => ({ name: a.name, type: a.type, size: a.size, dataUrl: a.dataUrl })),
+      comments: (updated!.comments || []).map(c => ({ userId: c.userId, name: c.name, content: c.content, createdAt: c.createdAt }))
     }});
   } catch (e) {
     console.error(e);
@@ -126,8 +134,15 @@ export const deleteMessage: RequestHandler = async (req: AuthRequest, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { messageId } = req.params as { messageId: string };
-    const deleted = await Message.findOneAndDelete({ _id: messageId, teacherId: (req as any).userId }).lean();
-    if (!deleted) return res.status(404).json({ message: "Message not found or unauthorized" });
+    const msg = await Message.findById(messageId).lean();
+    if (!msg) return res.status(404).json({ message: "Message not found" });
+    const cls = await ClassModel.findById(msg.classId).select("teacher").lean();
+    const userId = String((req as any).userId || "");
+    const isPoster = String(msg.teacherId) === userId;
+    const isOwner = cls ? String(cls.teacher) === userId : false;
+    if (!isPoster && !isOwner) return res.status(403).json({ message: "Unauthorized" });
+
+    await Message.findByIdAndDelete(messageId).lean();
     res.json({ ok: true });
   } catch (e) {
     console.error(e);
