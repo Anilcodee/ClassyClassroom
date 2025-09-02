@@ -10,6 +10,7 @@ import { getClass } from "./routes/classes.get-by-id";
 import { activateClass, sessionStatus, markAttendance } from "./routes/attendance";
 import { getTodayAttendance } from "./routes/attendance.today";
 import { listAttendanceDates, classAttendancePdf, classAttendancePdfAll } from "./routes/attendance.pdf";
+import { getStudentAttendance } from "./routes/student.attendance";
 import { getAttendanceForDate } from "./routes/attendance.view";
 import { listMessages, createMessage, addComment, updateMessage, deleteMessage } from "./routes/messages";
 import { dbHealth } from "./routes/health";
@@ -75,6 +76,7 @@ export function createServer() {
   // Student
   app.get("/api/student/classes", requireAuth, listStudentClasses);
   app.post("/api/student/classes/join", requireAuth, joinClass);
+  app.get("/api/student/classes/:id/attendance", requireAuth, getStudentAttendance);
 
   return app;
 }
