@@ -11,9 +11,9 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
   try {
     const { id } = req.params as { id: string };
     const msgs = await Message.find({ classId: id }).sort({ createdAt: -1 }).lean();
-    const cls = await ClassModel.findById(id).select("teacher students").lean();
+    const cls = await ClassModel.findById(id).select("teacher coTeachers students").lean();
     const userId = String((req as any).userId || "");
-    const classOwnerId = cls ? String(cls.teacher) : "";
+    const isOwnerOrCo = cls ? (String(cls.teacher) === userId || (cls.coTeachers||[]).some((t:any)=> String(t) === userId)) : false;
     const user = await User.findById(userId).select("enrolledClasses rollNo").lean();
     const enrolled = new Set((user?.enrolledClasses || []).map((x: any) => String(x)));
     const inRoster = (cls?.students || []).some((s: any) => String(s.rollNo) === String((user as any)?.rollNo || ""));
