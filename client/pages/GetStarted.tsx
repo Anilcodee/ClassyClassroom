@@ -29,7 +29,7 @@ export default function GetStarted() {
         <div className="grid sm:grid-cols-2 gap-6">
           <div className="flex flex-col items-center">
             <TeacherAnimation />
-            <div className="mt-3 w-full">
+            <div className="mt-3 w-full max-w-md mx-auto">
               <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Teachers</h3>
               <ul className="text-sm text-foreground/70 space-y-2 mx-auto inline-block text-left">
                 <li className="flex items-center gap-2"><span>✅</span> Create and manage classes with cover images</li>
@@ -41,7 +41,7 @@ export default function GetStarted() {
           </div>
           <div className="flex flex-col items-center">
             <StudentAnimation />
-            <div className="mt-3 w-full">
+            <div className="mt-3 w-full max-w-md mx-auto">
               <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Students</h3>
               <ul className="text-sm text-foreground/70 space-y-2 mx-auto inline-block text-left">
                 <li className="flex items-center gap-2"><span>✅</span> Join classes via secure code</li>
