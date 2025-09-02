@@ -31,7 +31,7 @@ export default function GetStarted() {
             <TeacherAnimation />
             <div className="mt-3 w-full max-w-md mx-auto">
               <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Teachers</h3>
-              <ul className="text-sm text-foreground/70 space-y-2 mx-auto">
+              <ul className="text-sm text-foreground/70 space-y-2 mx-auto pl-[69px] mb-[13px]">
                 <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Create and manage classes with cover images</span></li>
                 <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Start timed QR attendance sessions</span></li>
                 <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Download PDFs and view attendance history</span></li>
@@ -41,9 +41,9 @@ export default function GetStarted() {
           </div>
           <div className="flex flex-col items-center">
             <StudentAnimation />
-            <div className="mt-3 w-full max-w-md mx-auto">
+            <div className="mt-3 w-full max-w-md mx-auto mb-[1px]">
               <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Students</h3>
-              <ul className="text-sm text-foreground/70 space-y-2 mx-auto">
+              <ul className="text-sm text-foreground/70 space-y-2 mx-auto pl-[69px] mb-[11px]">
                 <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Join classes via secure code</span></li>
                 <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>See your classes and attendance days</span></li>
                 <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Comment on announcements (except your own)</span></li>
