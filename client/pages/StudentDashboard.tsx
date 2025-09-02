@@ -83,7 +83,7 @@ export default function StudentDashboard() {
               return (
                 <li
                   key={cid}
-                  className="rounded-xl border border-border overflow-hidden relative"
+                  className="w-full rounded-xl border border-border overflow-hidden relative"
                   style={{ minHeight: "10rem" }}
                 >
                   {c.imageUrl ? (
