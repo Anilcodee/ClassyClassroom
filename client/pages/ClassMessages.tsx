@@ -156,8 +156,8 @@ export default function ClassMessages() {
       <h1 className="mt-2 text-2xl font-bold">Messages</h1>
       <div className="mt-4">
         <Link to={`/classes/${id}/messages/new`} className="block">
-          <Button className="w-full justify-start gap-2" variant="outline">
-            <Pencil className="h-4 w-4" />
+          <Button className="w-full justify-center gap-2 bg-blue-600 hover:bg-blue-600/90 text-white py-5 text-base" variant="default">
+            <Pencil className="h-5 w-5" />
             Write an announcement
           </Button>
         </Link>
