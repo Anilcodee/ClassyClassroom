@@ -78,16 +78,18 @@ export const createAssignment: RequestHandler = async (req: AuthRequest, res) =>
       allowedRollNos: Array.isArray(allowedRollNos) ? allowedRollNos.filter((x: any) => typeof x === 'string' && x.trim()).map((x: any) => x.trim()) : [],
     });
 
-    // Auto-post an announcement message so it appears in class Messages
+    // Auto-post only if published now (not draft and publishAt <= now)
     try {
-      const parts: string[] = [];
-      parts.push(`${doc.type === 'quiz' ? 'Quiz' : 'Assignment'} created: ${doc.title}`);
-      if (doc.dueAt) parts.push(`Due: ${doc.dueAt.toISOString()}`);
-      if (doc.publishAt) parts.push(`Publish: ${doc.publishAt.toISOString()}`);
-      const content = [doc.description || "", parts.join(" | ")].filter(Boolean).join("\n\n");
-      await Message.create({ classId: id, teacherId: userId, title: doc.type === 'quiz' ? `Quiz: ${doc.title}` : `Assignment: ${doc.title}`, content: content || (doc.type === 'quiz' ? 'New quiz assigned.' : 'New assignment assigned.'), attachments: atts.slice(0, 5), comments: [] });
+      const nowIso = new Date();
+      const published = !doc.isDraft && (!doc.publishAt || doc.publishAt <= nowIso);
+      if (published) {
+        const parts: string[] = [];
+        parts.push(`${doc.type === 'quiz' ? 'Quiz' : 'Assignment'}: ${doc.title}`);
+        if (doc.dueAt) parts.push(`Due: ${doc.dueAt.toISOString()}`);
+        const content = [doc.description || "", parts.join(" | ")].filter(Boolean).join("\n\n");
+        await Message.create({ classId: id, teacherId: userId, title: doc.type === 'quiz' ? `Quiz: ${doc.title}` : `Assignment: ${doc.title}`, content: content || (doc.type === 'quiz' ? 'New quiz assigned.' : 'New assignment assigned.'), attachments: atts.slice(0, 5), comments: [] });
+      }
     } catch (e) {
-      // non-fatal
       console.error('Failed to post assignment message', e);
     }
 
@@ -126,7 +128,25 @@ export const updateAssignment: RequestHandler = async (req: AuthRequest, res) =>
     if (typeof payload.allowLate === 'boolean') a.allowLate = payload.allowLate;
     if (Array.isArray(payload.allowedRollNos)) a.allowedRollNos = payload.allowedRollNos.map((x: any)=> String(x||'').trim()).filter(Boolean);
 
+    const wasDraft = a.isDraft;
+    const prevPublishAt = a.publishAt ? new Date(a.publishAt) : null;
     await a.save();
+
+    // If it just became published (not draft and publishAt <= now), post a message
+    try {
+      const now = new Date();
+      const nowPublished = !a.isDraft && (!a.publishAt || a.publishAt <= now);
+      const wasPublished = !wasDraft && (!!prevPublishAt ? prevPublishAt <= now : true);
+      if (nowPublished && !wasPublished) {
+        const atts = (a as any).attachments || [];
+        const parts: string[] = [];
+        parts.push(`${a.type === 'quiz' ? 'Quiz' : 'Assignment'}: ${a.title}`);
+        if (a.dueAt) parts.push(`Due: ${a.dueAt.toISOString()}`);
+        const content = [a.description || "", parts.join(" | ")].filter(Boolean).join("\n\n");
+        await Message.create({ classId: a.classId, teacherId: (req as any).userId, title: a.type === 'quiz' ? `Quiz: ${a.title}` : `Assignment: ${a.title}`, content, attachments: atts.slice(0, 5), comments: [] });
+      }
+    } catch (e) { console.error('Failed to post assignment message on publish', e); }
+
     res.json({ assignment: a });
   } catch (e) {
     console.error(e);
@@ -202,6 +222,24 @@ export const submitAssignment: RequestHandler = async (req: AuthRequest, res) =>
 
     const sub = await Submission.create({ assignmentId, userId, answers, submittedAt: now, status });
     res.status(201).json({ submission: sub });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const deleteAssignment: RequestHandler = async (req: AuthRequest, res) => {
+  if (mongoose.connection.readyState !== 1)
+    return res.status(503).json({ message: "Database not connected" });
+  try {
+    const { assignmentId } = req.params as { assignmentId: string };
+    const a = await Assignment.findById(assignmentId);
+    if (!a) return res.status(404).json({ message: "Not found" });
+    const cls = await ClassModel.findById(a.classId).select("teacher coTeachers").lean();
+    const userId = String((req as any).userId || "");
+    if (!isOwnerOrCo(cls, userId)) return res.status(403).json({ message: "Unauthorized" });
+    await Assignment.findByIdAndDelete(assignmentId);
+    res.json({ ok: true });
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Server error" });
