@@ -37,6 +37,8 @@ export default function ClassMessageCompose() {
         if (r.status === 403) throw new Error("You are not allowed to post in this class");
         throw new Error(d?.message || r.statusText);
       }
+      // Poster has seen this message; clear new-message indicator for self
+      try { localStorage.setItem(`lastSeenMsgs:${id}`, String(Date.now())); } catch {}
       toast({ title: "Announcement posted" });
       nav(`/classes/${id}/messages`);
     } catch (e: any) {
