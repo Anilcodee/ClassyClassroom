@@ -52,10 +52,15 @@ export const createMessage: RequestHandler = async (req: AuthRequest, res) => {
       dataUrl: String(a.dataUrl || ""),
     })) : [];
 
-    const cls = await ClassModel.findById(id).select("teacher coTeachers").lean();
+    const cls = await ClassModel.findById(id).select("teacher coTeachers students").lean();
     const userId = String((req as any).userId || "");
     const isOwnerOrCo = cls ? (String(cls.teacher) === userId || (cls.coTeachers||[]).some((t:any)=> String(t) === userId)) : false;
-    if (!isOwnerOrCo) return res.status(403).json({ message: "Unauthorized" });
+    // Allow any class member (teacher, co-teacher, or student in class) to post
+    const user = await User.findById(userId).select("enrolledClasses rollNo").lean();
+    const enrolled = new Set((user?.enrolledClasses || []).map((x: any) => String(x)));
+    const inRoster = (cls?.students || []).some((s: any) => String(s.rollNo) === String((user as any)?.rollNo || ""));
+    const isMember = Boolean(userId) && (isOwnerOrCo || enrolled.has(String(id)) || inRoster);
+    if (!isMember) return res.status(403).json({ message: "Not a class member" });
 
     const msg = await Message.create({ classId: id, teacherId: (req as any).userId, title: title || undefined, content: content.trim(), pinned: !!pinned, attachments: atts, comments: [] });
     res.status(201).json({ message: { id: msg.id, title: msg.title || "", content: msg.content, createdAt: msg.createdAt, updatedAt: msg.updatedAt, pinned: !!msg.pinned, attachments: atts, comments: [], canEdit: true, canComment: false } });
