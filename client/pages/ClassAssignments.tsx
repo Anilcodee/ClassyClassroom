@@ -26,21 +26,45 @@ export default function ClassAssignments(){
   const MAX_SIZE = 4 * 1024 * 1024;
 
   const role = useMemo(()=>{ try { const raw = localStorage.getItem('user'); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
+  const mountedRef = useRef(true);
 
-  async function load(){
+  async function load(signal?: AbortSignal){
+    if (!mountedRef.current) return;
     setLoading(true); setError(null);
     try {
       const token = localStorage.getItem('token');
-      const headers: Record<string,string> = {}; if (token) headers.Authorization = `Bearer ${token}`;
-      const r = await fetch(`/api/classes/${id}/assignments`, { headers, cache: 'no-store' });
-      const d = await r.json().catch(()=>({}));
-      if (!r.ok) throw new Error(d?.message || r.statusText);
-      setItems((d.assignments||[]).map((a:any)=> ({ id: a._id, title: a.title, type: a.type, description: a.description, dueAt: a.dueAt, publishAt: a.publishAt, isDraft: a.isDraft, allowLate: a.allowLate, allowedRollNos: a.allowedRollNos })));
-    } catch(e:any){ setError(e.message||'Failed'); }
-    finally { setLoading(false); }
+      if (!token) { nav('/auth'); return; }
+      const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
+      const r = await fetch(`/api/classes/${id}/assignments`, { headers, cache: 'no-store', signal });
+      if (!r.ok) {
+        let d: any = {}; try { d = await r.json(); } catch {}
+        throw new Error(d?.message || r.statusText);
+      }
+      const d = await r.json();
+      if (mountedRef.current) setItems((d.assignments||[]).map((a:any)=> ({ id: a._id, title: a.title, type: a.type, description: a.description, dueAt: a.dueAt, publishAt: a.publishAt, isDraft: a.isDraft, allowLate: a.allowLate, allowedRollNos: a.allowedRollNos })));
+    } catch(e:any){
+      if (e?.name === 'AbortError') return;
+      try {
+        await new Promise(res => setTimeout(res, 500));
+        const token = localStorage.getItem('token');
+        if (!token) { nav('/auth'); return; }
+        const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
+        const r2 = await fetch(`/api/classes/${id}/assignments`, { headers, cache: 'no-store' });
+        const d2 = await r2.json().catch(()=>({}));
+        if (!r2.ok) throw new Error(d2?.message || r2.statusText);
+        if (mountedRef.current) setItems((d2.assignments||[]).map((a:any)=> ({ id: a._id, title: a.title, type: a.type, description: a.description, dueAt: a.dueAt, publishAt: a.publishAt, isDraft: a.isDraft, allowLate: a.allowLate, allowedRollNos: a.allowedRollNos })));
+      } catch(e2:any) {
+        if (mountedRef.current) setError(e2?.message || 'Network error');
+      }
+    } finally { if (mountedRef.current) setLoading(false); }
   }
 
-  useEffect(()=>{ void load(); }, [id]);
+  useEffect(()=>{
+    mountedRef.current = true;
+    const ac = new AbortController();
+    void load(ac.signal);
+    return () => { mountedRef.current = false; try { ac.abort(); } catch {} };
+  }, [id]);
 
   async function readFiles(fs: File[]) {
     const picked = fs.slice(0, MAX_FILES).filter(f => f.size <= MAX_SIZE);
