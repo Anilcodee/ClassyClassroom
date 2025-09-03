@@ -289,9 +289,6 @@ export default function ClassMessages() {
               Write an announcement
             </Button>
           </Link>
-          {hasNewMsgs && (
-            <span className="absolute top-1 right-1 h-3 w-3 rounded-full bg-green-500 shadow ring-2 ring-background" />
-          )}
         </div>
       </div>
       {loading ? (
