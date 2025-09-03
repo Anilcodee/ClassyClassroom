@@ -90,7 +90,13 @@ export default function AssignmentSubmit(){
   return (
     <main className="container mx-auto py-8">
       <div className="flex items-center justify-between">
-        <button type="button" onClick={()=>nav(-1)} className="text-sm text-foreground/70 hover:text-foreground">← Back</button>
+        <button
+          type="button"
+          onClick={()=>{ try { if (window.history.length > 1) nav(-1); else if (a?.classId) nav(`/classes/${a.classId}/assignments`); else nav('/classes'); } catch { nav('/classes'); } }}
+          className="text-sm text-foreground/70 hover:text-foreground"
+        >
+          ← Back
+        </button>
         {a?.classId && <Link to={`/classes/${a.classId}/assignments`} className="text-sm text-foreground/70 hover:text-foreground">Assignments</Link>}
       </div>
       {loading ? <p className="mt-4 text-sm text-foreground/70">Loading…</p> : error ? <p className="mt-4 text-sm text-destructive">{error}</p> : a ? (
