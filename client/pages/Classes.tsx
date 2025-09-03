@@ -20,6 +20,36 @@ export default function Classes() {
   const [showCodeFor, setShowCodeFor] = React.useState<string>("");
   const [menuOpenFor, setMenuOpenFor] = React.useState<string>("");
 
+  async function canReachOrigin(): Promise<boolean> {
+    try {
+      if (typeof window === 'undefined') return true;
+      if (navigator.onLine === false) return false;
+      await new Promise<void>((resolve, reject) => {
+        const img = new Image();
+        const done = () => { cleanup(); resolve(); };
+        const fail = () => { cleanup(); reject(new Error('unreachable')); };
+        const cleanup = () => { img.onload = null; img.onerror = null; };
+        img.onload = done; img.onerror = fail;
+        img.src = `/placeholder.svg?ping=${Date.now()}`;
+      });
+      return true;
+    } catch { return false; }
+  }
+
+  async function fetchWithRetry(url: string, init: RequestInit = {}, attempt = 1): Promise<Response> {
+    const { signal, ...rest } = init as any;
+    try { return await fetch(url, { ...rest, signal }); }
+    catch (e: any) {
+      const aborted = (signal && (signal as any).aborted) || e?.name === 'AbortError';
+      if (aborted) return new Response(JSON.stringify({ message: 'aborted' }), { status: 499, headers: { 'Content-Type': 'application/json' } });
+      if (attempt < 3 && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
+        await new Promise(r => setTimeout(r, 300 * attempt));
+        return fetchWithRetry(url, init, attempt + 1);
+      }
+      return new Response(JSON.stringify({ message: 'Network error' }), { status: 0, headers: { 'Content-Type': 'application/json' } });
+    }
+  }
+
   async function load() {
     setLoading(true);
     try {
