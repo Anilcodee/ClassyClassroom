@@ -231,7 +231,14 @@ export const submitAssignment: RequestHandler = async (req: AuthRequest, res) =>
     const allowed = (a.allowedRollNos || []).length === 0 || (a.allowedRollNos || []).includes(roll);
     if (!published || !allowed) return res.status(403).json({ message: "Unauthorized" });
 
-    const answers = (req.body as any).answers ?? {};
+    const body = (req.body as any) || {};
+    const answers = body.answers ?? {};
+    const attachments = Array.isArray(body.attachments) ? body.attachments.slice(0, 5).map((a:any)=> ({
+      name: String(a.name || 'file'),
+      type: String(a.type || 'application/octet-stream'),
+      size: Number(a.size || 0),
+      dataUrl: String(a.dataUrl || ''),
+    })) : [];
 
     if (a.dueAt && now > a.dueAt) {
       if (!a.allowLate) return res.status(400).json({ message: "Late submissions disabled" });
@@ -242,13 +249,14 @@ export const submitAssignment: RequestHandler = async (req: AuthRequest, res) =>
     const existing = await Submission.findOne({ assignmentId, userId });
     if (existing) {
       existing.answers = answers;
+      (existing as any).attachments = attachments;
       existing.submittedAt = now;
       existing.status = status;
       await existing.save();
       return res.json({ submission: existing });
     }
 
-    const sub = await Submission.create({ assignmentId, userId, answers, submittedAt: now, status });
+    const sub = await Submission.create({ assignmentId, userId, answers, attachments, submittedAt: now, status });
     res.status(201).json({ submission: sub });
   } catch (e) {
     console.error(e);
