@@ -56,7 +56,10 @@ export default function Classes() {
       const token = localStorage.getItem("token");
       const headers: Record<string, string> = {};
       if (token) headers.Authorization = `Bearer ${token}`;
-      const res = await fetch("/api/classes", { headers, cache: "no-store" });
+      const ok = await canReachOrigin();
+      if (!ok) throw new Error('Network error. Please retry.');
+      const res = await fetchWithRetry("/api/classes", { headers, cache: "no-store" });
+      if (res.status === 0 || res.status === 499) throw new Error('Network error. Please retry.');
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || (res.status === 401 ? "Please log in" : "Failed to load"));
       const list = data.classes.map((c: any) => ({ id: c._id, name: c.name, joinCode: c.joinCode, isActive: c.isActive, imageUrl: c.imageUrl }));
