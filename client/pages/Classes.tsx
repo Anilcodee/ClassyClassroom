@@ -16,6 +16,7 @@ export default function Classes() {
   const [error, setError] = React.useState<string | null>(null);
   const [selectedId, setSelectedId] = React.useState<string>("");
   const [showCodeFor, setShowCodeFor] = React.useState<string>("");
+  const [menuOpenFor, setMenuOpenFor] = React.useState<string>("");
 
   async function load() {
     setLoading(true);
@@ -178,8 +179,17 @@ export default function Classes() {
                   ) : (
                     <div className="w-full h-28 md:h-40 bg-muted/50" />
                   )}
-                  <div className="p-5">
-                    <p className="font-medium">{c.name}</p>
+                  <div className="p-5 relative">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-medium truncate pr-8">{c.name}</p>
+                      <button
+                        className="p-1 rounded hover:bg-accent"
+                        title="More"
+                        onClick={(e)=>{ e.stopPropagation(); setMenuOpenFor(menuOpenFor === c.id ? "" : c.id); }}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </button>
+                    </div>
                     <div className="mt-2 text-xs text-foreground/60 flex items-center gap-2">
                       <span className="relative inline-flex items-center">
                         <button
@@ -213,6 +223,29 @@ export default function Classes() {
                         )}
                       </span>
                     </div>
+                    {menuOpenFor === c.id && (
+                      <div className="absolute z-20 right-4 top-12 w-40 rounded-md border border-border bg-background shadow">
+                        <button
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                          onClick={async ()=>{
+                            try {
+                              const token = localStorage.getItem("token");
+                              const headers: Record<string,string> = { "Content-Type": "application/json" };
+                              if (token) headers.Authorization = `Bearer ${token}`;
+                              const res = await fetch(`/api/classes/${c.id}/archive`, { method: 'PATCH', headers });
+                              const d = await res.json().catch(()=>({}));
+                              if (!res.ok) throw new Error(d?.message || res.statusText);
+                              setClasses(prev => prev.filter(x => x.id !== c.id));
+                              toast({ title: "Class archived" });
+                            } catch (e: any) {
+                              toast({ title: "Failed to archive", description: e.message || "" });
+                            } finally { setMenuOpenFor(""); }
+                          }}
+                        >
+                          Archive class
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <span className={"absolute top-2 right-2 text-xs px-2 py-1 rounded-full " + (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")}>{c.isActive ? "Active" : "Inactive"}</span>
                 {/* Action buttons bottom-right */}
