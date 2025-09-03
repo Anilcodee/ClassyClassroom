@@ -58,9 +58,9 @@ export default function GetStarted() {
 
 function TeacherAnimation() {
   return (
-    <div className="relative mx-auto max-w-md rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-6 sm:p-8 overflow-hidden">
-      <div className="absolute -top-20 -right-20 h-40 sm:h-60 w-40 sm:w-60 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
-      <svg viewBox="0 0 200 200" className="mx-auto h-48 sm:h-56">
+    <div className="relative mx-auto max-w-xl rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-8 overflow-hidden">
+      <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
+      <svg viewBox="0 0 200 200" className="mx-auto h-60">
         <circle cx="100" cy="100" r="90" className="fill-[hsl(var(--muted))]" />
         <g className="origin-[120px_70px] animate-wave">
           <circle cx="120" cy="60" r="12" className="fill-[hsl(var(--brand-500))]" />
@@ -80,9 +80,9 @@ function TeacherAnimation() {
 
 function StudentAnimation() {
   return (
-    <div className="relative mx-auto max-w-md rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-6 sm:p-8 overflow-hidden">
-      <div className="absolute -bottom-16 -left-16 h-40 sm:h-56 w-40 sm:w-56 rounded-full bg-gradient-to-tr from-blue-400/40 to-cyan-700/40 blur-3xl" />
-      <svg viewBox="0 0 200 200" className="mx-auto h-48 sm:h-56">
+    <div className="relative mx-auto max-w-xl rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-8 overflow-hidden">
+      <div className="absolute -bottom-16 -left-16 h-60 w-60 rounded-full bg-gradient-to-tr from-blue-400/40 to-cyan-700/40 blur-3xl" />
+      <svg viewBox="0 0 200 200" className="mx-auto h-60">
         <circle cx="100" cy="100" r="90" className="fill-[hsl(var(--muted))]" />
         {/* Head */}
         <circle cx="90" cy="70" r="12" className="fill-blue-500" />
