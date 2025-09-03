@@ -75,18 +75,34 @@ export default function ClassMessages() {
     };
   }, []);
 
+  async function fetchWithRetry(url: string, init: RequestInit & { timeoutMs?: number } = {}, attempt = 1): Promise<Response> {
+    const { timeoutMs = 8000, signal, ...rest } = init as any;
+    const ac = new AbortController();
+    const onAbort = () => ac.abort();
+    if (signal) signal.addEventListener('abort', onAbort, { once: true });
+    const t = setTimeout(() => ac.abort(), timeoutMs);
+    try {
+      return await fetch(url, { ...rest, signal: ac.signal });
+    } catch (e) {
+      if (attempt < 2 && (!signal || !(signal as any).aborted)) {
+        await new Promise(r => setTimeout(r, 400));
+        return fetchWithRetry(url, init, attempt + 1);
+      }
+      throw e as any;
+    } finally {
+      clearTimeout(t);
+      if (signal) signal.removeEventListener('abort', onAbort as any);
+    }
+  }
+
   async function load(signal?: AbortSignal) {
     if (mountedRef.current) { setLoading(true); setError(null); }
     const headers: Record<string,string> = {};
     if (token) headers.Authorization = `Bearer ${token}`;
     try {
-      const r = await fetch(`/api/classes/${id}/messages`, { headers, cache: 'no-store', signal });
-      if (!r.ok) {
-        let d: any = {};
-        try { d = await r.json(); } catch {}
-        throw new Error(d?.message || r.statusText);
-      }
-      const d = await r.json();
+      const r = await fetchWithRetry(`/api/classes/${id}/messages`, { headers, cache: 'no-store', signal });
+      const d = await r.json().catch(()=>({}));
+      if (!r.ok) throw new Error(d?.message || r.statusText);
       if (mountedRef.current) {
         setMessages(d.messages || []);
         const latest = (d.messages||[]).reduce((acc:number, m:any)=> Math.max(acc, new Date(m.createdAt).getTime()||0), 0);
@@ -95,21 +111,8 @@ export default function ClassMessages() {
         setHasNewMsgs(latest > seen);
       }
     } catch (e: any) {
-      if (e?.name === 'AbortError') return;
-      // Retry once for transient network errors; don't reuse possibly aborted signal
-      try {
-        await new Promise(res => setTimeout(res, 500));
-        const r2 = await fetch(`/api/classes/${id}/messages`, { headers, cache: 'no-store' });
-        if (!r2.ok) {
-          let d2: any = {};
-          try { d2 = await r2.json(); } catch {}
-          throw new Error(d2?.message || r2.statusText);
-        }
-        const d2 = await r2.json();
-        if (mountedRef.current) setMessages(d2.messages || []);
-      } catch (e2: any) {
-        if (mountedRef.current) setError(e2?.message || 'Network error. Please retry.');
-      }
+      if (e?.name !== 'AbortError' && mountedRef.current)
+        setError(e?.message || (navigator.onLine ? 'Network error. Please retry.' : 'You appear to be offline'));
     } finally { if (mountedRef.current) setLoading(false); }
   }
 
