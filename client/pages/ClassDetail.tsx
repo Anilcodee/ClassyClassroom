@@ -15,31 +15,43 @@ export default function ClassDetail() {
   const token = useMemo(() => localStorage.getItem("token"), []);
   const userRole = useMemo(() => { try { const raw = localStorage.getItem('user'); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
 
+  async function fetchWithRetry(url: string, init: RequestInit & { timeoutMs?: number } = {}, attempt = 1): Promise<Response> {
+    const { timeoutMs = 8000, signal, ...rest } = init as any;
+    const ac = new AbortController();
+    const onAbort = () => ac.abort();
+    if (signal) signal.addEventListener('abort', onAbort, { once: true });
+    const t = setTimeout(() => ac.abort(), timeoutMs);
+    try {
+      return await fetch(url, { ...rest, signal: ac.signal });
+    } catch (e) {
+      if (attempt < 2 && (!signal || !(signal as any).aborted)) {
+        await new Promise(r => setTimeout(r, 400));
+        return fetchWithRetry(url, init, attempt + 1);
+      }
+      throw e;
+    } finally {
+      clearTimeout(t);
+      if (signal) signal.removeEventListener('abort', onAbort as any);
+    }
+  }
+
   async function load(signal?: AbortSignal) {
     if (!token) { setError("Please log in"); nav('/auth'); return; }
     setLoading(true); setError(null);
     const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
     try {
-      let res: Response | null = null; let data: any = null;
-      try {
-        res = await fetch(`/api/classes/${id}`, { headers, cache: 'no-store', signal });
-      } catch (e: any) {
-        if (e?.name === 'AbortError') return; // user navigated away
-        await new Promise(r=>setTimeout(r, 400));
-        res = await fetch(`/api/classes/${id}`, { headers, cache: 'no-store' });
-      }
-      const raw = await res!.text();
-      data = raw ? JSON.parse(raw) : {};
-      if (!res!.ok) throw new Error(data?.message || res!.statusText);
+      const res = await fetchWithRetry(`/api/classes/${id}`, { headers, cache: 'no-store', signal });
+      const raw = await res.text();
+      const data = raw ? JSON.parse(raw) : {};
+      if (!res.ok) throw new Error(data?.message || res.statusText);
       setCls(data.class);
 
-      // Attendance is best-effort: don't fail whole page if network hiccups
+      // Attendance is best-effort
       try {
-        const r = await fetch(`/api/classes/${id}/attendance/today`, { headers, cache: 'no-store', signal });
+        const r = await fetchWithRetry(`/api/classes/${id}/attendance/today`, { headers, cache: 'no-store', signal });
         const rraw = await r.text();
         const rd = rraw ? JSON.parse(rraw) : {};
-        if (r.ok) setRecords(rd.records || []);
-        else setRecords([]);
+        setRecords(r.ok ? (rd.records || []) : []);
       } catch (e: any) {
         if (e?.name !== 'AbortError') setRecords([]);
       }
