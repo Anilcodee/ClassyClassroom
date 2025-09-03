@@ -20,9 +20,16 @@ export default function Header() {
     const onAuthChanged = () => readUser();
     window.addEventListener("storage", onStorage);
     window.addEventListener("auth-changed", onAuthChanged as any);
+
+    // Warm up serverless API to reduce first-request failures
+    let interval: any;
+    (async () => { try { await fetch("/api/ping", { cache: "no-store" }); } catch {} })();
+    interval = setInterval(() => { fetch("/api/ping", { cache: "no-store" }).catch(()=>{}); }, 10 * 60 * 1000);
+
     return () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("auth-changed", onAuthChanged as any);
+      if (interval) clearInterval(interval);
     };
   }, []);
 
