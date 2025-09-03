@@ -70,9 +70,11 @@ export default function Classes() {
       results.forEach(r => { if (r.status === 'fulfilled') map[(r.value as any).id] = { latestAt: (r.value as any).latestAt, latestBy: (r.value as any).latestBy }; });
       setLatestMap(map);
       // archived list
-      const ar = await fetch('/api/classes/archived', { headers, cache: 'no-store' });
-      const ad = await ar.json().catch(()=>({}));
-      if (ar.ok) setArchived((ad.classes||[]).map((c:any)=> ({ id: c._id, name: c.name, joinCode: '', isActive: false, imageUrl: c.imageUrl })));
+      const ar = await fetchWithRetry('/api/classes/archived', { headers, cache: 'no-store' });
+      if (ar.status !== 0 && ar.status !== 499) {
+        const ad = await ar.json().catch(()=>({}));
+        if (ar.ok) setArchived((ad.classes||[]).map((c:any)=> ({ id: c._id, name: c.name, joinCode: '', isActive: false, imageUrl: c.imageUrl })));
+      }
     } catch (e: any) {
       setError(e.message || "Network error");
     } finally {
