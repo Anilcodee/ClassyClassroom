@@ -26,24 +26,24 @@ export default function GetStarted() {
             </Link>
           </div>
         </div>
-        <div className="grid sm:grid-cols-2 gap-6">
-          <div className="flex flex-col items-center">
+        <div className="space-y-6">
+          <div className="grid sm:grid-cols-2 gap-6 items-start">
             <TeacherAnimation />
-            <div className="mt-3 w-full max-w-md mx-auto">
-              <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Teachers</h3>
-              <ul className="text-sm text-foreground/70 space-y-2 mx-auto">
+            <StudentAnimation />
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="w-full max-w-md mx-auto">
+              <h3 className="text-sm font-semibold mb-2 text-foreground/80">For Teachers</h3>
+              <ul className="text-sm text-foreground/70 space-y-2">
                 <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Create and manage classes with cover images</span></li>
                 <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Start timed QR attendance sessions</span></li>
                 <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Download PDFs and view attendance history</span></li>
                 <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Post announcements; edit/delete your posts</span></li>
               </ul>
             </div>
-          </div>
-          <div className="flex flex-col items-center">
-            <StudentAnimation />
-            <div className="mt-3 w-full max-w-md mx-auto">
-              <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Students</h3>
-              <ul className="text-sm text-foreground/70 space-y-2 mx-auto">
+            <div className="w-full max-w-md mx-auto">
+              <h3 className="text-sm font-semibold mb-2 text-foreground/80">For Students</h3>
+              <ul className="text-sm text-foreground/70 space-y-2">
                 <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Join classes via secure code</span></li>
                 <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">See your classes and attendance days</span></li>
                 <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Comment on announcements (except your own)</span></li>
