@@ -67,6 +67,7 @@ export function createServer() {
   app.post("/api/classes/:id/activate", requireAuth, activateClass);
   app.get("/api/session/:sessionId", sessionStatus);
   app.post("/api/session/:sessionId/mark", markAttendance);
+  app.post("/api/classes/:id/attendance/manual", requireAuth, manualMarkAttendance);
 
   // Messages
   app.get("/api/classes/:id/messages", requireAuth, listMessages);
