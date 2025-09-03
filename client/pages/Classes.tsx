@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import React from "react";
 import { toast } from "@/hooks/use-toast";
+import { MoreVertical } from "lucide-react";
 
 interface ClassItem { id: string; name: string; joinCode: string; isActive: boolean; imageUrl?: string }
 interface NewStudent { name: string; rollNo: string }
