@@ -20,6 +20,9 @@ export default function AssignmentSubmit(){
   const [isFs, setIsFs] = useState(false);
   useEffect(()=>{ const onFs = ()=> setIsFs(Boolean(document.fullscreenElement)); document.addEventListener('fullscreenchange', onFs); return ()=> document.removeEventListener('fullscreenchange', onFs); }, []);
 
+  const [submitting, setSubmitting] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+
   const MAX_FILES = 4;
   const MAX_SIZE = 4 * 1024 * 1024;
 
@@ -50,13 +53,25 @@ export default function AssignmentSubmit(){
 
   async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
     const list = Array.from(e.target.files || []);
-    setFiles(list);
     const atts = await readFiles(list);
+    setFiles(list);
     setAttachments(atts);
   }
 
+  async function onDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault(); setDragOver(false);
+    const list = Array.from(e.dataTransfer.files || []);
+    const atts = await readFiles(list);
+    setFiles(list);
+    setAttachments(atts);
+  }
+
+  function onDragOver(e: React.DragEvent<HTMLDivElement>) { e.preventDefault(); setDragOver(true); }
+  function onDragLeave(e: React.DragEvent<HTMLDivElement>) { e.preventDefault(); setDragOver(false); }
+
   async function submit(){
-    setError(null);
+    if (submitting) return;
+    setSubmitting(true); setError(null);
     try {
       const token = localStorage.getItem('token');
       const r = await fetch(`/api/assignments/${assignmentId}/submit`, {
@@ -64,19 +79,27 @@ export default function AssignmentSubmit(){
         body: JSON.stringify({ answers, attachments })
       });
       const d = await r.json().catch(()=>({}));
-      if (!r.ok) throw new Error(d?.message || r.statusText);
+      if (!r.ok) throw new Error(d?.message || r.statusText || 'Submit failed');
       nav(-1);
     } catch(e:any){ setError(e.message||'Failed'); }
+    finally { setSubmitting(false); }
   }
+
+  const closed = Boolean(a?.dueAt && new Date(a.dueAt).getTime() < Date.now() && a?.allowLate === false);
 
   return (
     <main className="container mx-auto py-8">
-      <button type="button" onClick={()=>nav(-1)} className="text-sm text-foreground/70 hover:text-foreground">← Back</button>
+      <div className="flex items-center justify-between">
+        <button type="button" onClick={()=>nav(-1)} className="text-sm text-foreground/70 hover:text-foreground">← Back</button>
+        {a?.classId && <Link to={`/classes/${a.classId}/assignments`} className="text-sm text-foreground/70 hover:text-foreground">Assignments</Link>}
+      </div>
       {loading ? <p className="mt-4 text-sm text-foreground/70">Loading…</p> : error ? <p className="mt-4 text-sm text-destructive">{error}</p> : a ? (
         <div className="mt-4">
           <h1 className="text-2xl font-bold">{a.title} <span className="text-xs text-foreground/60">({a.type})</span></h1>
           {a.description && <p className="mt-2 text-foreground/70 whitespace-pre-wrap">{a.description}</p>}
           {a.dueAt && <p className="mt-1 text-sm text-foreground/60">Due on {formatDateTime(a.dueAt)}</p>}
+          {closed && <p className="mt-1 text-sm text-destructive">Submissions are closed for this assignment.</p>}
+
           <div className="mt-4 space-y-3">
             {(a.questions||[]).length === 0 ? (
               <p className="text-sm text-foreground/70">No questions. You can still submit notes.</p>
@@ -100,11 +123,22 @@ export default function AssignmentSubmit(){
 
           <div className="mt-6">
             <h2 className="font-semibold">Attachments</h2>
-            <input type="file" multiple className="mt-2" onChange={onPick} />
+            <div
+              className={`mt-2 rounded-lg border border-dashed ${dragOver ? 'border-primary bg-primary/5' : 'border-border'} p-4 text-sm text-foreground/70`}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              onDragLeave={onDragLeave}
+            >
+              <input id="file" type="file" multiple className="hidden" onChange={onPick} />
+              <label htmlFor="file" className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border hover:bg-accent hover:text-accent-foreground cursor-pointer">
+                Browse files
+              </label>
+              <p className="mt-1 text-xs text-foreground/60">You can also drag and drop files here. Up to 4 files, 4MB each.</p>
+            </div>
             {attachments.length > 0 && (
-              <ul className="mt-3 space-y-2">
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                 {attachments.map((att, idx)=> (
-                  <li key={idx} className="flex items-center justify-between rounded border border-border px-3 py-2 text-sm">
+                  <li key={idx} className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm bg-background">
                     <button type="button" className="flex items-center gap-2 truncate" title="Preview" onClick={()=> setPreview({ name: att.name, type: att.type, url: att.dataUrl })}>
                       {att.type.startsWith('image/') ? (
                         <img src={att.dataUrl} alt={att.name} className="h-10 w-10 object-cover rounded" />
@@ -113,9 +147,12 @@ export default function AssignmentSubmit(){
                       )}
                       <span className="max-w-[12rem] truncate text-left">{att.name}</span>
                     </button>
-                    <button type="button" className="px-2 py-1 rounded border border-border" onClick={()=> { const next = attachments.slice(); next.splice(idx,1); setAttachments(next); }}>
-                      Remove
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <span className="hidden sm:inline text-xs text-foreground/50">{Math.ceil(att.size/1024)} KB</span>
+                      <button type="button" className="px-2 py-1 rounded border border-border" onClick={()=> { const next = attachments.slice(); next.splice(idx,1); setAttachments(next); }}>
+                        Remove
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -123,7 +160,7 @@ export default function AssignmentSubmit(){
           </div>
 
           {role === 'student' && (
-            <button className="mt-4 px-4 py-2 rounded-lg bg-primary text-primary-foreground" onClick={submit}>Submit</button>
+            <button disabled={submitting || closed} className="mt-4 px-4 py-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-50" onClick={submit}>{submitting ? 'Submitting…' : 'Submit'}</button>
           )}
         </div>
       ) : null}
@@ -159,7 +196,7 @@ export default function AssignmentSubmit(){
                 <iframe title="pdf" src={preview.url} className={(isFs ? "h-[90vh]" : "h-[70vh]") + " w-full rounded border border-border"} allowFullScreen />
               )}
               {(preview.type.startsWith('text/') || preview.type === 'application/json') && (
-                <pre className={(isFs ? "max-h-[90vh]" : "max-h-[70vh]") + " w-full overflow-auto rounded bg-muted p-3 text-xs whitespace-pre-wrap break-all"}>{/* Text preview requires fetch; skip for brevity */}</pre>
+                <pre className={(isFs ? "max-h-[90vh]" : "max-h-[70vh]") + " w-full overflow-auto rounded bg-muted p-3 text-xs whitespace-pre-wrap break-all"}></pre>
               )}
               {preview.type.startsWith('audio/') && (
                 <audio controls className="w-full">
