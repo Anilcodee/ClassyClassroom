@@ -205,7 +205,10 @@ export default function ClassMessages() {
     } catch (e: any) {
       if (e?.name !== 'AbortError') {
         if (mountedRef.current) setError(e.message);
-        await load();
+        const ac2 = new AbortController();
+        controllersRef.current.push(ac2);
+        try { await load(ac2.signal); } catch {}
+        finally { controllersRef.current = controllersRef.current.filter(c => c !== ac2); }
       }
     } finally {
       controllersRef.current = controllersRef.current.filter(c => c !== ac);
