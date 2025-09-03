@@ -107,6 +107,13 @@ export default function ClassMessages() {
     const headers: Record<string,string> = {};
     if (token) headers.Authorization = `Bearer ${token}`;
     try {
+      // Warm-up / connectivity check before main call
+      const ping = await fetchWithRetry('/api/ping', { cache: 'no-store', signal });
+      if (!ping.ok) {
+        if (mountedRef.current) setError('Network error. Please retry.');
+        if (mountedRef.current) setLoading(false);
+        return;
+      }
       const r = await fetchWithRetry(`/api/classes/${id}/messages`, { headers, cache: 'no-store', signal });
       const d = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
@@ -136,6 +143,8 @@ export default function ClassMessages() {
     (async ()=>{
       try {
         if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+        const ping = await fetchWithRetry('/api/ping', { cache: 'no-store', signal: ac.signal });
+        if (!ping.ok) return;
         const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
         const r = await fetchWithRetry(`/api/classes/${id}/assignments`, { headers, cache: 'no-store', signal: ac.signal });
         const d = await r.json().catch(()=>({}));
