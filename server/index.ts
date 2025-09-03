@@ -3,24 +3,54 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { connectDB } from "./db";
-import { signup, login, signupStudent, signupTeacher, loginStudent, loginTeacher } from "./routes/auth";
+import {
+  signup,
+  login,
+  signupStudent,
+  signupTeacher,
+  loginStudent,
+  loginTeacher,
+} from "./routes/auth";
 import { requireAuth } from "./middleware/auth";
 import { listClasses, createClass, updateClassImage } from "./routes/classes";
 import { archiveClass } from "./routes/classes.archive";
 import { listArchivedClasses, unarchiveClass } from "./routes/classes.archived";
 import { getClass } from "./routes/classes.get-by-id";
-import { activateClass, sessionStatus, markAttendance, manualMarkAttendance } from "./routes/attendance";
+import {
+  activateClass,
+  sessionStatus,
+  markAttendance,
+  manualMarkAttendance,
+} from "./routes/attendance";
 import { getTodayAttendance } from "./routes/attendance.today";
-import { listAttendanceDates, classAttendancePdf, classAttendancePdfAll } from "./routes/attendance.pdf";
+import {
+  listAttendanceDates,
+  classAttendancePdf,
+  classAttendancePdfAll,
+} from "./routes/attendance.pdf";
 import { getStudentAttendance } from "./routes/student.attendance";
 import { getAttendanceForDate } from "./routes/attendance.view";
-import { listMessages, createMessage, addComment, updateMessage, deleteMessage } from "./routes/messages";
+import {
+  listMessages,
+  createMessage,
+  addComment,
+  updateMessage,
+  deleteMessage,
+} from "./routes/messages";
 import { listLatestForClasses } from "./routes/messages.latest";
 import { dbHealth } from "./routes/health";
 import { listStudentClasses, joinClass, unenrollClass } from "./routes/student";
 import { updateClassDetails } from "./routes/classes.update";
 import { joinClassAsTeacher } from "./routes/classes.join-teacher";
-import { listAssignments, createAssignment, updateAssignment, getAssignment, submitAssignment, listSubmissions, deleteAssignment } from "./routes/assignments";
+import {
+  listAssignments,
+  createAssignment,
+  updateAssignment,
+  getAssignment,
+  submitAssignment,
+  listSubmissions,
+  deleteAssignment,
+} from "./routes/assignments";
 
 export function createServer() {
   const app = express();
@@ -65,15 +95,27 @@ export function createServer() {
   // Attendance (teacher view)
   app.get("/api/classes/:id/attendance/today", requireAuth, getTodayAttendance);
   app.get("/api/classes/:id/attendance", requireAuth, getAttendanceForDate);
-  app.get("/api/classes/:id/attendance/dates", requireAuth, listAttendanceDates);
+  app.get(
+    "/api/classes/:id/attendance/dates",
+    requireAuth,
+    listAttendanceDates,
+  );
   app.get("/api/classes/:id/attendance/pdf", requireAuth, classAttendancePdf);
-  app.get("/api/classes/:id/attendance/pdf/all", requireAuth, classAttendancePdfAll);
+  app.get(
+    "/api/classes/:id/attendance/pdf/all",
+    requireAuth,
+    classAttendancePdfAll,
+  );
 
   // Attendance (session)
   app.post("/api/classes/:id/activate", requireAuth, activateClass);
   app.get("/api/session/:sessionId", sessionStatus);
   app.post("/api/session/:sessionId/mark", markAttendance);
-  app.post("/api/classes/:id/attendance/manual", requireAuth, manualMarkAttendance);
+  app.post(
+    "/api/classes/:id/attendance/manual",
+    requireAuth,
+    manualMarkAttendance,
+  );
 
   // Messages
   app.get("/api/classes/:id/messages", requireAuth, listMessages);
@@ -88,14 +130,26 @@ export function createServer() {
   app.post("/api/classes/:id/assignments", requireAuth, createAssignment);
   app.get("/api/assignments/:assignmentId", requireAuth, getAssignment);
   app.patch("/api/assignments/:assignmentId", requireAuth, updateAssignment);
-  app.post("/api/assignments/:assignmentId/submit", requireAuth, submitAssignment);
-  app.get("/api/assignments/:assignmentId/submissions", requireAuth, listSubmissions);
+  app.post(
+    "/api/assignments/:assignmentId/submit",
+    requireAuth,
+    submitAssignment,
+  );
+  app.get(
+    "/api/assignments/:assignmentId/submissions",
+    requireAuth,
+    listSubmissions,
+  );
   app.delete("/api/assignments/:assignmentId", requireAuth, deleteAssignment);
 
   // Student
   app.get("/api/student/classes", requireAuth, listStudentClasses);
   app.post("/api/student/classes/join", requireAuth, joinClass);
-  app.get("/api/student/classes/:id/attendance", requireAuth, getStudentAttendance);
+  app.get(
+    "/api/student/classes/:id/attendance",
+    requireAuth,
+    getStudentAttendance,
+  );
   app.delete("/api/student/classes/:id/unenroll", requireAuth, unenrollClass);
 
   // Teachers: join as co-teacher

@@ -3,11 +3,17 @@ import mongoose from "mongoose";
 import { AuthRequest } from "../middleware/auth";
 import { ClassModel } from "../models/Class";
 
-export const listArchivedClasses: RequestHandler = async (req: AuthRequest, res) => {
+export const listArchivedClasses: RequestHandler = async (
+  req: AuthRequest,
+  res,
+) => {
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
   try {
-    const classes = await ClassModel.find({ isArchived: true, $or: [ { teacher: req.userId }, { coTeachers: req.userId } ] })
+    const classes = await ClassModel.find({
+      isArchived: true,
+      $or: [{ teacher: req.userId }, { coTeachers: req.userId }],
+    })
       .select("name imageUrl createdAt updatedAt")
       .lean();
     res.json({ classes });
@@ -22,7 +28,10 @@ export const unarchiveClass: RequestHandler = async (req: AuthRequest, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { id } = req.params as { id: string };
-    const cls = await ClassModel.findOne({ _id: id, $or: [ { teacher: req.userId }, { coTeachers: req.userId } ] });
+    const cls = await ClassModel.findOne({
+      _id: id,
+      $or: [{ teacher: req.userId }, { coTeachers: req.userId }],
+    });
     if (!cls) return res.status(404).json({ message: "Class not found" });
     (cls as any).isArchived = false;
     await cls.save();

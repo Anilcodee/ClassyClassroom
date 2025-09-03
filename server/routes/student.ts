@@ -19,13 +19,17 @@ export const unenrollClass: RequestHandler = async (req: AuthRequest, res) => {
     if (!cls) return res.status(404).json({ message: "Class not found" });
 
     // Remove from user's enrolledClasses
-    (user as any).enrolledClasses = ((user as any).enrolledClasses || []).filter((cid: any) => String(cid) !== String(id));
+    (user as any).enrolledClasses = (
+      (user as any).enrolledClasses || []
+    ).filter((cid: any) => String(cid) !== String(id));
     await user.save();
 
     // Optionally remove from class roster by rollNo
     const rollNo = (user as any).rollNo || "";
     if (rollNo) {
-      (cls as any).students = (cls as any).students.filter((s: any) => String(s.rollNo) !== String(rollNo));
+      (cls as any).students = (cls as any).students.filter(
+        (s: any) => String(s.rollNo) !== String(rollNo),
+      );
       await cls.save();
     }
 
@@ -36,7 +40,10 @@ export const unenrollClass: RequestHandler = async (req: AuthRequest, res) => {
   }
 };
 
-export const listStudentClasses: RequestHandler = async (req: AuthRequest, res) => {
+export const listStudentClasses: RequestHandler = async (
+  req: AuthRequest,
+  res,
+) => {
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
   try {
@@ -61,7 +68,8 @@ export const joinClass: RequestHandler = async (req: AuthRequest, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { joinCode } = req.body as { joinCode: string };
-    if (!joinCode) return res.status(400).json({ message: "joinCode is required" });
+    if (!joinCode)
+      return res.status(400).json({ message: "joinCode is required" });
 
     const user = await User.findById(req.userId);
     if (!user) return res.status(401).json({ message: "Unauthorized" });
@@ -74,7 +82,10 @@ export const joinClass: RequestHandler = async (req: AuthRequest, res) => {
 
     const rollNo = (user as any).rollNo || "";
     const name = user.name;
-    if (!rollNo) return res.status(400).json({ message: "Your profile is missing roll number" });
+    if (!rollNo)
+      return res
+        .status(400)
+        .json({ message: "Your profile is missing roll number" });
 
     const alreadyInClass = cls.students.some((s) => s.rollNo === rollNo);
     if (!alreadyInClass) {
@@ -82,12 +93,16 @@ export const joinClass: RequestHandler = async (req: AuthRequest, res) => {
       await cls.save();
     }
 
-    const enrolled = new Set([...(user as any).enrolledClasses?.map((id: any) => String(id)) || []]);
+    const enrolled = new Set([
+      ...((user as any).enrolledClasses?.map((id: any) => String(id)) || []),
+    ]);
     enrolled.add(String(cls._id));
     (user as any).enrolledClasses = Array.from(enrolled);
     await user.save();
 
-    res.status(200).json({ class: { id: cls.id, name: cls.name, joinCode: cls.joinCode } });
+    res
+      .status(200)
+      .json({ class: { id: cls.id, name: cls.name, joinCode: cls.joinCode } });
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Server error" });

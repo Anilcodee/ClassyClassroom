@@ -22,7 +22,7 @@ const StudentSchema = new Schema<IStudent>(
     name: { type: String, required: true },
     rollNo: { type: String, required: true },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const ClassSchema = new Schema<IClass>(
@@ -33,12 +33,17 @@ const ClassSchema = new Schema<IClass>(
     joinCode: { type: String, required: true, unique: true, index: true },
     students: { type: [StudentSchema], default: [] },
     isActive: { type: Boolean, default: false },
-    activeSession: { type: Schema.Types.ObjectId, ref: "AttendanceSession", default: null },
+    activeSession: {
+      type: Schema.Types.ObjectId,
+      ref: "AttendanceSession",
+      default: null,
+    },
     imageUrl: { type: String },
     durationMinutes: { type: Number, default: 4, min: 1, max: 10 },
     isArchived: { type: Boolean, default: false, index: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export const ClassModel = mongoose.models.Class || mongoose.model<IClass>("Class", ClassSchema);
+export const ClassModel =
+  mongoose.models.Class || mongoose.model<IClass>("Class", ClassSchema);

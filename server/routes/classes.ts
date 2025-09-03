@@ -8,7 +8,10 @@ export const listClasses: RequestHandler = async (req: AuthRequest, res) => {
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
   try {
-    const classes = await ClassModel.find({ isArchived: { $ne: true }, $or: [ { teacher: req.userId }, { coTeachers: req.userId } ] }).lean();
+    const classes = await ClassModel.find({
+      isArchived: { $ne: true },
+      $or: [{ teacher: req.userId }, { coTeachers: req.userId }],
+    }).lean();
     res.json({ classes });
   } catch (e) {
     console.error(e);
@@ -20,11 +23,24 @@ export const createClass: RequestHandler = async (req: AuthRequest, res) => {
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
   try {
-    const { name, students, imageUrl, durationMinutes } = req.body as { name: string; students?: { name: string; rollNo: string }[]; imageUrl?: string; durationMinutes?: number };
+    const { name, students, imageUrl, durationMinutes } = req.body as {
+      name: string;
+      students?: { name: string; rollNo: string }[];
+      imageUrl?: string;
+      durationMinutes?: number;
+    };
     if (!name) return res.status(400).json({ message: "Name is required" });
     const joinCode = crypto.randomBytes(4).toString("hex");
     const dm = Math.max(1, Math.min(10, Number(durationMinutes || 4)));
-    const cls = await ClassModel.create({ name, teacher: req.userId, coTeachers: [], students: students || [], joinCode, imageUrl, durationMinutes: dm });
+    const cls = await ClassModel.create({
+      name,
+      teacher: req.userId,
+      coTeachers: [],
+      students: students || [],
+      joinCode,
+      imageUrl,
+      durationMinutes: dm,
+    });
     res.status(201).json({ class: cls });
   } catch (e) {
     console.error(e);
@@ -32,14 +48,21 @@ export const createClass: RequestHandler = async (req: AuthRequest, res) => {
   }
 };
 
-export const updateClassImage: RequestHandler = async (req: AuthRequest, res) => {
+export const updateClassImage: RequestHandler = async (
+  req: AuthRequest,
+  res,
+) => {
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { id } = req.params as { id: string };
     const { imageUrl } = req.body as { imageUrl?: string };
-    if (!imageUrl) return res.status(400).json({ message: "imageUrl required" });
-    const cls = await ClassModel.findOne({ _id: id, $or: [ { teacher: req.userId }, { coTeachers: req.userId } ] });
+    if (!imageUrl)
+      return res.status(400).json({ message: "imageUrl required" });
+    const cls = await ClassModel.findOne({
+      _id: id,
+      $or: [{ teacher: req.userId }, { coTeachers: req.userId }],
+    });
     if (!cls) return res.status(404).json({ message: "Class not found" });
     cls.imageUrl = imageUrl;
     await cls.save();

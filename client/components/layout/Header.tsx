@@ -16,7 +16,9 @@ export default function Header() {
       } catch {}
     }
     readUser();
-    const onStorage = (e: StorageEvent) => { if (e.key === "user" || e.key === "token") readUser(); };
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "user" || e.key === "token") readUser();
+    };
     const onAuthChanged = () => readUser();
     window.addEventListener("storage", onStorage);
     window.addEventListener("auth-changed", onAuthChanged as any);
@@ -30,7 +32,12 @@ export default function Header() {
       } catch {}
     };
     pingImg();
-    interval = setInterval(() => { pingImg(); }, 10 * 60 * 1000);
+    interval = setInterval(
+      () => {
+        pingImg();
+      },
+      10 * 60 * 1000,
+    );
 
     return () => {
       window.removeEventListener("storage", onStorage);
@@ -40,17 +47,18 @@ export default function Header() {
   }, []);
 
   const role = user?.role || null;
-  const roleHome = role === "teacher" ? "/classes" : role === "student" ? "/student" : "/";
+  const roleHome =
+    role === "teacher" ? "/classes" : role === "student" ? "/student" : "/";
   const dynamicNavRaw = user
     ? [
         { to: roleHome, label: "Home" },
         ...(role === "teacher" ? [] : []),
         ...(role === "student" ? [] : []),
       ]
-    : [
-        { to: "/", label: "Get Started" },
-      ];
-  const dynamicNav = dynamicNavRaw.filter((item, idx, arr) => arr.findIndex((i) => i.to === item.to) === idx);
+    : [{ to: "/", label: "Get Started" }];
+  const dynamicNav = dynamicNavRaw.filter(
+    (item, idx, arr) => arr.findIndex((i) => i.to === item.to) === idx,
+  );
 
   function logout() {
     localStorage.removeItem("token");
@@ -63,7 +71,10 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur supports-[backdrop-filter]:bg-background/70 border-b border-border">
       <div className="container mx-auto px-4 flex h-14 items-center justify-between gap-3">
-        <Link to={user ? (role === "teacher" ? "/classes" : "/student") : "/"} className="flex min-w-0 items-center gap-2 font-extrabold text-primary">
+        <Link
+          to={user ? (role === "teacher" ? "/classes" : "/student") : "/"}
+          className="flex min-w-0 items-center gap-2 font-extrabold text-primary"
+        >
           <span className="inline-block h-7 w-7 rounded-md bg-gradient-to-br from-brand-500 to-brand-700"></span>
           <span className="truncate">Attendify</span>
         </Link>
@@ -74,7 +85,7 @@ export default function Header() {
               to={n.to}
               className={cn(
                 "hover:text-foreground/80 transition-colors",
-                pathname === n.to ? "text-foreground" : "text-foreground/60"
+                pathname === n.to ? "text-foreground" : "text-foreground/60",
               )}
             >
               {n.label}
@@ -84,17 +95,28 @@ export default function Header() {
         <div className="flex items-center gap-3">
           {user ? (
             <>
-              <span className="hidden sm:inline text-sm text-foreground/70">{user.name}</span>
-              <button onClick={logout} className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:opacity-90">
+              <span className="hidden sm:inline text-sm text-foreground/70">
+                {user.name}
+              </span>
+              <button
+                onClick={logout}
+                className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:opacity-90"
+              >
                 Log out
               </button>
             </>
           ) : (
             <div className="flex items-center gap-2">
-              <Link to="/student-auth" className="px-3 py-1.5 rounded-md border border-border hover:bg-accent hover:text-accent-foreground">
+              <Link
+                to="/student-auth"
+                className="px-3 py-1.5 rounded-md border border-border hover:bg-accent hover:text-accent-foreground"
+              >
                 Student login
               </Link>
-              <Link to="/auth" className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:opacity-90">
+              <Link
+                to="/auth"
+                className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:opacity-90"
+              >
                 Teacher login
               </Link>
             </div>
