@@ -26,19 +26,40 @@ export default function AssignmentSubmit(){
   const MAX_FILES = 4;
   const MAX_SIZE = 4 * 1024 * 1024;
 
-  async function load(){
+  async function fetchWithRetry(url: string, init: RequestInit & { timeoutMs?: number } = {}, attempt = 1): Promise<Response> {
+    const { timeoutMs = 8000, signal, ...rest } = init as any;
+    const ac = new AbortController();
+    const onAbort = () => ac.abort();
+    if (signal) signal.addEventListener('abort', onAbort, { once: true });
+    const t = setTimeout(() => ac.abort(), timeoutMs);
+    try {
+      return await fetch(url, { ...rest, signal: ac.signal });
+    } catch (e) {
+      if (attempt < 2 && (!signal || !(signal as any).aborted)) {
+        await new Promise(r => setTimeout(r, 400));
+        return fetchWithRetry(url, init, attempt + 1);
+      }
+      throw e as any;
+    } finally {
+      clearTimeout(t);
+      if (signal) signal.removeEventListener('abort', onAbort as any);
+    }
+  }
+
+  async function load(signal?: AbortSignal){
     setLoading(true); setError(null);
     try {
       const token = localStorage.getItem('token');
-      const headers: Record<string,string> = {}; if (token) headers.Authorization = `Bearer ${token}`;
-      const r = await fetch(`/api/assignments/${assignmentId}`, { headers, cache: 'no-store' });
+      if (!token) { if (role === 'student') nav('/student-auth'); else nav('/auth'); return; }
+      const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
+      const r = await fetchWithRetry(`/api/assignments/${assignmentId}`, { headers, cache: 'no-store', signal });
       const d = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
       setA(d.assignment);
-    } catch(e:any){ setError(e.message||'Failed'); }
+    } catch(e:any){ if (e?.name !== 'AbortError') setError(e.message||'Failed'); }
     finally { setLoading(false); }
   }
-  useEffect(()=>{ void load(); }, [assignmentId]);
+  useEffect(()=>{ const ac = new AbortController(); void load(ac.signal); return ()=> { try { ac.abort(); } catch {} }; }, [assignmentId]);
 
   async function readFiles(fs: File[]): Promise<Attachment[]> {
     const picked = fs.slice(0, MAX_FILES).filter(f => f.size <= MAX_SIZE);
