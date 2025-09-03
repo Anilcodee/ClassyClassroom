@@ -81,6 +81,7 @@ export function createServer() {
   app.patch("/api/messages/:messageId", requireAuth, updateMessage);
   app.delete("/api/messages/:messageId", requireAuth, deleteMessage);
   app.post("/api/messages/:messageId/comments", requireAuth, addComment);
+  app.get("/api/messages/latest", requireAuth, listLatestForClasses);
 
   // Assignments
   app.get("/api/classes/:id/assignments", requireAuth, listAssignments);
