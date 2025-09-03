@@ -91,9 +91,19 @@ export const createAssignment: RequestHandler = async (req: AuthRequest, res) =>
       const nowIso = new Date();
       const published = !doc.isDraft && (!doc.publishAt || doc.publishAt <= nowIso);
       if (published) {
+        const fmt = (v?: Date | null) => {
+          if (!v) return "";
+          const d = new Date(v);
+          const dd = String(d.getDate()).padStart(2, '0');
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const yyyy = d.getFullYear();
+          const hh = String(d.getHours()).padStart(2, '0');
+          const mi = String(d.getMinutes()).padStart(2, '0');
+          return `${dd}-${mm}-${yyyy}, ${hh}:${mi}`;
+        };
         const parts: string[] = [];
         parts.push(`${doc.type === 'quiz' ? 'Quiz' : 'Assignment'}: ${doc.title}`);
-        if (doc.dueAt) parts.push(`Due: ${doc.dueAt.toISOString()}`);
+        if (doc.dueAt) parts.push(`Due on ${fmt(doc.dueAt)}`);
         const content = [doc.description || "", parts.join(" | ")].filter(Boolean).join("\n\n");
         await Message.create({ classId: id, teacherId: userId, title: doc.type === 'quiz' ? `Quiz: ${doc.title}` : `Assignment: ${doc.title}`, content: content || (doc.type === 'quiz' ? 'New quiz assigned.' : 'New assignment assigned.'), attachments: atts.slice(0, 5), comments: [] });
       }
