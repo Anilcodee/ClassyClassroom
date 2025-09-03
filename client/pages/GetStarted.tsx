@@ -3,25 +3,25 @@ import { Link } from "react-router-dom";
 export default function GetStarted() {
   return (
     <main className="min-h-[calc(100vh-56px)] bg-gradient-to-b from-background via-background to-background">
-      <section className="container mx-auto grid lg:grid-cols-2 gap-10 py-16 items-center">
+      <section className="container mx-auto px-4 grid lg:grid-cols-2 gap-8 sm:gap-10 py-10 sm:py-14 lg:py-16 items-center">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-foreground/70 mb-4">
             <span className="h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
             Fast, secure classroom platform for teachers and students
           </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
             All‑in‑one classroom: attendance, messages, and more.
           </h1>
-          <p className="mt-4 text-lg text-foreground/70 max-w-xl">
+          <p className="mt-4 text-base sm:text-lg text-foreground/70 max-w-xl">
             Teachers can create classes, run timed QR attendance, and post announcements.
             Students join with a code, comment on posts, and track their own attendance.
             PDFs, history, class covers, and role‑based access included.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/student-auth" className="px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:opacity-90">
+            <Link to="/student-auth" className="px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:opacity-90 w-full xs:w-auto text-center">
               Sign in as Student
             </Link>
-            <Link to="/auth" className="px-5 py-3 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground">
+            <Link to="/auth" className="px-5 py-3 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground w-full xs:w-auto text-center">
               Sign in as Teacher
             </Link>
           </div>
@@ -31,23 +31,23 @@ export default function GetStarted() {
             <TeacherAnimation />
             <div className="mt-3 w-full max-w-md mx-auto">
               <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Teachers</h3>
-              <ul className="text-sm text-foreground/70 space-y-2 mx-auto pl-[69px] mb-[13px]">
-                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Create and manage classes with cover images</span></li>
-                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Start timed QR attendance sessions</span></li>
-                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Download PDFs and view attendance history</span></li>
-                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Post announcements; edit/delete your posts</span></li>
+              <ul className="text-sm text-foreground/70 space-y-2 mx-auto">
+                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Create and manage classes with cover images</span></li>
+                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Start timed QR attendance sessions</span></li>
+                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Download PDFs and view attendance history</span></li>
+                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Post announcements; edit/delete your posts</span></li>
               </ul>
             </div>
           </div>
           <div className="flex flex-col items-center">
             <StudentAnimation />
-            <div className="mt-3 w-full max-w-md mx-auto mb-[1px]">
+            <div className="mt-3 w-full max-w-md mx-auto">
               <h3 className="text-sm font-semibold mb-2 text-foreground/80 text-center">For Students</h3>
-              <ul className="text-sm text-foreground/70 space-y-2 mx-auto pl-[69px] mb-[11px]">
-                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Join classes via secure code</span></li>
-                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>See your classes and attendance days</span></li>
-                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Comment on announcements (except your own)</span></li>
-                <li className="flex items-start gap-2"><span>✅</span><span className="flex-1" style={{textAlign:'justify'}}>Clean, mobile‑friendly experience</span></li>
+              <ul className="text-sm text-foreground/70 space-y-2 mx-auto">
+                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Join classes via secure code</span></li>
+                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">See your classes and attendance days</span></li>
+                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Comment on announcements (except your own)</span></li>
+                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Clean, mobile‑friendly experience</span></li>
               </ul>
             </div>
           </div>
@@ -59,9 +59,9 @@ export default function GetStarted() {
 
 function TeacherAnimation() {
   return (
-    <div className="relative mx-auto max-w-md rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-8 overflow-hidden">
-      <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
-      <svg viewBox="0 0 200 200" className="mx-auto h-52">
+    <div className="relative mx-auto max-w-md rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-6 sm:p-8 overflow-hidden">
+      <div className="absolute -top-20 -right-20 h-40 sm:h-60 w-40 sm:w-60 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
+      <svg viewBox="0 0 200 200" className="mx-auto h-48 sm:h-56">
         <circle cx="100" cy="100" r="90" className="fill-[hsl(var(--muted))]" />
         <g className="origin-[120px_70px] animate-wave">
           <circle cx="120" cy="60" r="12" className="fill-[hsl(var(--brand-500))]" />
@@ -81,9 +81,9 @@ function TeacherAnimation() {
 
 function StudentAnimation() {
   return (
-    <div className="relative mx-auto max-w-md rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-8 overflow-hidden">
-      <div className="absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-gradient-to-tr from-blue-400/40 to-cyan-700/40 blur-3xl" />
-      <svg viewBox="0 0 200 200" className="mx-auto h-52">
+    <div className="relative mx-auto max-w-md rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-6 sm:p-8 overflow-hidden">
+      <div className="absolute -bottom-16 -left-16 h-40 sm:h-56 w-40 sm:w-56 rounded-full bg-gradient-to-tr from-blue-400/40 to-cyan-700/40 blur-3xl" />
+      <svg viewBox="0 0 200 200" className="mx-auto h-48 sm:h-56">
         <circle cx="100" cy="100" r="90" className="fill-[hsl(var(--muted))]" />
         {/* Head */}
         <circle cx="90" cy="70" r="12" className="fill-blue-500" />
