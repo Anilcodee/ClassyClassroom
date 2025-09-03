@@ -100,7 +100,9 @@ export default function ClassMessages() {
       return await fetch(url, { ...rest, signal });
     } catch (e: any) {
       const aborted = (signal && (signal as any).aborted) || e?.name === 'AbortError';
-      if (aborted) throw new DOMException('Aborted', 'AbortError');
+      if (aborted) {
+        return new Response(JSON.stringify({ message: 'aborted' }), { status: 499, headers: { 'Content-Type': 'application/json' } });
+      }
       if (attempt < 3 && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
         if (attempt === 1) {
           try { await fetch('/api/ping', { cache: 'no-store' }); } catch {}
@@ -132,6 +134,7 @@ export default function ClassMessages() {
         return;
       }
       const r = await fetchWithRetry(`/api/classes/${id}/messages`, { headers, cache: 'no-store', signal });
+      if (r.status === 0 || r.status === 499) return; // aborted or offline: silent
       const d = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
       if (mountedRef.current) {
@@ -164,6 +167,7 @@ export default function ClassMessages() {
         if (!ok) return;
         const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
         const r = await fetchWithRetry(`/api/classes/${id}/assignments`, { headers, cache: 'no-store', signal: ac.signal });
+        if (r.status === 0 || r.status === 499) return; // aborted or offline
         const d = await r.json().catch(()=>({}));
         if (r.ok && mountedRef.current) {
           const latest = (d.assignments||[]).reduce((acc:number, a:any)=> Math.max(acc, new Date(a.publishAt || a.createdAt).getTime()||0), 0);
