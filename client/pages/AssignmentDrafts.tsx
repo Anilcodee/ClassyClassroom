@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { formatDateTime } from "@/lib/utils";
 
 interface AssignmentItem { id: string; title: string; type: 'assignment'|'quiz'; description?: string; dueAt?: string|null; publishAt?: string|null; isDraft: boolean; allowLate: boolean }
 
@@ -15,16 +16,6 @@ export default function AssignmentDrafts(){
   const mountedRef = useRef(true);
 
   const role = useMemo(()=>{ try { const raw = localStorage.getItem('user'); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
-
-  function formatDateOnly(v?: string | Date | null) {
-    if (!v) return "";
-    const d = new Date(v);
-    if (isNaN(d.getTime())) return "";
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const yyyy = d.getFullYear();
-    return `${dd}-${mm}-${yyyy}`;
-  }
 
   async function load(signal?: AbortSignal){
     if (!mountedRef.current) return;
@@ -76,7 +67,7 @@ export default function AssignmentDrafts(){
               <div>
                 <p className="font-medium">{a.title} <span className="text-xs text-foreground/60">({a.type})</span></p>
                 <p className="text-xs text-foreground/60">Draft</p>
-                {a.dueAt && <p className="text-xs text-foreground/60">Due on {formatDateOnly(a.dueAt)}</p>}
+                {a.dueAt && <p className="text-xs text-foreground/60">Due on {formatDateTime(a.dueAt)}</p>}
               </div>
               <div className="flex items-center gap-2">
                 <button
