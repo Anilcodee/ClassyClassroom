@@ -9,8 +9,10 @@ export default function StudentDashboard() {
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [classes, setClasses] = useState<ClassItem[]>([]);
+  const [latestMap, setLatestMap] = useState<Record<string, { latestAt: number | null; latestBy: string | null }>>({});
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const userRaw = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+  const userId = userRaw ? (JSON.parse(userRaw)?.id || null) : null;
   const role = userRaw ? (JSON.parse(userRaw)?.role || "teacher") : null;
 
   useEffect(() => {
@@ -26,7 +28,14 @@ export default function StudentDashboard() {
       const res = await fetch("/api/student/classes", { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || res.statusText);
-      setClasses(data?.classes || []);
+      const list = data?.classes || [];
+      setClasses(list);
+      // Fetch latest message metadata for each class
+      const headers = token ? { Authorization: `Bearer ${token}` } : {} as any;
+      const results = await Promise.allSettled(list.map((c: any) => fetch(`/api/classes/${c.id || c._id}/messages?latest=1`, { headers }).then(r => r.json().catch(()=>({}))).then(d => ({ id: c.id || c._id, latestAt: d?.latestAt ? new Date(d.latestAt).getTime() : null, latestBy: d?.latestBy ? String(d.latestBy) : null }))));
+      const map: Record<string, { latestAt: number | null; latestBy: string | null }> = {};
+      results.forEach(r => { if (r.status === 'fulfilled') map[(r.value as any).id] = { latestAt: (r.value as any).latestAt, latestBy: (r.value as any).latestBy }; });
+      setLatestMap(map);
     } catch (e: any) {
       setError(e.message || "Failed to load classes");
     }
@@ -99,13 +108,25 @@ export default function StudentDashboard() {
                   </div>
                   <span className={"absolute top-2 right-2 text-xs px-2 py-1 rounded-full " + (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")}>{c.isActive ? "Active" : "Inactive"}</span>
                   <div className="absolute bottom-3 right-3 z-10 flex flex-row gap-2">
-                    <Link
-                      to={`/classes/${cid}/messages`}
-                      className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground hover:opacity-90 text-center"
-                      title="Messages"
-                    >
-                      Messages
-                    </Link>
+                    <div className="relative inline-block">
+                      <Link
+                        to={`/classes/${cid}/messages`}
+                        className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground hover:opacity-90 text-center"
+                        title="Messages"
+                        onClick={()=>{ try { localStorage.setItem(`lastSeenMsgs:${cid}`, String(Date.now())); } catch {} }}
+                      >
+                        Messages
+                      </Link>
+                      {(() => {
+                        const meta = latestMap[cid];
+                        const key = `lastSeenMsgs:${cid}`;
+                        const seen = Number(typeof window !== 'undefined' ? (localStorage.getItem(key) || 0) : 0);
+                        const isNew = meta && meta.latestAt && (!userId || String(meta.latestBy) !== String(userId)) && meta.latestAt > seen;
+                        return isNew ? (
+                          <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 shadow ring-2 ring-background" />
+                        ) : null;
+                      })()}
+                    </div>
                     <Link
                       to={`/student/classes/${cid}/attendance`}
                       className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background hover:bg-accent hover:text-accent-foreground text-center"
