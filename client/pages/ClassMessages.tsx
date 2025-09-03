@@ -131,6 +131,7 @@ export default function ClassMessages() {
     // Also fetch latest assignments to compute indicator
     (async ()=>{
       try {
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
         const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
         const r = await fetchWithRetry(`/api/classes/${id}/assignments`, { headers, cache: 'no-store', signal: ac.signal });
         const d = await r.json().catch(()=>({}));
