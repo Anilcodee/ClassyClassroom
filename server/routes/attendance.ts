@@ -81,3 +81,43 @@ export const markAttendance: RequestHandler = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const manualMarkAttendance: RequestHandler = async (req: AuthRequest, res) => {
+  if (mongoose.connection.readyState !== 1)
+    return res.status(503).json({ message: "Database not connected" });
+  try {
+    const { id } = req.params as { id: string };
+    const { name, rollNo, present } = req.body as { name: string; rollNo: string; present: boolean };
+    if (!name || !rollNo) return res.status(400).json({ message: "Missing student info" });
+
+    const cls = await ClassModel.findById(id).select("teacher coTeachers").lean();
+    const userId = String((req as any).userId || "");
+    const isOwnerOrCo = cls && (String(cls.teacher) === userId || (cls.coTeachers||[]).some((t:any)=> String(t) === userId));
+    if (!isOwnerOrCo) return res.status(403).json({ message: "Unauthorized" });
+
+    const todayKey = new Date().toISOString().slice(0,10);
+    const dayStart = new Date(todayKey);
+    const dayEnd = new Date(dayStart.getTime() + 24*60*60*1000);
+    let doc = await Attendance.findOne({ classId: id, date: { $gte: dayStart, $lt: dayEnd } });
+    if (!doc) doc = await Attendance.create({ classId: id, date: dayStart, records: [] });
+
+    const idx = doc.records.findIndex(r => String(r.student.rollNo) === String(rollNo));
+    if (present) {
+      if (idx === -1) {
+        doc.records.push({ student: { name, rollNo }, markedAt: new Date() });
+      } else {
+        doc.records[idx].student.name = name;
+      }
+    } else {
+      if (idx !== -1) {
+        doc.records.splice(idx, 1);
+      }
+    }
+
+    await doc.save();
+    res.json({ records: doc.records });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Server error" });
+  }
+};
