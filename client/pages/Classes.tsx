@@ -64,11 +64,18 @@ export default function Classes() {
       if (!res.ok) throw new Error(data?.message || (res.status === 401 ? "Please log in" : "Failed to load"));
       const list = data.classes.map((c: any) => ({ id: c._id, name: c.name, joinCode: c.joinCode, isActive: c.isActive, imageUrl: c.imageUrl }));
       setClasses(list);
-      // latest map
-      const results = await Promise.allSettled(list.map((c: any) => fetchWithRetry(`/api/classes/${c.id}/messages?latest=1`, { headers }).then(r => (r.status===0||r.status===499) ? ({}) : r.json().catch(()=>({}))).then(d => ({ id: c.id, latestAt: d?.latestAt ? new Date(d.latestAt).getTime() : null, latestBy: d?.latestBy ? String(d.latestBy) : null }))));
-      const map: Record<string, { latestAt: number | null; latestBy: string | null }> = {};
-      results.forEach(r => { if (r.status === 'fulfilled') map[(r.value as any).id] = { latestAt: (r.value as any).latestAt, latestBy: (r.value as any).latestBy }; });
-      setLatestMap(map);
+      // latest map (single request)
+      const idsParam = list.map((c:any)=>c.id).join(',');
+      const latestRes = await fetchWithRetry(`/api/messages/latest?classIds=${encodeURIComponent(idsParam)}`, { headers, cache: 'no-store' });
+      if (latestRes.status !== 0 && latestRes.status !== 499) {
+        const latestData = await latestRes.json().catch(()=>({}));
+        const src = latestData?.latest || {};
+        const map: Record<string, { latestAt: number | null; latestBy: string | null }> = {};
+        Object.keys(src).forEach((cid) => {
+          map[cid] = { latestAt: src[cid]?.latestAt ? new Date(src[cid].latestAt).getTime() : null, latestBy: src[cid]?.latestBy ? String(src[cid].latestBy) : null };
+        });
+        setLatestMap(map);
+      }
       // archived list
       const ar = await fetchWithRetry('/api/classes/archived', { headers, cache: 'no-store' });
       if (ar.status !== 0 && ar.status !== 499) {
