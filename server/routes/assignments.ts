@@ -25,14 +25,22 @@ export const listAssignments: RequestHandler = async (req: AuthRequest, res) => 
     const teacherView = isOwnerOrCo(cls, userId);
     const now = new Date();
 
+    const status = String((req.query as any).status || 'published');
+
     let query: any = { classId: id };
-    if (!teacherView) {
-      const roll = String((user as any).rollNo || "");
-      query.$and = [
+    if (status === 'drafts') {
+      if (!teacherView) return res.status(403).json({ message: 'Unauthorized' });
+      query.$and = [ { $or: [{ isDraft: true }] } ];
+    } else {
+      const andConds: any[] = [
         { $or: [{ isDraft: false }, { isDraft: { $exists: false } }] },
         { $or: [{ publishAt: null }, { publishAt: { $lte: now } }] },
-        { $or: [{ allowedRollNos: { $size: 0 } }, { allowedRollNos: roll }] },
       ];
+      if (!teacherView) {
+        const roll = String((user as any).rollNo || "");
+        andConds.push({ $or: [{ allowedRollNos: { $size: 0 } }, { allowedRollNos: roll }] });
+      }
+      query.$and = andConds;
     }
 
     const docs = await Assignment.find(query).sort({ createdAt: -1 }).lean();
