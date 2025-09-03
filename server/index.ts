@@ -59,8 +59,8 @@ export function createServer() {
   app.patch("/api/classes/:id", requireAuth, updateClassDetails);
   app.patch("/api/classes/:id/archive", requireAuth, archiveClass);
   app.patch("/api/classes/:id/unarchive", requireAuth, unarchiveClass);
-  app.get("/api/classes/:id", requireAuth, getClass);
   app.get("/api/classes/archived", requireAuth, listArchivedClasses);
+  app.get("/api/classes/:id", requireAuth, getClass);
 
   // Attendance (teacher view)
   app.get("/api/classes/:id/attendance/today", requireAuth, getTodayAttendance);
