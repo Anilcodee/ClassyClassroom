@@ -157,9 +157,19 @@ export const updateAssignment: RequestHandler = async (req: AuthRequest, res) =>
       const wasPublished = !wasDraft && (!!prevPublishAt ? prevPublishAt <= now : true);
       if (nowPublished && !wasPublished) {
         const atts = (a as any).attachments || [];
+        const fmt = (v?: Date | null) => {
+          if (!v) return "";
+          const d = new Date(v);
+          const dd = String(d.getDate()).padStart(2, '0');
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const yyyy = d.getFullYear();
+          const hh = String(d.getHours()).padStart(2, '0');
+          const mi = String(d.getMinutes()).padStart(2, '0');
+          return `${dd}-${mm}-${yyyy}, ${hh}:${mi}`;
+        };
         const parts: string[] = [];
         parts.push(`${a.type === 'quiz' ? 'Quiz' : 'Assignment'}: ${a.title}`);
-        if (a.dueAt) parts.push(`Due: ${a.dueAt.toISOString()}`);
+        if (a.dueAt) parts.push(`Due on ${fmt(a.dueAt)}`);
         const content = [a.description || "", parts.join(" | ")].filter(Boolean).join("\n\n");
         await Message.create({ classId: a.classId, teacherId: (req as any).userId, title: a.type === 'quiz' ? `Quiz: ${a.title}` : `Assignment: ${a.title}`, content, attachments: atts.slice(0, 5), comments: [] });
       }
