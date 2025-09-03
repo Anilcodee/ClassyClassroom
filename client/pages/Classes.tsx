@@ -65,7 +65,7 @@ export default function Classes() {
       const list = data.classes.map((c: any) => ({ id: c._id, name: c.name, joinCode: c.joinCode, isActive: c.isActive, imageUrl: c.imageUrl }));
       setClasses(list);
       // latest map
-      const results = await Promise.allSettled(list.map((c: any) => fetch(`/api/classes/${c.id}/messages?latest=1`, { headers }).then(r => r.json().catch(()=>({}))).then(d => ({ id: c.id, latestAt: d?.latestAt ? new Date(d.latestAt).getTime() : null, latestBy: d?.latestBy ? String(d.latestBy) : null }))));
+      const results = await Promise.allSettled(list.map((c: any) => fetchWithRetry(`/api/classes/${c.id}/messages?latest=1`, { headers }).then(r => (r.status===0||r.status===499) ? ({}) : r.json().catch(()=>({}))).then(d => ({ id: c.id, latestAt: d?.latestAt ? new Date(d.latestAt).getTime() : null, latestBy: d?.latestBy ? String(d.latestBy) : null }))));
       const map: Record<string, { latestAt: number | null; latestBy: string | null }> = {};
       results.forEach(r => { if (r.status === 'fulfilled') map[(r.value as any).id] = { latestAt: (r.value as any).latestAt, latestBy: (r.value as any).latestBy }; });
       setLatestMap(map);
