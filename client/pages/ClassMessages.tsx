@@ -170,6 +170,8 @@ export default function ClassMessages() {
       if (mountedRef.current) {
         setTitle(""); setContent(""); setFiles([]);
         setMessages((prev) => [d.message, ...prev]);
+        try { localStorage.setItem(`lastSeenMsgs:${id}`, String(Date.now())); } catch {}
+        setHasNewMsgs(false);
       }
     } catch (e: any) { if (e?.name !== 'AbortError' && mountedRef.current) setError(e.message); }
     finally { if (mountedRef.current) setPosting(false); }
