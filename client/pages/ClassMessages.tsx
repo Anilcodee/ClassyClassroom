@@ -243,19 +243,21 @@ export default function ClassMessages() {
           )}
         </div>
       </div>
-      <div className="mt-4">
-        <div className="relative block" onClick={()=>{ localStorage.setItem(`lastSeenMsgs:${id}`, String(Date.now())); setHasNewMsgs(false); }}>
-          <Link to={`/classes/${id}/messages/new`} className="block">
-            <Button className="w-full justify-center gap-2 bg-blue-600 hover:bg-blue-600/90 text-white py-5 text-base" variant="default">
-              <Pencil className="h-5 w-5" />
-              Write an announcement
-            </Button>
-          </Link>
-          {hasNewMsgs && (
-            <span className="absolute top-1 right-1 h-3 w-3 rounded-full bg-green-500 shadow ring-2 ring-background" />
-          )}
+      {userRole !== 'student' && (
+        <div className="mt-4">
+          <div className="relative block" onClick={()=>{ localStorage.setItem(`lastSeenMsgs:${id}`, String(Date.now())); setHasNewMsgs(false); }}>
+            <Link to={`/classes/${id}/messages/new`} className="block">
+              <Button className="w-full justify-center gap-2 bg-blue-600 hover:bg-blue-600/90 text-white py-5 text-base" variant="default">
+                <Pencil className="h-5 w-5" />
+                Write an announcement
+              </Button>
+            </Link>
+            {hasNewMsgs && (
+              <span className="absolute top-1 right-1 h-3 w-3 rounded-full bg-green-500 shadow ring-2 ring-background" />
+            )}
+          </div>
         </div>
-      </div>
+      )}
       {loading ? (
         <p className="mt-4 text-sm text-foreground/70">Loading…</p>
       ) : error ? (
