@@ -15,23 +15,37 @@ export default function ClassDetail() {
   const token = useMemo(() => localStorage.getItem("token"), []);
   const userRole = useMemo(() => { try { const raw = localStorage.getItem('user'); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
 
-  async function load() {
+  async function load(signal?: AbortSignal) {
+    if (!token) { setError("Please log in"); nav('/auth'); return; }
     setLoading(true); setError(null);
+    const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
     try {
-      if (!token) throw new Error("Please log in");
-      const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
-      const res = await fetch(`/api/classes/${id}`, { headers, cache: 'no-store' });
-      const raw = await res.text();
-      const data = raw ? JSON.parse(raw) : {};
-      if (!res.ok) throw new Error(data?.message || res.statusText);
+      let res: Response | null = null; let data: any = null;
+      try {
+        res = await fetch(`/api/classes/${id}`, { headers, cache: 'no-store', signal });
+      } catch (e: any) {
+        if (e?.name === 'AbortError') return; // user navigated away
+        await new Promise(r=>setTimeout(r, 400));
+        res = await fetch(`/api/classes/${id}`, { headers, cache: 'no-store' });
+      }
+      const raw = await res!.text();
+      data = raw ? JSON.parse(raw) : {};
+      if (!res!.ok) throw new Error(data?.message || res!.statusText);
       setCls(data.class);
-      const r = await fetch(`/api/classes/${id}/attendance/today`, { headers, cache: 'no-store' });
-      const rraw = await r.text();
-      const rd = rraw ? JSON.parse(rraw) : {};
-      if (r.ok) setRecords(rd.records || []);
+
+      // Attendance is best-effort: don't fail whole page if network hiccups
+      try {
+        const r = await fetch(`/api/classes/${id}/attendance/today`, { headers, cache: 'no-store', signal });
+        const rraw = await r.text();
+        const rd = rraw ? JSON.parse(rraw) : {};
+        if (r.ok) setRecords(rd.records || []);
+        else setRecords([]);
+      } catch (e: any) {
+        if (e?.name !== 'AbortError') setRecords([]);
+      }
     } catch (e: any) {
-      setError(e.message || "Network error");
-      if (e.message === "Please log in") nav("/auth");
+      if (e?.name === 'AbortError') return;
+      setError(e?.message || 'Network error');
     } finally {
       setLoading(false);
     }
