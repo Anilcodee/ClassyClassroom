@@ -52,6 +52,7 @@ export interface ISubmission extends Document {
   assignmentId: Types.ObjectId;
   userId: Types.ObjectId;
   answers: any;
+  attachments: IAttachment[];
   submittedAt: Date;
   status: "on_time" | "late" | "closed";
 }
@@ -60,6 +61,7 @@ const SubmissionSchema = new Schema<ISubmission>({
   assignmentId: { type: Schema.Types.ObjectId, ref: "Assignment", index: true, required: true },
   userId: { type: Schema.Types.ObjectId, ref: "User", index: true, required: true },
   answers: { type: Schema.Types.Mixed },
+  attachments: { type: [{ name: String, type: String, size: Number, dataUrl: String }], default: [] },
   submittedAt: { type: Date, default: () => new Date() },
   status: { type: String, enum: ["on_time", "late", "closed"], default: "on_time" },
 }, { timestamps: true });
