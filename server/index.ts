@@ -7,6 +7,7 @@ import { signup, login, signupStudent, signupTeacher, loginStudent, loginTeacher
 import { requireAuth } from "./middleware/auth";
 import { listClasses, createClass, updateClassImage } from "./routes/classes";
 import { archiveClass } from "./routes/classes.archive";
+import { listArchivedClasses, unarchiveClass } from "./routes/classes.archived";
 import { getClass } from "./routes/classes.get-by-id";
 import { activateClass, sessionStatus, markAttendance, manualMarkAttendance } from "./routes/attendance";
 import { getTodayAttendance } from "./routes/attendance.today";
@@ -56,7 +57,9 @@ export function createServer() {
   app.patch("/api/classes/:id/image", requireAuth, updateClassImage);
   app.patch("/api/classes/:id", requireAuth, updateClassDetails);
   app.patch("/api/classes/:id/archive", requireAuth, archiveClass);
+  app.patch("/api/classes/:id/unarchive", requireAuth, unarchiveClass);
   app.get("/api/classes/:id", requireAuth, getClass);
+  app.get("/api/classes/archived", requireAuth, listArchivedClasses);
 
   // Attendance (teacher view)
   app.get("/api/classes/:id/attendance/today", requireAuth, getTodayAttendance);
