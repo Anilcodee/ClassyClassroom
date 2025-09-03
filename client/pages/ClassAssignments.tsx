@@ -116,7 +116,12 @@ export default function ClassAssignments(){
         )}
       </div>
 
-      <h2 className="mt-6 font-semibold">All assignments</h2>
+      <div className="mt-6 flex items-center justify-between">
+        <h2 className="font-semibold">All assignments</h2>
+        {role !== 'student' && (
+          <Link to={`/classes/${id}/assignments/drafts`} className="px-3 py-1.5 rounded-md border border-border text-sm">Drafts</Link>
+        )}
+      </div>
       {loading ? (
         <p className="text-sm text-foreground/70 mt-2">Loading…</p>
       ) : error ? (
