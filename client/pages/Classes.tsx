@@ -95,7 +95,7 @@ export default function Classes() {
         <div className="md:col-span-2">
           <MakeClassCard onCreated={load} />
         </div>
-        <aside className="md:col-span-1 space-y-4">
+        <aside className="md:col-span-1 space-y-5 self-start">
           <div className="rounded-2xl border border-border p-5 bg-card shadow">
             <h3 className="font-semibold mb-2">Downloads</h3>
             <p className="text-sm text-foreground/70 mb-3">Download PDF list (all days) for a specific class.</p>
@@ -289,8 +289,8 @@ export default function Classes() {
                               const res = await fetch(`/api/classes/${c.id}/archive`, { method: 'PATCH', headers });
                               const d = await res.json().catch(()=>({}));
                               if (!res.ok) throw new Error(d?.message || res.statusText);
-                              setClasses(prev => prev.filter(x => x.id !== c.id));
                               toast({ title: "Class archived" });
+                              await load();
                             } catch (e: any) {
                               toast({ title: "Failed to archive", description: e.message || "" });
                             } finally { setMenuOpenFor(""); }
