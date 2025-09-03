@@ -4,7 +4,7 @@ import { CheckCircle } from "lucide-react";
 export default function GetStarted() {
   return (
     <main className="min-h-[calc(100vh-56px)] bg-gradient-to-b from-background via-background to-background">
-      <section className="container mx-auto px-4 grid lg:grid-cols-2 gap-8 sm:gap-10 py-10 sm:py-14 lg:py-16 items-center">
+      <section className="container mx-auto px-4 grid lg:grid-cols-2 gap-12 sm:gap-14 py-10 sm:py-14 lg:py-16 items-center">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-foreground/70 mb-4">
             <span className="h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
@@ -18,7 +18,7 @@ export default function GetStarted() {
             Students join with a code, comment on posts, and track their own attendance.
             PDFs, history, class covers, and role‑based access included.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-10 flex flex-wrap gap-4">
             <Link to="/student-auth" className="px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:opacity-90 w-full xs:w-auto text-center">
               Sign in as Student
             </Link>
@@ -27,9 +27,9 @@ export default function GetStarted() {
             </Link>
           </div>
         </div>
-        <div className="space-y-6">
+        <div className="space-y-10">
           <div className="w-full max-w-3xl mx-auto">
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm text-foreground/80">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-4 text-sm text-foreground/80">
               <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-500 mt-0.5" /><span className="flex-1">Create and manage classes with cover images</span></li>
               <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-500 mt-0.5" /><span className="flex-1">Start timed QR attendance sessions</span></li>
               <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-500 mt-0.5" /><span className="flex-1">Download PDFs and view attendance history</span></li>
@@ -40,7 +40,7 @@ export default function GetStarted() {
               <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-500 mt-0.5" /><span className="flex-1">Clean, mobile‑friendly experience</span></li>
             </ul>
           </div>
-          <div className="grid sm:grid-cols-2 gap-6 items-start text-center">
+          <div className="grid sm:grid-cols-2 gap-8 items-start text-center">
             <div className="flex flex-col items-center">
               <TeacherAnimation />
               <div className="mt-2 text-sm font-semibold text-foreground/80">For Teachers</div>
@@ -58,9 +58,9 @@ export default function GetStarted() {
 
 function TeacherAnimation() {
   return (
-    <div className="relative mx-auto max-w-xl lg:max-w-2xl rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-8 sm:p-10 overflow-hidden">
+    <div className="relative mx-auto max-w-2xl lg:max-w-3xl rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-8 sm:p-10 overflow-hidden">
       <div className="absolute -top-20 -right-20 h-72 w-72 lg:h-80 lg:w-80 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
-      <svg viewBox="0 0 200 200" className="mx-auto h-64 sm:h-72 lg:h-80">
+      <svg viewBox="0 0 200 200" className="mx-auto h-56">
         <circle cx="100" cy="100" r="90" className="fill-[hsl(var(--muted))]" />
         <g className="origin-[120px_70px] animate-wave">
           <circle cx="120" cy="60" r="12" className="fill-[hsl(var(--brand-500))]" />
@@ -80,9 +80,9 @@ function TeacherAnimation() {
 
 function StudentAnimation() {
   return (
-    <div className="relative mx-auto max-w-xl lg:max-w-2xl rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-8 sm:p-10 overflow-hidden">
+    <div className="relative mx-auto max-w-2xl lg:max-w-3xl rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-8 sm:p-10 overflow-hidden">
       <div className="absolute -bottom-16 -left-16 h-72 w-72 lg:h-80 lg:w-80 rounded-full bg-gradient-to-tr from-blue-400/40 to-cyan-700/40 blur-3xl" />
-      <svg viewBox="0 0 200 200" className="mx-auto h-64 sm:h-72 lg:h-80">
+      <svg viewBox="0 0 200 200" className="mx-auto h-56">
         <circle cx="100" cy="100" r="90" className="fill-[hsl(var(--muted))]" />
         {/* Head */}
         <circle cx="90" cy="70" r="12" className="fill-blue-500" />
