@@ -252,6 +252,11 @@ export default function ClassMessages() {
       </div>
       {loading ? (
         <p className="mt-4 text-sm text-foreground/70">Loading…</p>
+      ) : error ? (
+        <div className="mt-4 text-sm">
+          <p className="text-destructive">{error}</p>
+          <button className="mt-2 px-3 py-1.5 rounded-md border border-border" onClick={()=>{ const ac = new AbortController(); void load(ac.signal); }}>Retry</button>
+        </div>
       ) : (
         <ul className="mt-4 space-y-3">
           {messages.map((m) => (
