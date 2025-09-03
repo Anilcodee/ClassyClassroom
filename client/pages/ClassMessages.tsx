@@ -166,7 +166,7 @@ export default function ClassMessages() {
       await load();
     } finally {
       controllersRef.current = controllersRef.current.filter(c => c !== ac);
-      try { ac.abort(); } catch {}
+      // Do not abort here; unmount cleanup already aborts in-flight requests. Late abort triggers AbortError in wrapped fetch.
     }
   }
 
