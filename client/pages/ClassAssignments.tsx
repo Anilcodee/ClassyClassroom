@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { formatDateTime } from "@/lib/utils";
 
 interface AssignmentItem { id: string; title: string; type: 'assignment'|'quiz'; description?: string; dueAt?: string|null; publishAt?: string|null; isDraft: boolean; allowLate: boolean; allowedRollNos?: string[] }
 
@@ -77,16 +78,6 @@ export default function ClassAssignments(){
     return res;
   }
 
-  function formatDateOnly(v?: string | Date | null) {
-    if (!v) return "";
-    const d = new Date(v);
-    if (isNaN(d.getTime())) return "";
-    const dd = String(d.getDate()).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const yyyy = d.getFullYear();
-    return `${dd}-${mm}-${yyyy}`;
-  }
-
   async function create(){
     setCreating(true); setError(null);
     try {
@@ -144,8 +135,8 @@ export default function ClassAssignments(){
             <li key={a.id} className="rounded-xl border border-border p-4 flex items-center justify-between cursor-pointer hover:bg-accent/30" onClick={()=> nav(`/assign/${a.id}`)}>
               <div>
                 <p className="font-medium">{a.title} <span className="text-xs text-foreground/60">({a.type})</span></p>
-                <p className="text-xs text-foreground/60">{a.isDraft ? 'Draft' : (a.publishAt ? `Published on ${formatDateOnly(a.publishAt)}` : 'Published')}</p>
-                {a.dueAt && <p className="text-xs text-foreground/60">Due on {formatDateOnly(a.dueAt)}</p>}
+                <p className="text-xs text-foreground/60">{a.isDraft ? 'Draft' : (a.publishAt ? `Published on ${formatDateTime(a.publishAt)}` : 'Published')}</p>
+                {a.dueAt && <p className="text-xs text-foreground/60">Due on {formatDateTime(a.dueAt)}</p>}
               </div>
               <div className="flex items-center gap-2">
                 {role === 'student' ? (
