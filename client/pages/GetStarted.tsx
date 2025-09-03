@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { CheckCircle } from "lucide-react";
 
 export default function GetStarted() {
   return (
@@ -27,16 +28,16 @@ export default function GetStarted() {
           </div>
         </div>
         <div className="space-y-6">
-          <div className="w-full max-w-2xl mx-auto">
-            <ul className="text-sm text-foreground/70 space-y-2">
-              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Create and manage classes with cover images</span></li>
-              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Start timed QR attendance sessions</span></li>
-              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Download PDFs and view attendance history</span></li>
-              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Post announcements; edit/delete your posts</span></li>
-              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Join classes via secure code</span></li>
-              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">See your classes and attendance days</span></li>
-              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Comment on announcements (except your own)</span></li>
-              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Clean, mobile‑friendly experience</span></li>
+          <div className="w-full max-w-3xl mx-auto">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm text-foreground/80">
+              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-500 mt-0.5" /><span className="flex-1">Create and manage classes with cover images</span></li>
+              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-500 mt-0.5" /><span className="flex-1">Start timed QR attendance sessions</span></li>
+              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-500 mt-0.5" /><span className="flex-1">Download PDFs and view attendance history</span></li>
+              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-500 mt-0.5" /><span className="flex-1">Post announcements; edit/delete your posts</span></li>
+              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-500 mt-0.5" /><span className="flex-1">Join classes via secure code</span></li>
+              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-500 mt-0.5" /><span className="flex-1">See your classes and attendance days</span></li>
+              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-500 mt-0.5" /><span className="flex-1">Comment on announcements (except your own)</span></li>
+              <li className="flex items-start gap-2"><CheckCircle className="h-4 w-4 text-green-500 mt-0.5" /><span className="flex-1">Clean, mobile‑friendly experience</span></li>
             </ul>
           </div>
           <div className="grid sm:grid-cols-2 gap-6 items-start text-center">
