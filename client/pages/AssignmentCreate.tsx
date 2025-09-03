@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export default function AssignmentCreate(){
   const { id } = useParams();
@@ -16,7 +18,10 @@ export default function AssignmentCreate(){
   const [allowedRollNos, setAllowedRollNos] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
   const [creating, setCreating] = useState(false);
-  const MAX_FILES = 4; const MAX_SIZE = 4 * 1024 * 1024;
+  const MAX_FILES = 3; const MAX_SIZE = 2 * 1024 * 1024; // base64 overhead; keep small under server 10MB limit
+  const MAX_TOTAL = 7 * 1024 * 1024;
+  const [err, setErr] = useState<string | null>(null);
+  const [errOpen, setErrOpen] = useState(false);
 
   useEffect(()=>{
     if (role === 'student') nav(`/classes/${id}/assignments`);
@@ -34,6 +39,13 @@ export default function AssignmentCreate(){
   }
 
   async function create(){
+    if (!title.trim()) { setErr('Title is required'); setErrOpen(true); return; }
+    const totalSize = files.reduce((s,f)=> s + f.size, 0);
+    if (files.length > MAX_FILES || totalSize > MAX_TOTAL || files.some(f => f.size > MAX_SIZE)) {
+      setErr(`Attachments exceed limits. Max ${MAX_FILES} files, ${Math.round(MAX_SIZE/1024/1024)}MB each, total under ${Math.round(MAX_TOTAL/1024/1024)}MB.`);
+      setErrOpen(true);
+      return;
+    }
     setCreating(true);
     try {
       const attachments = await readFiles(files);
@@ -56,8 +68,9 @@ export default function AssignmentCreate(){
       });
       const d = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
+      toast({ title: 'Assignment created' });
       nav(`/classes/${id}/assignments`);
-    } catch(e:any) { alert(e.message || 'Failed'); }
+    } catch(e:any) { setErr(e.message || 'Failed'); setErrOpen(true); }
     finally { setCreating(false); }
   }
 
@@ -129,6 +142,18 @@ export default function AssignmentCreate(){
           <button disabled={creating || !title.trim()} onClick={create} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-50">{creating? 'Creating…' : 'Create'}</button>
         </div>
       </div>
+      <AlertDialog open={errOpen} onOpenChange={setErrOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Failed to create assignment</AlertDialogTitle>
+            <AlertDialogDescription>{err || 'Something went wrong. Please try again.'}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Close</AlertDialogCancel>
+            <AlertDialogAction onClick={()=> setErrOpen(false)}>OK</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
