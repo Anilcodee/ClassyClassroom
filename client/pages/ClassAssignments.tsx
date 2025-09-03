@@ -154,6 +154,9 @@ export default function ClassAssignments(){
                             const r = await fetch(`/api/assignments/${a.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' }, body: JSON.stringify({ isDraft: false, publishAt: new Date().toISOString() }) });
                             const d = await r.json().catch(()=>({}));
                             if (!r.ok) throw new Error(d?.message || r.statusText);
+                            try {
+                              await fetch(`/api/classes/${id}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' }, body: JSON.stringify({ title: a.type === 'quiz' ? `Quiz: ${a.title}` : `Assignment: ${a.title}`, content: [a.description||'', `${a.type === 'quiz' ? 'Quiz' : 'Assignment'}: ${a.title}${a.dueAt ? ` | Due on ${formatDateTime(a.dueAt)}` : ''}`].filter(Boolean).join('\n\n') }) });
+                            } catch {}
                             await load();
                           } catch(e:any) { console.error(e); }
                           finally { setBusyId(null); }
