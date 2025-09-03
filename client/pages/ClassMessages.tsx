@@ -127,7 +127,7 @@ export default function ClassMessages() {
     (async ()=>{
       try {
         const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
-        const r = await fetch(`/api/classes/${id}/assignments`, { headers, cache: 'no-store', signal: ac.signal });
+        const r = await fetchWithRetry(`/api/classes/${id}/assignments`, { headers, cache: 'no-store', signal: ac.signal });
         const d = await r.json().catch(()=>({}));
         if (r.ok && mountedRef.current) {
           const latest = (d.assignments||[]).reduce((acc:number, a:any)=> Math.max(acc, new Date(a.publishAt || a.createdAt).getTime()||0), 0);
