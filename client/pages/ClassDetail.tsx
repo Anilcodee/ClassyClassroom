@@ -163,10 +163,12 @@ export default function ClassDetail() {
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
+                        role="switch"
+                        aria-checked={present}
                         disabled={userRole === 'student'}
                         title={userRole === 'student' ? undefined : (present ? 'Mark absent' : 'Mark present')}
                         onClick={()=> userRole !== 'student' && togglePresent(s.name, s.rollNo, !present)}
-                        className={`h-8 w-8 rounded-full grid place-items-center font-semibold ${present ? 'bg-green-500 text-white' : 'bg-brand-500/15 text-brand-700'} ${userRole !== 'student' ? 'cursor-pointer hover:opacity-80' : ''}`}
+                        className={`h-8 w-8 rounded-full grid place-items-center font-semibold border border-border shadow-sm ${present ? 'bg-green-500 text-white' : 'bg-accent/30 text-foreground/80'} ${userRole !== 'student' ? 'cursor-pointer hover:opacity-80' : ''}`}
                       >
                         {s.name.slice(0,1).toUpperCase()}
                       </button>
