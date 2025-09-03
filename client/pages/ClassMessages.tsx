@@ -91,7 +91,8 @@ export default function ClassMessages() {
         await new Promise(r => setTimeout(r, 300 * attempt));
         return fetchWithRetry(url, init, attempt + 1);
       }
-      throw e;
+      const body = JSON.stringify({ message: 'Network error' });
+      return new Response(body, { status: 0, headers: { 'Content-Type': 'application/json' } });
     }
   }
 
