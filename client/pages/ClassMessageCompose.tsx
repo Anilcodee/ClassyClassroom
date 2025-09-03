@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 
@@ -8,6 +8,7 @@ export default function ClassMessageCompose() {
   const { id } = useParams();
   const nav = useNavigate();
   const token = useMemo(() => localStorage.getItem("token"), []);
+  const role = useMemo(() => { try { const raw = localStorage.getItem("user"); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [files, setFiles] = useState<File[]>([]);
@@ -27,13 +28,23 @@ export default function ClassMessageCompose() {
     return res;
   }
 
+  useEffect(() => {
+    if (role === 'student') {
+      toast({ title: "Not allowed", description: "Only teachers can post announcements" });
+      nav(`/classes/${id}/messages`);
+    }
+  }, [role, id]);
+
   async function post() {
     setPosting(true); setError(null);
     try {
       const attachments = await readFiles(files);
       const r = await fetch(`/api/classes/${id}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : "" }, body: JSON.stringify({ title: title || undefined, content, attachments }) });
       const d = await r.json().catch(()=>({}));
-      if (!r.ok) throw new Error(d?.message || r.statusText);
+      if (!r.ok) {
+        if (r.status === 403) throw new Error("Only teachers can post announcements");
+        throw new Error(d?.message || r.statusText);
+      }
       toast({ title: "Announcement posted" });
       nav(`/classes/${id}/messages`);
     } catch (e: any) {
