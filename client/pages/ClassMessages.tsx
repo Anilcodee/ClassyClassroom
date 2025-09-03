@@ -42,6 +42,9 @@ export default function ClassMessages() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
+  const [hasNewMsgs, setHasNewMsgs] = useState(false);
+  const [hasNewAssigns, setHasNewAssigns] = useState(false);
+
   const [preview, setPreview] = useState<{ name: string; type: string; url: string; text?: string } | null>(null);
   const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
   const [commentLoading, setCommentLoading] = useState<Record<string, boolean>>({});
