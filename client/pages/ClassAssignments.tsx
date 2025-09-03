@@ -133,7 +133,7 @@ export default function ClassAssignments(){
                       </button>
                     )}
                     <Link to={`/assign/${a.id}`} className="px-3 py-1.5 rounded-md border border-border text-sm">Open</Link>
-                    <Link to={`/classes/${id}/assignments/new`} state={{ editFrom: a }} className="px-3 py-1.5 rounded-md border border-border text-sm">Edit</Link>
+                    <Link to={`/assign/${a.id}/edit`} className="px-3 py-1.5 rounded-md border border-border text-sm">Edit</Link>
                     <button className="px-3 py-1.5 rounded-md border border-border text-sm text-destructive" onClick={()=> setConfirmId(a.id)}>Delete</button>
                   </>
                 )}
