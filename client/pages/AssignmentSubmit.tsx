@@ -120,7 +120,15 @@ export default function AssignmentSubmit(){
         </button>
         {a?.classId && <Link to={`/classes/${a.classId}/assignments`} className="text-sm text-foreground/70 hover:text-foreground">Assignments</Link>}
       </div>
-      {loading ? <p className="mt-4 text-sm text-foreground/70">Loading…</p> : error ? <p className="mt-4 text-sm text-destructive">{error}</p> : a ? (
+      {loading ? <p className="mt-4 text-sm text-foreground/70">Loading…</p> : error ? (
+        <div className="mt-4 text-sm">
+          <p className="text-destructive">{error || (navigator.onLine ? 'Failed to load' : 'You appear to be offline')}</p>
+          <div className="mt-2 flex items-center gap-2">
+            <button className="px-3 py-1.5 rounded-md border border-border" onClick={()=>{ const ac = new AbortController(); void load(ac.signal); }}>Retry</button>
+            <button className="px-3 py-1.5 rounded-md border border-border" onClick={()=>{ if (a?.classId) nav(`/classes/${a.classId}/assignments`); else nav('/classes'); }}>Go to assignments</button>
+          </div>
+        </div>
+      ) : a ? (
         <div className="mt-4">
           <h1 className="text-2xl font-bold">{a.title} <span className="text-xs text-foreground/60">({a.type})</span></h1>
           {a.description && <p className="mt-2 text-foreground/70 whitespace-pre-wrap">{a.description}</p>}
