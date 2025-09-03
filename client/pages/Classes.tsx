@@ -14,6 +14,8 @@ export default function Classes() {
   const userId = userRaw ? (JSON.parse(userRaw)?.id || null) : null;
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [archived, setArchived] = React.useState<ClassItem[]>([]);
+  const [archMenuFor, setArchMenuFor] = React.useState<string>("");
   const [selectedId, setSelectedId] = React.useState<string>("");
   const [showCodeFor, setShowCodeFor] = React.useState<string>("");
   const [menuOpenFor, setMenuOpenFor] = React.useState<string>("");
@@ -29,10 +31,15 @@ export default function Classes() {
       if (!res.ok) throw new Error(data?.message || (res.status === 401 ? "Please log in" : "Failed to load"));
       const list = data.classes.map((c: any) => ({ id: c._id, name: c.name, joinCode: c.joinCode, isActive: c.isActive, imageUrl: c.imageUrl }));
       setClasses(list);
+      // latest map
       const results = await Promise.allSettled(list.map((c: any) => fetch(`/api/classes/${c.id}/messages?latest=1`, { headers }).then(r => r.json().catch(()=>({}))).then(d => ({ id: c.id, latestAt: d?.latestAt ? new Date(d.latestAt).getTime() : null, latestBy: d?.latestBy ? String(d.latestBy) : null }))));
       const map: Record<string, { latestAt: number | null; latestBy: string | null }> = {};
       results.forEach(r => { if (r.status === 'fulfilled') map[(r.value as any).id] = { latestAt: (r.value as any).latestAt, latestBy: (r.value as any).latestBy }; });
       setLatestMap(map);
+      // archived list
+      const ar = await fetch('/api/classes/archived', { headers, cache: 'no-store' });
+      const ad = await ar.json().catch(()=>({}));
+      if (ar.ok) setArchived((ad.classes||[]).map((c:any)=> ({ id: c._id, name: c.name, joinCode: '', isActive: false, imageUrl: c.imageUrl })));
     } catch (e: any) {
       setError(e.message || "Network error");
     } finally {
@@ -88,7 +95,7 @@ export default function Classes() {
         <div className="md:col-span-2">
           <MakeClassCard onCreated={load} />
         </div>
-        <aside className="md:col-span-1">
+        <aside className="md:col-span-1 space-y-4">
           <div className="rounded-2xl border border-border p-5 bg-card shadow">
             <h3 className="font-semibold mb-2">Downloads</h3>
             <p className="text-sm text-foreground/70 mb-3">Download PDF list (all days) for a specific class.</p>
@@ -122,6 +129,53 @@ export default function Classes() {
                 Download PDF list (all days)
               </button>
             </div>
+          </div>
+
+          <div className="rounded-2xl border border-border p-5 bg-card shadow">
+            <h3 className="font-semibold mb-2">Archived classes</h3>
+            {archived.length === 0 ? (
+              <p className="text-sm text-foreground/70">No archived classes.</p>
+            ) : (
+              <ul className="divide-y divide-border">
+                {archived.map((c)=> (
+                  <li key={c.id} className="py-2 flex items-center justify-between gap-2">
+                    <span className="truncate">{c.name}</span>
+                    <div className="relative">
+                      <button
+                        className="p-1 rounded hover:bg-accent"
+                        onClick={() => setArchMenuFor(archMenuFor === c.id ? "" : c.id)}
+                        title="More"
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </button>
+                      {archMenuFor === c.id && (
+                        <div className="absolute right-0 top-6 z-20 w-40 rounded-md border border-border bg-background shadow">
+                          <button
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                            onClick={async ()=>{
+                              try {
+                                const token = localStorage.getItem('token');
+                                const headers: Record<string,string> = { 'Content-Type': 'application/json' };
+                                if (token) headers.Authorization = `Bearer ${token}`;
+                                const res = await fetch(`/api/classes/${c.id}/unarchive`, { method: 'PATCH', headers });
+                                const d = await res.json().catch(()=>({}));
+                                if (!res.ok) throw new Error(d?.message || res.statusText);
+                                setArchMenuFor("");
+                                await load();
+                              } catch (e: any) {
+                                toast({ title: 'Failed to unarchive', description: e.message || '' });
+                              }
+                            }}
+                          >
+                            Unarchive
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </aside>
         <div className="md:col-span-3">
