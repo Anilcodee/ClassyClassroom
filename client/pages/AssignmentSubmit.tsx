@@ -113,7 +113,7 @@ export default function AssignmentSubmit(){
       <div className="flex items-center justify-between">
         <button
           type="button"
-          onClick={()=>{ try { if (window.history.length > 1) nav(-1); else if (a?.classId) nav(`/classes/${a.classId}/assignments`); else nav('/classes'); } catch { nav('/classes'); } }}
+          onClick={()=>{ if (a?.classId) nav(`/classes/${a.classId}/assignments`); else nav('/classes'); }}
           className="text-sm text-foreground/70 hover:text-foreground"
         >
           ← Back
