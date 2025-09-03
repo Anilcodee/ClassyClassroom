@@ -4,6 +4,7 @@ import { AuthRequest } from "../middleware/auth";
 import { Assignment, Submission } from "../models/Assignment";
 import { ClassModel } from "../models/Class";
 import { User } from "../models/User";
+import { Message } from "../models/Message";
 
 function isOwnerOrCo(cls: any, userId: string) {
   return cls && (String(cls.teacher) === userId || (cls.coTeachers || []).some((t: any) => String(t) === userId));
@@ -31,11 +32,6 @@ export const listAssignments: RequestHandler = async (req: AuthRequest, res) => 
         { $or: [{ isDraft: false }, { isDraft: { $exists: false } }] },
         { $or: [{ publishAt: null }, { publishAt: { $lte: now } }] },
         { $or: [{ allowedRollNos: { $size: 0 } }, { allowedRollNos: roll }] },
-      ];
-    } else {
-      query.$and = [
-        { $or: [{ isDraft: false }, { isDraft: { $exists: false } }] },
-        { $or: [{ publishAt: null }, { publishAt: { $lte: now } }] },
       ];
     }
 
@@ -81,6 +77,19 @@ export const createAssignment: RequestHandler = async (req: AuthRequest, res) =>
       allowLate: allowLate !== false,
       allowedRollNos: Array.isArray(allowedRollNos) ? allowedRollNos.filter((x: any) => typeof x === 'string' && x.trim()).map((x: any) => x.trim()) : [],
     });
+
+    // Auto-post an announcement message so it appears in class Messages
+    try {
+      const parts: string[] = [];
+      parts.push(`${doc.type === 'quiz' ? 'Quiz' : 'Assignment'} created: ${doc.title}`);
+      if (doc.dueAt) parts.push(`Due: ${doc.dueAt.toISOString()}`);
+      if (doc.publishAt) parts.push(`Publish: ${doc.publishAt.toISOString()}`);
+      const content = [doc.description || "", parts.join(" | ")].filter(Boolean).join("\n\n");
+      await Message.create({ classId: id, teacherId: userId, title: doc.type === 'quiz' ? `Quiz: ${doc.title}` : `Assignment: ${doc.title}`, content: content || (doc.type === 'quiz' ? 'New quiz assigned.' : 'New assignment assigned.'), attachments: atts.slice(0, 5), comments: [] });
+    } catch (e) {
+      // non-fatal
+      console.error('Failed to post assignment message', e);
+    }
 
     res.status(201).json({ assignment: doc });
   } catch (e) {
