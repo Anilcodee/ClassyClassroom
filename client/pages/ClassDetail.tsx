@@ -13,6 +13,7 @@ export default function ClassDetail() {
   const [expiresAt, setExpiresAt] = useState<Date | null>(null);
   const [now, setNow] = useState(Date.now());
   const token = useMemo(() => localStorage.getItem("token"), []);
+  const userRole = useMemo(() => { try { const raw = localStorage.getItem('user'); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
 
   async function load() {
     setLoading(true); setError(null);
