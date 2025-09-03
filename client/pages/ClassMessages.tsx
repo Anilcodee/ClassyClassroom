@@ -162,8 +162,10 @@ export default function ClassMessages() {
       }
       await load();
     } catch (e: any) {
-      if (e?.name !== 'AbortError' && mountedRef.current) setError(e.message);
-      await load();
+      if (e?.name !== 'AbortError') {
+        if (mountedRef.current) setError(e.message);
+        await load();
+      }
     } finally {
       controllersRef.current = controllersRef.current.filter(c => c !== ac);
       // Do not abort here; unmount cleanup already aborts in-flight requests. Late abort triggers AbortError in wrapped fetch.
