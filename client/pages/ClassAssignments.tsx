@@ -144,8 +144,8 @@ export default function ClassAssignments(){
             <li key={a.id} className="rounded-xl border border-border p-4 flex items-center justify-between cursor-pointer hover:bg-accent/30" onClick={()=> nav(`/assign/${a.id}`)}>
               <div>
                 <p className="font-medium">{a.title} <span className="text-xs text-foreground/60">({a.type})</span></p>
-                <p className="text-xs text-foreground/60">{a.isDraft ? 'Draft' : (a.publishAt ? `Publishes ${new Date(a.publishAt).toLocaleString()}` : 'Published')}</p>
-                {a.dueAt && <p className="text-xs text-foreground/60">Due {new Date(a.dueAt).toLocaleString()}</p>}
+                <p className="text-xs text-foreground/60">{a.isDraft ? 'Draft' : (a.publishAt ? `Published on ${formatDateOnly(a.publishAt)}` : 'Published')}</p>
+                {a.dueAt && <p className="text-xs text-foreground/60">Due on {formatDateOnly(a.dueAt)}</p>}
               </div>
               <div className="flex items-center gap-2">
                 {role === 'student' ? (
