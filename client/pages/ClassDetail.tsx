@@ -161,7 +161,15 @@ export default function ClassDetail() {
                 return (
                   <div key={i} className="flex items-center justify-between p-3">
                     <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-brand-500/15 grid place-items-center text-brand-700 font-semibold">{s.name.slice(0,1).toUpperCase()}</div>
+                      <button
+                        type="button"
+                        disabled={userRole === 'student'}
+                        title={userRole === 'student' ? undefined : (present ? 'Mark absent' : 'Mark present')}
+                        onClick={()=> userRole !== 'student' && togglePresent(s.name, s.rollNo, !present)}
+                        className={`h-8 w-8 rounded-full grid place-items-center font-semibold ${present ? 'bg-green-500 text-white' : 'bg-brand-500/15 text-brand-700'} ${userRole !== 'student' ? 'cursor-pointer hover:opacity-80' : ''}`}
+                      >
+                        {s.name.slice(0,1).toUpperCase()}
+                      </button>
                       <div>
                         <p className="font-medium">{s.name}</p>
                         <p className="text-xs text-foreground/60">Roll: {s.rollNo}</p>
