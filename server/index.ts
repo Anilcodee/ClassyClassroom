@@ -7,7 +7,7 @@ import { signup, login, signupStudent, signupTeacher, loginStudent, loginTeacher
 import { requireAuth } from "./middleware/auth";
 import { listClasses, createClass, updateClassImage } from "./routes/classes";
 import { getClass } from "./routes/classes.get-by-id";
-import { activateClass, sessionStatus, markAttendance } from "./routes/attendance";
+import { activateClass, sessionStatus, markAttendance, manualMarkAttendance } from "./routes/attendance";
 import { getTodayAttendance } from "./routes/attendance.today";
 import { listAttendanceDates, classAttendancePdf, classAttendancePdfAll } from "./routes/attendance.pdf";
 import { getStudentAttendance } from "./routes/student.attendance";
