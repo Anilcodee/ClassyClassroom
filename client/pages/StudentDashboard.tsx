@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { MoreVertical } from "lucide-react";
 
 interface ClassItem { id?: string; _id?: string; name: string; joinCode?: string; imageUrl?: string; isActive?: boolean }
 
