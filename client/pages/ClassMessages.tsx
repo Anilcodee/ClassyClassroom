@@ -52,6 +52,7 @@ export default function ClassMessages() {
   const [isFs, setIsFs] = useState(false);
   const mountedRef = useRef(true);
   const controllersRef = useRef<AbortController[]>([]);
+  const mountControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -94,6 +95,7 @@ export default function ClassMessages() {
   }
 
   async function load(signal?: AbortSignal) {
+    if (signal?.aborted) return; // do nothing if already aborted
     if (mountedRef.current) { setLoading(true); setError(null); }
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
       if (mountedRef.current) setError('You appear to be offline');
@@ -125,6 +127,7 @@ export default function ClassMessages() {
       return;
     }
     const ac = new AbortController();
+    mountControllerRef.current = ac;
     void load(ac.signal);
     // Also fetch latest assignments to compute indicator
     (async ()=>{
@@ -141,7 +144,7 @@ export default function ClassMessages() {
         }
       } catch {}
     })();
-    return () => { try { ac.abort(); } catch {} };
+    return () => { try { ac.abort(); } catch {} finally { mountControllerRef.current = null; } };
   }, [id, token]);
 
   const backHref = userRole === "student" ? "/student" : "/classes";
@@ -250,7 +253,7 @@ export default function ClassMessages() {
       {userRole !== 'student' && (
         <div className="mt-4">
           <div className="relative block" onClick={()=>{ localStorage.setItem(`lastSeenMsgs:${id}`, String(Date.now())); setHasNewMsgs(false); }}>
-            <Link to={`/classes/${id}/messages/new`} className="block">
+            <Link to={`/classes/${id}/messages/new`} className="block" onClick={()=> { try { mountControllerRef.current?.abort(); } catch {} }}>
               <Button className="w-full justify-center gap-2 bg-blue-600 hover:bg-blue-600/90 text-white py-5 text-base" variant="default">
                 <Pencil className="h-5 w-5" />
                 Write an announcement
