@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface AssignmentItem { id: string; title: string; type: 'assignment'|'quiz'; description?: string; dueAt?: string|null; publishAt?: string|null; isDraft: boolean; allowLate: boolean; allowedRollNos?: string[] }
 
@@ -18,6 +19,8 @@ export default function ClassAssignments(){
   const [allowLate, setAllowLate] = useState(true);
   const [allowedRollNos, setAllowedRollNos] = useState<string>("");
   const [creating, setCreating] = useState(false);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const MAX_FILES = 4;
   const MAX_SIZE = 4 * 1024 * 1024;
@@ -109,13 +112,62 @@ export default function ClassAssignments(){
                 {role === 'student' ? (
                   <Link to={`/assign/${a.id}`} className="px-3 py-1.5 rounded-md border border-border text-sm">Open</Link>
                 ) : (
-                  <Link to={`/assign/${a.id}`} className="px-3 py-1.5 rounded-md border border-border text-sm">Open</Link>
+                  <>
+                    {a.isDraft && (
+                      <button
+                        className="px-3 py-1.5 rounded-md border border-border text-sm disabled:opacity-50"
+                        disabled={busyId===a.id}
+                        onClick={async ()=>{
+                          setBusyId(a.id);
+                          try {
+                            const token = localStorage.getItem('token');
+                            const r = await fetch(`/api/assignments/${a.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' }, body: JSON.stringify({ isDraft: false, publishAt: new Date().toISOString() }) });
+                            const d = await r.json().catch(()=>({}));
+                            if (!r.ok) throw new Error(d?.message || r.statusText);
+                            await load();
+                          } catch(e:any) { console.error(e); }
+                          finally { setBusyId(null); }
+                        }}
+                      >
+                        Publish
+                      </button>
+                    )}
+                    <Link to={`/assign/${a.id}`} className="px-3 py-1.5 rounded-md border border-border text-sm">Open</Link>
+                    <Link to={`/classes/${id}/assignments/new`} state={{ editFrom: a }} className="px-3 py-1.5 rounded-md border border-border text-sm">Edit</Link>
+                    <button className="px-3 py-1.5 rounded-md border border-border text-sm text-destructive" onClick={()=> setConfirmId(a.id)}>Delete</button>
+                  </>
                 )}
               </div>
             </li>
           ))}
         </ul>
       )}
+      <AlertDialog open={!!confirmId} onOpenChange={(o)=>{ if(!o) setConfirmId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this assignment?</AlertDialogTitle>
+            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={()=> setConfirmId(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async ()=>{
+                const delId = confirmId!;
+                setConfirmId(null);
+                try {
+                  const token = localStorage.getItem('token');
+                  const r = await fetch(`/api/assignments/${delId}`, { method: 'DELETE', headers: { Authorization: token ? `Bearer ${token}` : '' } });
+                  if (!r.ok) throw new Error('Failed to delete');
+                  await load();
+                } catch(e:any){ console.error(e); }
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
