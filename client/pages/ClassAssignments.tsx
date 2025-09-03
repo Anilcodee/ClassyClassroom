@@ -77,6 +77,16 @@ export default function ClassAssignments(){
     return res;
   }
 
+  function formatDateOnly(v?: string | Date | null) {
+    if (!v) return "";
+    const d = new Date(v);
+    if (isNaN(d.getTime())) return "";
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+  }
+
   async function create(){
     setCreating(true); setError(null);
     try {
