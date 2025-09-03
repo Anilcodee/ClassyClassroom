@@ -198,7 +198,10 @@ export default function ClassMessages() {
         setMessages(prev => prev.map(m => m.id === mid ? d.message : m));
         setEditingId(null); setEditTitle(""); setEditContent(""); setEditAttachments([]); setEditNewFiles([]);
       }
-      await load();
+      const ac2 = new AbortController();
+      controllersRef.current.push(ac2);
+      try { await load(ac2.signal); } catch {}
+      finally { controllersRef.current = controllersRef.current.filter(c => c !== ac2); }
     } catch (e: any) {
       if (e?.name !== 'AbortError') {
         if (mountedRef.current) setError(e.message);
