@@ -27,28 +27,26 @@ export default function GetStarted() {
           </div>
         </div>
         <div className="space-y-6">
-          <div className="grid sm:grid-cols-2 gap-6 items-start">
-            <TeacherAnimation />
-            <StudentAnimation />
+          <div className="w-full max-w-2xl mx-auto">
+            <ul className="text-sm text-foreground/70 space-y-2">
+              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Create and manage classes with cover images</span></li>
+              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Start timed QR attendance sessions</span></li>
+              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Download PDFs and view attendance history</span></li>
+              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Post announcements; edit/delete your posts</span></li>
+              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Join classes via secure code</span></li>
+              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">See your classes and attendance days</span></li>
+              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Comment on announcements (except your own)</span></li>
+              <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Clean, mobile‑friendly experience</span></li>
+            </ul>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="w-full max-w-md mx-auto">
-              <h3 className="text-sm font-semibold mb-2 text-foreground/80">For Teachers</h3>
-              <ul className="text-sm text-foreground/70 space-y-2">
-                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Create and manage classes with cover images</span></li>
-                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Start timed QR attendance sessions</span></li>
-                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Download PDFs and view attendance history</span></li>
-                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Post announcements; edit/delete your posts</span></li>
-              </ul>
+          <div className="grid sm:grid-cols-2 gap-6 items-start text-center">
+            <div className="flex flex-col items-center">
+              <TeacherAnimation />
+              <div className="mt-2 text-sm font-semibold text-foreground/80">For Teachers</div>
             </div>
-            <div className="w-full max-w-md mx-auto">
-              <h3 className="text-sm font-semibold mb-2 text-foreground/80">For Students</h3>
-              <ul className="text-sm text-foreground/70 space-y-2">
-                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Join classes via secure code</span></li>
-                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">See your classes and attendance days</span></li>
-                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Comment on announcements (except your own)</span></li>
-                <li className="flex items-start gap-2"><span className="shrink-0">✅</span><span className="flex-1 text-justify">Clean, mobile‑friendly experience</span></li>
-              </ul>
+            <div className="flex flex-col items-center">
+              <StudentAnimation />
+              <div className="mt-2 text-sm font-semibold text-foreground/80">For Students</div>
             </div>
           </div>
         </div>
