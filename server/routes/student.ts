@@ -4,6 +4,38 @@ import { AuthRequest } from "../middleware/auth";
 import { User } from "../models/User";
 import { ClassModel } from "../models/Class";
 
+export const unenrollClass: RequestHandler = async (req: AuthRequest, res) => {
+  if (mongoose.connection.readyState !== 1)
+    return res.status(503).json({ message: "Database not connected" });
+  try {
+    const { id } = req.params as { id: string };
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(401).json({ message: "Unauthorized" });
+    const role = (user as any).role || "teacher";
+    const isStudent = (user as any).isStudent === true || role === "student";
+    if (!isStudent) return res.status(403).json({ message: "Forbidden" });
+
+    const cls = await ClassModel.findById(id);
+    if (!cls) return res.status(404).json({ message: "Class not found" });
+
+    // Remove from user's enrolledClasses
+    (user as any).enrolledClasses = ((user as any).enrolledClasses || []).filter((cid: any) => String(cid) !== String(id));
+    await user.save();
+
+    // Optionally remove from class roster by rollNo
+    const rollNo = (user as any).rollNo || "";
+    if (rollNo) {
+      (cls as any).students = (cls as any).students.filter((s: any) => String(s.rollNo) !== String(rollNo));
+      await cls.save();
+    }
+
+    res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const listStudentClasses: RequestHandler = async (req: AuthRequest, res) => {
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });

@@ -36,6 +36,7 @@ const ClassSchema = new Schema<IClass>(
     activeSession: { type: Schema.Types.ObjectId, ref: "AttendanceSession", default: null },
     imageUrl: { type: String },
     durationMinutes: { type: Number, default: 4, min: 1, max: 10 },
+    isArchived: { type: Boolean, default: false, index: true },
   },
   { timestamps: true }
 );

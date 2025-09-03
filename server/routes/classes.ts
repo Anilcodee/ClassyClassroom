@@ -8,7 +8,7 @@ export const listClasses: RequestHandler = async (req: AuthRequest, res) => {
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
   try {
-    const classes = await ClassModel.find({ $or: [ { teacher: req.userId }, { coTeachers: req.userId } ] }).lean();
+    const classes = await ClassModel.find({ isArchived: { $ne: true }, $or: [ { teacher: req.userId }, { coTeachers: req.userId } ] }).lean();
     res.json({ classes });
   } catch (e) {
     console.error(e);

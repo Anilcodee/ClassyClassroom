@@ -6,6 +6,7 @@ import { connectDB } from "./db";
 import { signup, login, signupStudent, signupTeacher, loginStudent, loginTeacher } from "./routes/auth";
 import { requireAuth } from "./middleware/auth";
 import { listClasses, createClass, updateClassImage } from "./routes/classes";
+import { archiveClass } from "./routes/classes.archive";
 import { getClass } from "./routes/classes.get-by-id";
 import { activateClass, sessionStatus, markAttendance, manualMarkAttendance } from "./routes/attendance";
 import { getTodayAttendance } from "./routes/attendance.today";
@@ -14,7 +15,7 @@ import { getStudentAttendance } from "./routes/student.attendance";
 import { getAttendanceForDate } from "./routes/attendance.view";
 import { listMessages, createMessage, addComment, updateMessage, deleteMessage } from "./routes/messages";
 import { dbHealth } from "./routes/health";
-import { listStudentClasses, joinClass } from "./routes/student";
+import { listStudentClasses, joinClass, unenrollClass } from "./routes/student";
 import { updateClassDetails } from "./routes/classes.update";
 import { joinClassAsTeacher } from "./routes/classes.join-teacher";
 import { listAssignments, createAssignment, updateAssignment, getAssignment, submitAssignment, listSubmissions, deleteAssignment } from "./routes/assignments";
@@ -54,6 +55,7 @@ export function createServer() {
   app.post("/api/classes", requireAuth, createClass);
   app.patch("/api/classes/:id/image", requireAuth, updateClassImage);
   app.patch("/api/classes/:id", requireAuth, updateClassDetails);
+  app.patch("/api/classes/:id/archive", requireAuth, archiveClass);
   app.get("/api/classes/:id", requireAuth, getClass);
 
   // Attendance (teacher view)
@@ -89,6 +91,7 @@ export function createServer() {
   app.get("/api/student/classes", requireAuth, listStudentClasses);
   app.post("/api/student/classes/join", requireAuth, joinClass);
   app.get("/api/student/classes/:id/attendance", requireAuth, getStudentAttendance);
+  app.delete("/api/student/classes/:id/unenroll", requireAuth, unenrollClass);
 
   // Teachers: join as co-teacher
   app.post("/api/classes/join-as-teacher", requireAuth, joinClassAsTeacher);
