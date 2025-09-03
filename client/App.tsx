@@ -23,6 +23,7 @@ import ClassMessages from "./pages/ClassMessages";
 import ClassMessageCompose from "./pages/ClassMessageCompose";
 import ClassAssignments from "./pages/ClassAssignments";
 import AssignmentSubmit from "./pages/AssignmentSubmit";
+import AssignmentCreate from "./pages/AssignmentCreate";
 import ModifyClass from "./pages/ModifyClass";
 
 const queryClient = new QueryClient();
