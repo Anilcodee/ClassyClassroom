@@ -8,6 +8,9 @@ interface NewStudent { name: string; rollNo: string }
 
 export default function Classes() {
   const [classes, setClasses] = React.useState<ClassItem[]>([]);
+  const [latestMap, setLatestMap] = React.useState<Record<string, { latestAt: number | null; latestBy: string | null }>>({});
+  const userRaw = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+  const userId = userRaw ? (JSON.parse(userRaw)?.id || null) : null;
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [selectedId, setSelectedId] = React.useState<string>("");
@@ -22,7 +25,12 @@ export default function Classes() {
       const res = await fetch("/api/classes", { headers, cache: "no-store" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || (res.status === 401 ? "Please log in" : "Failed to load"));
-      setClasses(data.classes.map((c: any) => ({ id: c._id, name: c.name, joinCode: c.joinCode, isActive: c.isActive, imageUrl: c.imageUrl })));
+      const list = data.classes.map((c: any) => ({ id: c._id, name: c.name, joinCode: c.joinCode, isActive: c.isActive, imageUrl: c.imageUrl }));
+      setClasses(list);
+      const results = await Promise.allSettled(list.map((c: any) => fetch(`/api/classes/${c.id}/messages?latest=1`, { headers }).then(r => r.json().catch(()=>({}))).then(d => ({ id: c.id, latestAt: d?.latestAt ? new Date(d.latestAt).getTime() : null, latestBy: d?.latestBy ? String(d.latestBy) : null }))));
+      const map: Record<string, { latestAt: number | null; latestBy: string | null }> = {};
+      results.forEach(r => { if (r.status === 'fulfilled') map[(r.value as any).id] = { latestAt: (r.value as any).latestAt, latestBy: (r.value as any).latestBy }; });
+      setLatestMap(map);
     } catch (e: any) {
       setError(e.message || "Network error");
     } finally {
@@ -216,14 +224,25 @@ export default function Classes() {
                   >
                     Attendance
                   </Link>
-                  <Link
-                    to={`/classes/${c.id}/messages`}
-                    onClick={(e)=>e.stopPropagation()}
-                    className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground hover:opacity-90 text-center"
-                    title="Messages"
-                  >
-                    Messages
-                  </Link>
+                  <div className="relative inline-block">
+                    <Link
+                      to={`/classes/${c.id}/messages`}
+                      onClick={(e)=>{ e.stopPropagation(); try { localStorage.setItem(`lastSeenMsgs:${c.id}`, String(Date.now())); } catch {} }}
+                      className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground hover:opacity-90 text-center"
+                      title="Messages"
+                    >
+                      Messages
+                    </Link>
+                    {(() => {
+                      const meta = latestMap[c.id];
+                      const key = `lastSeenMsgs:${c.id}`;
+                      const seen = Number(typeof window !== 'undefined' ? (localStorage.getItem(key) || 0) : 0);
+                      const isNew = meta && meta.latestAt && (!userId || String(meta.latestBy) !== String(userId)) && meta.latestAt > seen;
+                      return isNew ? (
+                        <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 shadow ring-2 ring-background" />
+                      ) : null;
+                    })()}
+                  </div>
                   <Link
                     to={`/classes/${c.id}/modify`}
                     onClick={(e)=>e.stopPropagation()}
