@@ -82,75 +82,12 @@ export default function ClassAssignments(){
   return (
     <main className="container mx-auto py-8">
       <Link to={`/classes/${id}/messages`} className="text-sm text-foreground/70 hover:text-foreground">← Back to class</Link>
-      <h1 className="mt-2 text-2xl font-bold">Assignments</h1>
-      {role !== 'student' && (
-        <div className="mt-4 rounded-xl border border-border p-4 bg-card">
-          <h2 className="font-semibold mb-3">Create assignment or quiz</h2>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="grid gap-2">
-              <label className="text-sm">Title</label>
-              <input className="rounded-lg border border-input bg-background px-3 py-2" value={title} onChange={(e)=>setTitle(e.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <label className="text-sm">Type</label>
-              <select className="rounded-lg border border-input bg-background px-3 py-2" value={type} onChange={(e)=> setType(e.target.value as any)}>
-                <option value="assignment">Assignment</option>
-                <option value="quiz">Quiz</option>
-              </select>
-            </div>
-            <div className="grid gap-2 md:col-span-2">
-              <label className="text-sm">Description</label>
-              <textarea className="rounded-lg border border-input bg-background px-3 py-2 min-h-24" value={description} onChange={(e)=>setDescription(e.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <label className="text-sm">Due date</label>
-              <input type="datetime-local" className="rounded-lg border border-input bg-background px-3 py-2" value={dueAt} onChange={(e)=>setDueAt(e.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <label className="text-sm">Publish at</label>
-              <input type="datetime-local" className="rounded-lg border border-input bg-background px-3 py-2" value={publishAt} onChange={(e)=>setPublishAt(e.target.value)} />
-            </div>
-            <div className="flex items-center gap-3">
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={isDraft} onChange={(e)=>setIsDraft(e.target.checked)} /> Draft</label>
-              <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={allowLate} onChange={(e)=>setAllowLate(e.target.checked)} /> Allow late</label>
-            </div>
-            <div className="grid gap-2 md:col-span-2">
-              <label className="text-sm">Only for these roll numbers (comma separated, optional)</label>
-              <input className="rounded-lg border border-input bg-background px-3 py-2" value={allowedRollNos} onChange={(e)=>setAllowedRollNos(e.target.value)} placeholder="e.g. 23, 42, 77" />
-            </div>
-            <div className="grid gap-2 md:col-span-2">
-              <label className="text-sm">Attachments (any file type, up to {MAX_FILES} files, {Math.round(MAX_SIZE/1024/1024)}MB each)</label>
-              <div className="flex items-center gap-2">
-                <label className="px-3 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground cursor-pointer text-sm">
-                  Choose files
-                  <input type="file" multiple className="hidden" onChange={(e)=>{
-                    const incoming = Array.from(e.target.files || []);
-                    const valid = incoming.filter(f => f.size <= MAX_SIZE);
-                    const remaining = Math.max(0, MAX_FILES - files.length);
-                    setFiles(prev => [...prev, ...valid.slice(0, remaining)]);
-                    if (e.target) (e.target as HTMLInputElement).value = "";
-                  }} />
-                </label>
-                <span className="text-xs text-foreground/60">{files.length}/{MAX_FILES} files</span>
-              </div>
-              {files.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2 text-xs text-foreground/70">
-                  {files.map((f, i) => (
-                    <span key={i} className="inline-flex items-center gap-2 px-2 py-1 rounded border border-border bg-muted/50">
-                      <span className="max-w-[12rem] truncate">{f.name}</span>
-                      <button type="button" className="h-5 w-5 leading-none grid place-items-center rounded hover:bg-destructive/10 text-destructive" onClick={()=> setFiles(prev => prev.filter((_, idx)=> idx !== i))}>×</button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="mt-3">
-            <button disabled={creating || !title.trim()} onClick={create} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-50">{creating? 'Creating…' : 'Create'}</button>
-          </div>
-          {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
-        </div>
-      )}
+      <div className="mt-2 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Assignments</h1>
+        {role !== 'student' && (
+          <Link to={`/classes/${id}/assignments/new`} className="px-3 py-2 rounded-md border border-border text-sm">Create assignment or quiz</Link>
+        )}
+      </div>
 
       <h2 className="mt-6 font-semibold">All assignments</h2>
       {loading ? (
