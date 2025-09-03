@@ -40,7 +40,7 @@ export default function AssignmentSubmit(){
 
   return (
     <main className="container mx-auto py-8">
-      <Link to={-1 as any} className="text-sm text-foreground/70 hover:text-foreground">← Back</Link>
+      <button type="button" onClick={()=>nav(-1)} className="text-sm text-foreground/70 hover:text-foreground">← Back</button>
       {loading ? <p className="mt-4 text-sm text-foreground/70">Loading…</p> : error ? <p className="mt-4 text-sm text-destructive">{error}</p> : a ? (
         <div className="mt-4">
           <h1 className="text-2xl font-bold">{a.title} <span className="text-xs text-foreground/60">({a.type})</span></h1>
