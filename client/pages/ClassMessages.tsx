@@ -97,6 +97,11 @@ export default function ClassMessages() {
 
   async function load(signal?: AbortSignal) {
     if (mountedRef.current) { setLoading(true); setError(null); }
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      if (mountedRef.current) setError('You appear to be offline');
+      if (mountedRef.current) setLoading(false);
+      return;
+    }
     const headers: Record<string,string> = {};
     if (token) headers.Authorization = `Bearer ${token}`;
     try {
