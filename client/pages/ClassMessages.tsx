@@ -13,6 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { formatDateTime } from "@/lib/utils";
 
 interface Attachment { name: string; type: string; size: number; dataUrl: string }
 interface CommentItem { userId: string; name: string; content: string; createdAt: string }
@@ -343,7 +344,7 @@ export default function ClassMessages() {
                   )}
                 </>
               )}
-              <p className="mt-1 text-xs text-foreground/60">{m.updatedAt && new Date(m.updatedAt).getTime() > new Date(m.createdAt).getTime() ? `${new Date(m.updatedAt).toLocaleString()} (edited)` : new Date(m.createdAt).toLocaleString()}</p>
+              <p className="mt-1 text-xs text-foreground/60">{m.updatedAt && new Date(m.updatedAt).getTime() > new Date(m.createdAt).getTime() ? `${formatDateTime(m.updatedAt)} (edited)` : formatDateTime(m.createdAt)}</p>
 
               <div className="mt-3 border-t border-border pt-3">
                 <p className="text-sm font-medium">Comments</p>
@@ -351,7 +352,7 @@ export default function ClassMessages() {
                   {(m.comments||[]).map((c, i) => (
                     <li key={i} className="text-sm">
                       <span className="font-medium">{c.name}</span>: <span>{c.content}</span>
-                      <span className="ml-2 text-xs text-foreground/50">{new Date(c.createdAt).toLocaleString()}</span>
+                      <span className="ml-2 text-xs text-foreground/50">{formatDateTime(c.createdAt)}</span>
                     </li>
                   ))}
                   {(m.comments||[]).length === 0 && <li className="text-sm text-foreground/60">No comments yet.</li>}
