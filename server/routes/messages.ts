@@ -10,7 +10,7 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { id } = req.params as { id: string };
-    const msgs = await Message.find({ classId: id }).sort({ createdAt: -1 }).lean();
+    const latestOnly = String((req.query as any)?.latest || '') === '1' || String((req.query as any)?.limit || '') === '1';
     const cls = await ClassModel.findById(id).select("teacher coTeachers students").lean();
     const userId = String((req as any).userId || "");
     const isOwnerOrCo = cls ? (String(cls.teacher) === userId || (cls.coTeachers||[]).some((t:any)=> String(t) === userId)) : false;
@@ -18,6 +18,13 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
     const enrolled = new Set((user?.enrolledClasses || []).map((x: any) => String(x)));
     const inRoster = (cls?.students || []).some((s: any) => String(s.rollNo) === String((user as any)?.rollNo || ""));
     const isMember = Boolean(userId) && (isOwnerOrCo || enrolled.has(String(id)) || inRoster);
+
+    if (latestOnly) {
+      const latest = await Message.findOne({ classId: id }).sort({ createdAt: -1 }).select('createdAt teacherId').lean();
+      return res.json({ latestAt: latest?.createdAt || null, latestBy: latest?.teacherId || null, isMember });
+    }
+
+    const msgs = await Message.find({ classId: id }).sort({ createdAt: -1 }).lean();
     res.json({ messages: msgs.map(m => ({
       id: m._id,
       teacherId: m.teacherId,
