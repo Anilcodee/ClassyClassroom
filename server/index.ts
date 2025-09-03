@@ -82,6 +82,7 @@ export function createServer() {
   app.patch("/api/assignments/:assignmentId", requireAuth, updateAssignment);
   app.post("/api/assignments/:assignmentId/submit", requireAuth, submitAssignment);
   app.get("/api/assignments/:assignmentId/submissions", requireAuth, listSubmissions);
+  app.delete("/api/assignments/:assignmentId", requireAuth, deleteAssignment);
 
   // Student
   app.get("/api/student/classes", requireAuth, listStudentClasses);
