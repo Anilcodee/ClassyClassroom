@@ -17,7 +17,7 @@ import { dbHealth } from "./routes/health";
 import { listStudentClasses, joinClass } from "./routes/student";
 import { updateClassDetails } from "./routes/classes.update";
 import { joinClassAsTeacher } from "./routes/classes.join-teacher";
-import { listAssignments, createAssignment, updateAssignment, getAssignment, submitAssignment, listSubmissions } from "./routes/assignments";
+import { listAssignments, createAssignment, updateAssignment, getAssignment, submitAssignment, listSubmissions, deleteAssignment } from "./routes/assignments";
 
 export function createServer() {
   const app = express();
