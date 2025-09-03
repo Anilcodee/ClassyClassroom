@@ -17,13 +17,14 @@ import { formatDateTime } from "@/lib/utils";
 
 interface Attachment { name: string; type: string; size: number; dataUrl: string }
 interface CommentItem { userId: string; name: string; content: string; createdAt: string }
-interface MessageItem { id: string; title?: string; content: string; createdAt: string; updatedAt?: string; pinned?: boolean; attachments?: Attachment[]; comments?: CommentItem[]; canEdit?: boolean; canComment?: boolean }
+interface MessageItem { id: string; teacherId?: string; title?: string; content: string; createdAt: string; updatedAt?: string; pinned?: boolean; attachments?: Attachment[]; comments?: CommentItem[]; canEdit?: boolean; canComment?: boolean }
 
 export default function ClassMessages() {
   const { id } = useParams();
   const token = useMemo(() => localStorage.getItem("token"), []);
   const nav = useNavigate();
   const userRole = useMemo(() => { try { const raw = localStorage.getItem("user"); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
+  const userId = useMemo(() => { try { const raw = localStorage.getItem("user"); return raw ? JSON.parse(raw).id : undefined; } catch { return undefined; } }, []);
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -110,7 +111,8 @@ export default function ClassMessages() {
       if (!r.ok) throw new Error(d?.message || r.statusText);
       if (mountedRef.current) {
         setMessages(d.messages || []);
-        const latest = (d.messages||[]).reduce((acc:number, m:any)=> Math.max(acc, new Date(m.createdAt).getTime()||0), 0);
+        const msgsFromOthers = (d.messages||[]).filter((m:any) => !userId || String(m.teacherId) !== String(userId));
+        const latest = msgsFromOthers.reduce((acc:number, m:any)=> Math.max(acc, new Date(m.createdAt).getTime()||0), 0);
         const key = `lastSeenMsgs:${id}`;
         const seen = Number(localStorage.getItem(key) || 0);
         setHasNewMsgs(latest > seen);
