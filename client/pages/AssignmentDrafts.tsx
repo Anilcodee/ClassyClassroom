@@ -16,6 +16,16 @@ export default function AssignmentDrafts(){
 
   const role = useMemo(()=>{ try { const raw = localStorage.getItem('user'); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
 
+  function formatDateOnly(v?: string | Date | null) {
+    if (!v) return "";
+    const d = new Date(v);
+    if (isNaN(d.getTime())) return "";
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+  }
+
   async function load(signal?: AbortSignal){
     if (!mountedRef.current) return;
     setLoading(true); setError(null);
