@@ -21,10 +21,16 @@ export default function Header() {
     window.addEventListener("storage", onStorage);
     window.addEventListener("auth-changed", onAuthChanged as any);
 
-    // Warm up serverless API to reduce first-request failures
+    // Warm up connectivity using image ping to avoid fetch errors in console
     let interval: any;
-    (async () => { try { await fetch("/api/ping", { cache: "no-store" }); } catch {} })();
-    interval = setInterval(() => { fetch("/api/ping", { cache: "no-store" }).catch(()=>{}); }, 10 * 60 * 1000);
+    const pingImg = () => {
+      try {
+        const img = new Image();
+        img.src = `/placeholder.svg?warm=${Date.now()}`;
+      } catch {}
+    };
+    pingImg();
+    interval = setInterval(() => { pingImg(); }, 10 * 60 * 1000);
 
     return () => {
       window.removeEventListener("storage", onStorage);
