@@ -55,6 +55,23 @@ export default function ClassMessages() {
   const controllersRef = useRef<AbortController[]>([]);
   const mountControllerRef = useRef<AbortController | null>(null);
 
+  async function canReachOrigin(timeoutMs = 2500): Promise<boolean> {
+    try {
+      if (typeof window === 'undefined') return true;
+      if (navigator.onLine === false) return false;
+      await new Promise<void>((resolve, reject) => {
+        const img = new Image();
+        const done = () => { cleanup(); resolve(); };
+        const fail = () => { cleanup(); reject(new Error('unreachable')); };
+        const cleanup = () => { img.onload = null; img.onerror = null; };
+        img.onload = done;
+        img.onerror = fail;
+        img.src = `/placeholder.svg?ping=${Date.now()}`;
+      });
+      return true;
+    } catch { return false; }
+  }
+
   useEffect(() => {
     let active = true;
     if (!preview) return;
@@ -107,9 +124,9 @@ export default function ClassMessages() {
     const headers: Record<string,string> = {};
     if (token) headers.Authorization = `Bearer ${token}`;
     try {
-      // Warm-up / connectivity check before main call
-      const ping = await fetchWithRetry('/api/ping', { cache: 'no-store', signal });
-      if (!ping.ok) {
+      // Connectivity check using image to avoid fetch errors
+      const ok = await canReachOrigin();
+      if (!ok) {
         if (mountedRef.current) setError('Network error. Please retry.');
         if (mountedRef.current) setLoading(false);
         return;
@@ -143,8 +160,8 @@ export default function ClassMessages() {
     (async ()=>{
       try {
         if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
-        const ping = await fetchWithRetry('/api/ping', { cache: 'no-store', signal: ac.signal });
-        if (!ping.ok) return;
+        const ok = await canReachOrigin();
+        if (!ok) return;
         const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
         const r = await fetchWithRetry(`/api/classes/${id}/assignments`, { headers, cache: 'no-store', signal: ac.signal });
         const d = await r.json().catch(()=>({}));
