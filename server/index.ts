@@ -15,6 +15,7 @@ import { listAttendanceDates, classAttendancePdf, classAttendancePdfAll } from "
 import { getStudentAttendance } from "./routes/student.attendance";
 import { getAttendanceForDate } from "./routes/attendance.view";
 import { listMessages, createMessage, addComment, updateMessage, deleteMessage } from "./routes/messages";
+import { listLatestForClasses } from "./routes/messages.latest";
 import { dbHealth } from "./routes/health";
 import { listStudentClasses, joinClass, unenrollClass } from "./routes/student";
 import { updateClassDetails } from "./routes/classes.update";
