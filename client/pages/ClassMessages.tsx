@@ -87,7 +87,13 @@ export default function ClassMessages() {
         throw new Error(d?.message || r.statusText);
       }
       const d = await r.json();
-      if (mountedRef.current) setMessages(d.messages || []);
+      if (mountedRef.current) {
+        setMessages(d.messages || []);
+        const latest = (d.messages||[]).reduce((acc:number, m:any)=> Math.max(acc, new Date(m.createdAt).getTime()||0), 0);
+        const key = `lastSeenMsgs:${id}`;
+        const seen = Number(localStorage.getItem(key) || 0);
+        setHasNewMsgs(latest > seen);
+      }
     } catch (e: any) {
       if (e?.name === 'AbortError') return;
       // Retry once for transient network errors; don't reuse possibly aborted signal
@@ -109,12 +115,25 @@ export default function ClassMessages() {
 
   useEffect(() => {
     if (!token) {
-      // Redirect to appropriate auth if not logged in
       if (userRole === 'student') nav('/student-auth'); else nav('/auth');
       return;
     }
     const ac = new AbortController();
     void load(ac.signal);
+    // Also fetch latest assignments to compute indicator
+    (async ()=>{
+      try {
+        const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
+        const r = await fetch(`/api/classes/${id}/assignments`, { headers, cache: 'no-store', signal: ac.signal });
+        const d = await r.json().catch(()=>({}));
+        if (r.ok && mountedRef.current) {
+          const latest = (d.assignments||[]).reduce((acc:number, a:any)=> Math.max(acc, new Date(a.publishAt || a.createdAt).getTime()||0), 0);
+          const key = `lastSeenAssigns:${id}`;
+          const seen = Number(localStorage.getItem(key) || 0);
+          setHasNewAssigns(latest > seen);
+        }
+      } catch {}
+    })();
     return () => { try { ac.abort(); } catch {} };
   }, [id, token]);
 
