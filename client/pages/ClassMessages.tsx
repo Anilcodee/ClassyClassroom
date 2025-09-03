@@ -83,6 +83,9 @@ export default function ClassMessages() {
       const aborted = (signal && (signal as any).aborted) || e?.name === 'AbortError';
       if (aborted) throw new DOMException('Aborted', 'AbortError');
       if (attempt < 3 && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
+        if (attempt === 1) {
+          try { await fetch('/api/ping', { cache: 'no-store' }); } catch {}
+        }
         await new Promise(r => setTimeout(r, 300 * attempt));
         return fetchWithRetry(url, init, attempt + 1);
       }
