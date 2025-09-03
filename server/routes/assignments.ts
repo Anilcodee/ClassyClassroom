@@ -32,6 +32,11 @@ export const listAssignments: RequestHandler = async (req: AuthRequest, res) => 
         { $or: [{ publishAt: null }, { publishAt: { $lte: now } }] },
         { $or: [{ allowedRollNos: { $size: 0 } }, { allowedRollNos: roll }] },
       ];
+    } else {
+      query.$and = [
+        { $or: [{ isDraft: false }, { isDraft: { $exists: false } }] },
+        { $or: [{ publishAt: null }, { publishAt: { $lte: now } }] },
+      ];
     }
 
     const docs = await Assignment.find(query).sort({ createdAt: -1 }).lean();
