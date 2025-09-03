@@ -20,6 +20,7 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
     const isMember = Boolean(userId) && (isOwnerOrCo || enrolled.has(String(id)) || inRoster);
     res.json({ messages: msgs.map(m => ({
       id: m._id,
+      teacherId: m.teacherId,
       title: m.title || "",
       content: m.content,
       createdAt: m.createdAt,
