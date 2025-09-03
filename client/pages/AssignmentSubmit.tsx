@@ -24,6 +24,16 @@ export default function AssignmentSubmit(){
   }
   useEffect(()=>{ void load(); }, [assignmentId]);
 
+  function formatDateOnly(v?: string | Date | null) {
+    if (!v) return "";
+    const d = new Date(v);
+    if (isNaN(d.getTime())) return "";
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}-${mm}-${yyyy}`;
+  }
+
   async function submit(){
     setError(null);
     try {
@@ -45,7 +55,7 @@ export default function AssignmentSubmit(){
         <div className="mt-4">
           <h1 className="text-2xl font-bold">{a.title} <span className="text-xs text-foreground/60">({a.type})</span></h1>
           {a.description && <p className="mt-2 text-foreground/70 whitespace-pre-wrap">{a.description}</p>}
-          {a.dueAt && <p className="mt-1 text-sm text-foreground/60">Due {new Date(a.dueAt).toLocaleString()}</p>}
+          {a.dueAt && <p className="mt-1 text-sm text-foreground/60">Due on {formatDateOnly(a.dueAt)}</p>}
           <div className="mt-4 space-y-3">
             {(a.questions||[]).length === 0 ? (
               <p className="text-sm text-foreground/70">No questions. You can still submit notes.</p>
