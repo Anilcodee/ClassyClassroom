@@ -225,17 +225,27 @@ export default function ClassMessages() {
       <Link to={backHref} className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
       <div className="mt-2 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Messages</h1>
-        <Link to={`/classes/${id}/assignments`}>
-          <Button variant="outline" size="sm">Assignments</Button>
-        </Link>
+        <div className="relative inline-block" onClick={()=>{ localStorage.setItem(`lastSeenAssigns:${id}`, String(Date.now())); setHasNewAssigns(false); }}>
+          <Link to={`/classes/${id}/assignments`}>
+            <Button variant="outline" size="sm">Assignments</Button>
+          </Link>
+          {hasNewAssigns && (
+            <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-pink-500 shadow ring-2 ring-background" />
+          )}
+        </div>
       </div>
       <div className="mt-4">
-        <Link to={`/classes/${id}/messages/new`} className="block">
-          <Button className="w-full justify-center gap-2 bg-blue-600 hover:bg-blue-600/90 text-white py-5 text-base" variant="default">
-            <Pencil className="h-5 w-5" />
-            Write an announcement
-          </Button>
-        </Link>
+        <div className="relative block" onClick={()=>{ localStorage.setItem(`lastSeenMsgs:${id}`, String(Date.now())); setHasNewMsgs(false); }}>
+          <Link to={`/classes/${id}/messages/new`} className="block">
+            <Button className="w-full justify-center gap-2 bg-blue-600 hover:bg-blue-600/90 text-white py-5 text-base" variant="default">
+              <Pencil className="h-5 w-5" />
+              Write an announcement
+            </Button>
+          </Link>
+          {hasNewMsgs && (
+            <span className="absolute top-1 right-1 h-3 w-3 rounded-full bg-green-500 shadow ring-2 ring-background" />
+          )}
+        </div>
       </div>
       {loading ? (
         <p className="mt-4 text-sm text-foreground/70">Loading…</p>
