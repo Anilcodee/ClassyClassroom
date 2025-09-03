@@ -98,6 +98,20 @@ export default function ClassDetail() {
 
   const presentKeys = new Set(records.map((r) => `${r.student.name}|${r.student.rollNo}`));
 
+  async function togglePresent(name: string, rollNo: string, nextPresent: boolean) {
+    try {
+      if (!token) throw new Error("Please log in");
+      const headers: Record<string,string> = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+      const r = await fetch(`/api/classes/${id}/attendance/manual`, { method: 'POST', headers, body: JSON.stringify({ name, rollNo, present: nextPresent }) });
+      const d = await r.json().catch(()=>({}));
+      if (!r.ok) throw new Error(d?.message || r.statusText);
+      setRecords(d.records || []);
+    } catch (e: any) {
+      setError(e.message || 'Failed to update');
+      if (e.message === 'Please log in') nav('/auth');
+    }
+  }
+
   return (
     <main className="container mx-auto py-8">
       <Link to="/classes" className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
