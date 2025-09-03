@@ -76,7 +76,7 @@ export default function AssignmentDrafts(){
               <div>
                 <p className="font-medium">{a.title} <span className="text-xs text-foreground/60">({a.type})</span></p>
                 <p className="text-xs text-foreground/60">Draft</p>
-                {a.dueAt && <p className="text-xs text-foreground/60">Due {new Date(a.dueAt).toLocaleString()}</p>}
+                {a.dueAt && <p className="text-xs text-foreground/60">Due on {formatDateOnly(a.dueAt)}</p>}
               </div>
               <div className="flex items-center gap-2">
                 <button
