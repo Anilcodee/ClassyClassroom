@@ -10,6 +10,7 @@ export default function StudentDashboard() {
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [classes, setClasses] = useState<ClassItem[]>([]);
+  const [menuOpenFor, setMenuOpenFor] = useState<string>("");
   const [latestMap, setLatestMap] = useState<Record<string, { latestAt: number | null; latestBy: string | null }>>({});
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const userRaw = typeof window !== "undefined" ? localStorage.getItem("user") : null;
@@ -103,9 +104,40 @@ export default function StudentDashboard() {
                   ) : (
                     <div className="w-full h-28 md:h-40 bg-muted/50" />
                   )}
-                  <div className="p-5">
-                    <p className="font-medium">{c.name}</p>
+                  <div className="p-5 relative">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-medium truncate pr-8">{c.name}</p>
+                      <button
+                        className="p-1 rounded hover:bg-accent"
+                        title="More"
+                        onClick={(e)=>{ e.stopPropagation(); setMenuOpenFor(menuOpenFor === cid ? "" : String(cid)); }}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </button>
+                    </div>
                     <div className="mt-2 text-xs text-foreground/60">Joined</div>
+                    {menuOpenFor === String(cid) && (
+                      <div className="absolute z-20 right-4 top-12 w-40 rounded-md border border-border bg-background shadow">
+                        <button
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                          onClick={async ()=>{
+                            try {
+                              const token = localStorage.getItem("token");
+                              const headers: Record<string,string> = {};
+                              if (token) headers.Authorization = `Bearer ${token}`;
+                              const res = await fetch(`/api/student/classes/${cid}/unenroll`, { method: 'DELETE', headers });
+                              const d = await res.json().catch(()=>({}));
+                              if (!res.ok) throw new Error(d?.message || res.statusText);
+                              setClasses(prev => prev.filter(x => (x.id || (x as any)._id) !== cid));
+                            } catch (e: any) {
+                              setError(e.message || "Failed to unenroll");
+                            } finally { setMenuOpenFor(""); }
+                          }}
+                        >
+                          Unenrol class
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <span className={"absolute top-2 right-2 text-xs px-2 py-1 rounded-full " + (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")}>{c.isActive ? "Active" : "Inactive"}</span>
                   <div className="absolute bottom-3 right-3 z-10 flex flex-row gap-2">
