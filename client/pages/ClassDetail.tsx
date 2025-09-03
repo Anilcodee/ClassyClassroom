@@ -53,7 +53,9 @@ export default function ClassDetail() {
 
   useEffect(() => {
     if (!token) { nav('/auth'); return; }
-    void load();
+    const ac = new AbortController();
+    void load(ac.signal);
+    return () => { try { ac.abort(); } catch {} };
   }, [id, token]);
 
   // Auto-refresh status while active so button re-enables after 4 minutes
