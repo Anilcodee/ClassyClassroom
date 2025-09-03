@@ -126,7 +126,7 @@ export default function ClassAssignments(){
       ) : (
         <ul className="mt-3 space-y-3">
           {items.map(a => (
-            <li key={a.id} className="rounded-xl border border-border p-4 flex items-center justify-between">
+            <li key={a.id} className="rounded-xl border border-border p-4 flex items-center justify-between cursor-pointer hover:bg-accent/30" onClick={()=> nav(`/assign/${a.id}`)}>
               <div>
                 <p className="font-medium">{a.title} <span className="text-xs text-foreground/60">({a.type})</span></p>
                 <p className="text-xs text-foreground/60">{a.isDraft ? 'Draft' : (a.publishAt ? `Publishes ${new Date(a.publishAt).toLocaleString()}` : 'Published')}</p>
@@ -134,14 +134,14 @@ export default function ClassAssignments(){
               </div>
               <div className="flex items-center gap-2">
                 {role === 'student' ? (
-                  <Link to={`/assign/${a.id}`} className="px-3 py-1.5 rounded-md border border-border text-sm">Open</Link>
+                  <></>
                 ) : (
                   <>
                     {a.isDraft && (
                       <button
                         className="px-3 py-1.5 rounded-md border border-border text-sm disabled:opacity-50"
                         disabled={busyId===a.id}
-                        onClick={async ()=>{
+                        onClick={async (e)=>{ e.stopPropagation();
                           setBusyId(a.id);
                           try {
                             const token = localStorage.getItem('token');
@@ -156,9 +156,8 @@ export default function ClassAssignments(){
                         Publish
                       </button>
                     )}
-                    <Link to={`/assign/${a.id}`} className="px-3 py-1.5 rounded-md border border-border text-sm">Open</Link>
-                    <Link to={`/assign/${a.id}/edit`} className="px-3 py-1.5 rounded-md border border-border text-sm">Edit</Link>
-                    <button className="px-3 py-1.5 rounded-md border border-border text-sm text-destructive" onClick={()=> setConfirmId(a.id)}>Delete</button>
+                    <Link to={`/assign/${a.id}/edit`} onClick={(e)=>e.stopPropagation()} className="px-3 py-1.5 rounded-md border border-border text-sm">Edit</Link>
+                    <button className="px-3 py-1.5 rounded-md border border-border text-sm text-destructive" onClick={(e)=>{ e.stopPropagation(); setConfirmId(a.id); }}>Delete</button>
                   </>
                 )}
               </div>
