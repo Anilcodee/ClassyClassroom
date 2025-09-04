@@ -67,7 +67,13 @@ export default function Classes() {
     try {
       // Use globalThis.fetch to avoid potential site wrappers; ensure we always return a Response or a handled error
       const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
-      const res = await nativeFetch(url, { ...rest, signal });
+      const resolvedUrl =
+        typeof location !== "undefined" && typeof url === "string" && url.startsWith("/")
+          ? `${location.origin}${url}`
+          : url;
+      // Diagnostic: resolved URL
+      try { console.debug("fetchWithRetry resolvedUrl:", resolvedUrl); } catch {}
+      const res = await nativeFetch(resolvedUrl, { ...rest, signal });
       return res;
     } catch (e: any) {
       // Diagnostic logging to help identify failing URL and error
