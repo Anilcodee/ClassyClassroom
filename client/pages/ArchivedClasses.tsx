@@ -16,8 +16,49 @@ export default function ArchivedClasses() {
       const headers: Record<string, string> = {};
       if (token) headers.Authorization = `Bearer ${token}`;
       let res: Response;
+      const resolvedUrl =
+        typeof location !== "undefined" ? `${location.origin}/api/classes/archived` : "/api/classes/archived";
       try {
-        res = await fetch("/api/classes/archived", { headers, cache: "no-store" });
+        const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
+        try {
+          res = await nativeFetch(resolvedUrl, { headers, cache: "no-store" });
+        } catch (e) {
+          // XHR fallback for environments where fetch is wrapped or blocked
+          res = await new Promise<Response>((resolve, reject) => {
+            try {
+              const xhr = new XMLHttpRequest();
+              xhr.open("GET", resolvedUrl, true);
+              try {
+                Object.keys(headers || {}).forEach((hk) => {
+                  try {
+                    xhr.setRequestHeader(hk, (headers as any)[hk]);
+                  } catch {}
+                });
+              } catch {}
+              xhr.onreadystatechange = () => {
+                if (xhr.readyState !== 4) return;
+                const hdrs: Record<string, string> = {};
+                try {
+                  const raw = xhr.getAllResponseHeaders() || "";
+                  raw.trim().split(/\r?\n/).forEach((line) => {
+                    const idx = line.indexOf(":");
+                    if (idx > 0) {
+                      const k = line.slice(0, idx).trim();
+                      const v = line.slice(idx + 1).trim();
+                      hdrs[k] = v;
+                    }
+                  });
+                } catch {}
+                const responseInit: ResponseInit = { status: xhr.status, headers: hdrs };
+                resolve(new Response(xhr.responseText, responseInit));
+              };
+              xhr.onerror = () => reject(new Error("XHR error"));
+              xhr.send();
+            } catch (err) {
+              reject(err);
+            }
+          });
+        }
       } catch (e: any) {
         console.error("ArchivedClasses fetch failed", e);
         throw e;
