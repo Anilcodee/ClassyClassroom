@@ -92,7 +92,7 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           {user ? (
             <>
               <span className="hidden sm:inline text-sm text-foreground/70">
