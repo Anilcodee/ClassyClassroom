@@ -281,10 +281,14 @@ export default function Classes() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border p-5 bg-card shadow">
+          <div className="rounded-2xl border border-border p-5 bg-card shadow min-h-[24rem] flex flex-col">
             <h3 className="font-semibold mb-2">Archived classes</h3>
             {archived.length === 0 ? (
-              <p className="text-sm text-foreground/70">No archived classes.</p>
+              <Link to="/classes/archived" className="flex-1">
+                <button className="w-full h-full flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium">
+                  View archived classes
+                </button>
+              </Link>
             ) : (
               <ul className="divide-y divide-border">
                 {archived.map((c) => (
@@ -672,7 +676,7 @@ function MakeClassCard({
   }
 
   return (
-    <div className="rounded-2xl border border-border p-6 bg-card shadow">
+    <div className="rounded-2xl border border-border p-6 bg-card shadow min-h-[24rem]">
       <div className="flex flex-col md:flex-row items-center gap-6">
         <div className="flex-1">
           <h2 className="text-2xl font-bold">Make your class</h2>
