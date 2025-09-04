@@ -234,7 +234,7 @@ export default function Classes() {
           <MakeClassCard onCreated={load} />
         </div>
         <aside className="md:col-span-1 space-y-5 flex flex-col">
-          <div className="rounded-2xl border border-border p-5 bg-card shadow">
+          <div className="rounded-2xl border border-border p-5 bg-card shadow flex-none">
             <h3 className="font-semibold mb-2">Downloads</h3>
             <p className="text-sm text-foreground/70 mb-3">
               Download PDF list (all days) for a specific class.
@@ -281,7 +281,7 @@ export default function Classes() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border p-5 bg-card shadow min-h-[24rem] flex flex-col">
+          <div className="rounded-2xl border border-border p-5 bg-card shadow flex-1 flex flex-col">
             <h3 className="font-semibold mb-2">Archived classes</h3>
             {archived.length === 0 ? (
               <Link to="/classes/archived" className="flex-1">
