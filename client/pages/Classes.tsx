@@ -417,7 +417,7 @@ export default function Classes() {
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex flex-col items-start gap-2 min-w-0">
                             <div className="flex items-center gap-0.5 min-w-0">
-                              <p className="font-medium truncate max-w-[calc(100%-40px)]">{c.name}</p>
+                              <p className="font-medium truncate flex-1 min-w-0 mr-1">{c.name}</p>
                               <div className="flex items-center gap-0.5 flex-shrink-0">
                                 <button
                                   className="p-1 rounded border border-border hover:bg-accent group"
