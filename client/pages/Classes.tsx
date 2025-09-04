@@ -73,8 +73,51 @@ export default function Classes() {
       // Diagnostic logging to help identify failing URL and error
       try {
         // eslint-disable-next-line no-console
-        console.error("fetchWithRetry error", { url, attempt, error: e });
+        console.error("fetchWithRetry error", JSON.stringify({ url, attempt, error: String(e && e.message ? e.message : e) }));
       } catch {}
+
+      // If fetch throws synchronously (some wrappers may), try an XHR fallback for GET/POST/PATCH
+      try {
+        const method = (rest && rest.method) || "GET";
+        const headers = (rest && rest.headers) || {};
+        const body = (rest && rest.body) || null;
+        const xhrRes = await new Promise<Response>((resolve, reject) => {
+          try {
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, url, true);
+            Object.keys(headers || {}).forEach((hk) => {
+              try {
+                xhr.setRequestHeader(hk, (headers as any)[hk]);
+              } catch {}
+            });
+            xhr.onreadystatechange = () => {
+              if (xhr.readyState !== 4) return;
+              const hdrs: Record<string, string> = {};
+              try {
+                const raw = xhr.getAllResponseHeaders() || "";
+                raw.trim().split(/\r?\n/).forEach((line) => {
+                  const idx = line.indexOf(":");
+                  if (idx > 0) {
+                    const k = line.slice(0, idx).trim();
+                    const v = line.slice(idx + 1).trim();
+                    hdrs[k] = v;
+                  }
+                });
+              } catch {}
+              const responseInit: ResponseInit = { status: xhr.status, headers: hdrs };
+              resolve(new Response(xhr.responseText, responseInit));
+            };
+            xhr.onerror = () => reject(new Error("XHR error"));
+            if (body) xhr.send(body as any);
+            else xhr.send();
+          } catch (err) {
+            reject(err);
+          }
+        });
+        return xhrRes;
+      } catch (xhrErr) {
+        // ignore and continue to other handling
+      }
 
       // Normalize abort errors
       const aborted =
