@@ -415,7 +415,7 @@ export default function Classes() {
                       )}
                       <div className="p-5 relative">
                         <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-3 min-w-0">
+                          <div className="flex flex-col items-start gap-2 min-w-0">
                             <p className="font-medium truncate">{c.name}</p>
                             <button
                               className="p-1 rounded border border-border hover:bg-accent group"
