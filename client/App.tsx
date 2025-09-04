@@ -27,6 +27,7 @@ import AssignmentCreate from "./pages/AssignmentCreate";
 import AssignmentEdit from "./pages/AssignmentEdit";
 import AssignmentDrafts from "./pages/AssignmentDrafts";
 import ModifyClass from "./pages/ModifyClass";
+import ArchivedClasses from "./pages/ArchivedClasses";
 
 const queryClient = new QueryClient();
 
