@@ -540,10 +540,10 @@ export default function Classes() {
                                   };
                                   if (token)
                                     headers.Authorization = `Bearer ${token}`;
-                                  const res = await fetch(
-                                    `/api/classes/${c.id}/archive`,
-                                    { method: "PATCH", headers },
-                                  );
+                                  const res = await fetchWithRetry(
+                                  `/api/classes/${c.id}/archive`,
+                                  { method: "PATCH", headers },
+                                );
                                   const d = await res.json().catch(() => ({}));
                                   if (!res.ok)
                                     throw new Error(
