@@ -465,7 +465,7 @@ export default function Classes() {
                               <Link
                                 to={`/classes/${c.id}`}
                                 onClick={(e) => e.stopPropagation()}
-                                className="px-2.5 py-1.5 rounded-md text-xs bg-primary text-primary-foreground hover:opacity-90 text-center"
+                                className="px-2.5 py-1.5 rounded-md text-xs inline-flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90"
                                 title="View attendance"
                               >
                                 Attendance
@@ -482,7 +482,7 @@ export default function Classes() {
                                       );
                                     } catch {}
                                   }}
-                                  className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground hover:opacity-90 text-center"
+                                  className="px-2.5 py-1.5 rounded-md text-xs inline-flex items-center justify-center bg-secondary text-secondary-foreground hover:opacity-90"
                                   title="Messages"
                                 >
                                   Messages
@@ -509,7 +509,7 @@ export default function Classes() {
                               <Link
                                 to={`/classes/${c.id}/modify`}
                                 onClick={(e) => e.stopPropagation()}
-                                className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background hover:bg-accent hover:text-accent-foreground text-center"
+                                className="px-2.5 py-1.5 rounded-md text-xs inline-flex items-center justify-center border border-border bg-background hover:bg-accent hover:text-accent-foreground"
                                 title="Modify class"
                               >
                                 Modify
