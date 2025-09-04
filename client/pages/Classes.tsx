@@ -512,7 +512,7 @@ export default function Classes() {
                         {c.isActive ? "Active" : "Inactive"}
                       </span>
                       {/* Action buttons bottom-right */}
-                      <div className="absolute right-3 z-10 flex flex-col gap-2 top-1/2 -translate-y-1/2">
+                      <div className="mt-3 flex flex-row gap-2">
                         <Link
                           to={`/classes/${c.id}`}
                           onClick={(e) => e.stopPropagation()}
