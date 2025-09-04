@@ -109,15 +109,15 @@ export default function Header() {
             <div className="flex items-center gap-2">
               <Link
                 to="/student-auth"
-                className="px-3 py-1.5 rounded-md border border-border hover:bg-accent hover:text-accent-foreground"
+                className="px-2 py-1 rounded-md border border-border hover:bg-accent hover:text-accent-foreground text-sm sm:text-sm"
               >
-                Student login
+                Student
               </Link>
               <Link
                 to="/auth"
-                className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:opacity-90"
+                className="px-2 py-1 rounded-md bg-primary text-primary-foreground hover:opacity-90 text-sm sm:text-sm"
               >
-                Teacher login
+                Teacher
               </Link>
             </div>
           )}
