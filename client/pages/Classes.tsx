@@ -418,7 +418,7 @@ export default function Classes() {
                           <div className="flex flex-col items-start gap-2 min-w-0">
                             <div className="flex items-center gap-1 w-full min-w-0">
                               <p className="font-medium truncate flex-1 min-w-0">{c.name}</p>
-                              <div className="flex items-center gap-2 flex-shrink-0">
+                              <div className="flex items-center gap-1 flex-shrink-0">
                                 <button
                                   className="p-1 rounded border border-border hover:bg-accent group"
                                   onClick={(e) => {
