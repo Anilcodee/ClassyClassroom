@@ -456,6 +456,61 @@ export default function Classes() {
                                 {c.joinCode}
                               </span>
                             )}
+
+                            <div className="mt-3 flex flex-row gap-2">
+                              <Link
+                                to={`/classes/${c.id}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="px-2.5 py-1.5 rounded-md text-xs bg-primary text-primary-foreground hover:opacity-90 text-center"
+                                title="View attendance"
+                              >
+                                Attendance
+                              </Link>
+                              <div className="relative inline-block">
+                                <Link
+                                  to={`/classes/${c.id}/messages`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    try {
+                                      localStorage.setItem(
+                                        `lastSeenMsgs:${c.id}`,
+                                        String(Date.now()),
+                                      );
+                                    } catch {}
+                                  }}
+                                  className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground hover:opacity-90 text-center"
+                                  title="Messages"
+                                >
+                                  Messages
+                                </Link>
+                                {(() => {
+                                  const meta = latestMap[c.id];
+                                  const key = `lastSeenMsgs:${c.id}`;
+                                  const seen = Number(
+                                    typeof window !== "undefined"
+                                      ? localStorage.getItem(key) || 0
+                                      : 0,
+                                  );
+                                  const isNew =
+                                    meta &&
+                                    meta.latestAt &&
+                                    (!userId ||
+                                      String(meta.latestBy) !== String(userId)) &&
+                                    meta.latestAt > seen;
+                                  return isNew ? (
+                                    <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 shadow ring-2 ring-background" />
+                                  ) : null;
+                                })()}
+                              </div>
+                              <Link
+                                to={`/classes/${c.id}/modify`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background hover:bg-accent hover:text-accent-foreground text-center"
+                                title="Modify class"
+                              >
+                                Modify
+                              </Link>
+                            </div>
                           </div>
 
                           <button
