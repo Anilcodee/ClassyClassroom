@@ -72,6 +72,12 @@ export default function Classes() {
       const res = await nativeFetch(url, { ...rest, signal });
       return res;
     } catch (e: any) {
+      // Diagnostic logging to help identify failing URL and error
+      try {
+        // eslint-disable-next-line no-console
+        console.error("fetchWithRetry error", { url, attempt, error: e });
+      } catch {}
+
       // Normalize abort errors
       const aborted =
         (signal && (signal as any).aborted) ||
