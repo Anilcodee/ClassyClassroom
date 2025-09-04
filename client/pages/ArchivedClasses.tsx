@@ -15,7 +15,13 @@ export default function ArchivedClasses() {
       const token = localStorage.getItem("token");
       const headers: Record<string, string> = {};
       if (token) headers.Authorization = `Bearer ${token}`;
-      const res = await fetch("/api/classes/archived", { headers, cache: "no-store" });
+      let res: Response;
+      try {
+        res = await fetch("/api/classes/archived", { headers, cache: "no-store" });
+      } catch (e: any) {
+        console.error("ArchivedClasses fetch failed", e);
+        throw e;
+      }
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d?.message || res.statusText || "Failed to load");
       const list = (d.classes || []).map((c: any) => ({
