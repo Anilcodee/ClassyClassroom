@@ -416,7 +416,7 @@ export default function Classes() {
                       <div className="p-5 relative">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex flex-col items-start gap-2 min-w-0">
-                            <div className="flex items-center gap-1 w-full min-w-0">
+                            <div className="flex items-center gap-0.5 w-full min-w-0">
                               <p className="font-medium truncate flex-1 min-w-0">{c.name}</p>
                               <div className="flex items-center gap-1 flex-shrink-0">
                                 <button
