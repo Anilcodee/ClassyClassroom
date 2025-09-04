@@ -409,20 +409,8 @@ export default function Classes() {
                       )}
                       <div className="p-5 relative">
                         <div className="flex items-start justify-between gap-2">
-                          <p className="font-medium truncate pr-8">{c.name}</p>
-                          <button
-                            className="p-1 rounded hover:bg-accent"
-                            title="More"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setMenuOpenFor(menuOpenFor === c.id ? "" : c.id);
-                            }}
-                          >
-                            <MoreVertical className="h-4 w-4" />
-                          </button>
-                        </div>
-                        <div className="mt-2 text-xs text-foreground/60 flex items-center gap-2">
-                          <span className="relative inline-flex items-center">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <p className="font-medium truncate">{c.name}</p>
                             <button
                               className="p-1 rounded border border-border hover:bg-accent group"
                               onClick={(e) => {
@@ -431,26 +419,9 @@ export default function Classes() {
                                 navigator.clipboard
                                   .writeText(code)
                                   .then(() => {
-                                    toast({
-                                      title: "Copied",
-                                      description: "Join code copied",
-                                    });
+                                    toast({ title: "Copied", description: "Join code copied" });
                                   })
-                                  .catch(() => {
-                                    try {
-                                      const ta =
-                                        document.createElement("textarea");
-                                      ta.value = code;
-                                      document.body.appendChild(ta);
-                                      ta.select();
-                                      document.execCommand("copy");
-                                      document.body.removeChild(ta);
-                                      toast({
-                                        title: "Copied",
-                                        description: "Join code copied",
-                                      });
-                                    } catch {}
-                                  });
+                                  .catch(() => {});
                               }}
                               onMouseEnter={(e) => {
                                 e.stopPropagation();
@@ -470,23 +441,27 @@ export default function Classes() {
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                               >
-                                <rect
-                                  x="9"
-                                  y="9"
-                                  width="13"
-                                  height="13"
-                                  rx="2"
-                                  ry="2"
-                                ></rect>
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                               </svg>
                             </button>
                             {showCodeFor === c.id && (
-                              <span className="absolute left-full ml-2 font-mono px-1.5 py-0.5 rounded bg-muted text-foreground/80 shadow">
+                              <span className="font-mono px-1.5 py-0.5 rounded bg-muted text-foreground/80 shadow">
                                 {c.joinCode}
                               </span>
                             )}
-                          </span>
+                          </div>
+
+                          <button
+                            className="p-1 rounded hover:bg-accent"
+                            title="More"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setMenuOpenFor(menuOpenFor === c.id ? "" : c.id);
+                            }}
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </button>
                         </div>
                         {menuOpenFor === c.id && (
                           <div className="absolute z-20 right-4 top-12 w-40 rounded-md border border-border bg-background shadow">
@@ -537,7 +512,7 @@ export default function Classes() {
                         {c.isActive ? "Active" : "Inactive"}
                       </span>
                       {/* Action buttons bottom-right */}
-                      <div className="absolute bottom-3 right-3 z-10 flex flex-row gap-2">
+                      <div className="absolute right-3 z-10 flex flex-col gap-2 top-1/2 -translate-y-1/2">
                         <Link
                           to={`/classes/${c.id}`}
                           onClick={(e) => e.stopPropagation()}
