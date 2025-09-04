@@ -386,8 +386,7 @@ export default function Classes() {
                   {filtered.map((c) => (
                     <li
                       key={c.id}
-                      className="rounded-xl border border-border overflow-hidden relative"
-                      style={{ minHeight: "10rem" }}
+                      className="rounded-xl border border-border overflow-hidden relative min-h-40 md:min-h-56"
                     >
                       {!c.imageUrl && (
                         <button
@@ -461,7 +460,7 @@ export default function Classes() {
                               </div>
                             </div>
 
-                            <div className="mt-1 flex flex-row gap-2">
+                            <div className="mt-1 flex flex-col sm:flex-row gap-2">
                               <Link
                                 to={`/classes/${c.id}`}
                                 onClick={(e) => e.stopPropagation()}
@@ -646,7 +645,7 @@ function MakeClassCard({
   }
 
   return (
-    <div className="rounded-2xl border border-border p-6 bg-card shadow min-h-[24rem]">
+    <div className="rounded-2xl border border-border p-6 bg-card shadow min-h-[20rem] md:min-h-[24rem]">
       <div className="flex flex-col md:flex-row items-center gap-6">
         <div className="flex-1">
           <h2 className="text-2xl font-bold">Make your class</h2>
@@ -755,7 +754,7 @@ function MakeClassCard({
             </div>
           </div>
         </div>
-        <div className="w-48 h-48 relative">
+        <div className="w-40 h-40 md:w-48 md:h-48 relative">
           <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-brand-400/30 to-brand-700/30 blur-2xl" />
           <TeacherLoop />
         </div>
