@@ -529,9 +529,9 @@ export default function Classes() {
                           </button>
                         </div>
                         {menuOpenFor === c.id && (
-                          <div className="absolute z-20 right-4 top-12 w-40 rounded-md border border-border bg-background shadow">
+                          <div className="absolute z-20 right-4 top-12 rounded-md border border-border bg-background shadow flex flex-col items-end">
                             <button
-                              className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                              className="text-left px-2 py-1 text-sm hover:bg-accent whitespace-nowrap ml-auto"
                               onClick={async () => {
                                 try {
                                   const token = localStorage.getItem("token");
@@ -541,9 +541,9 @@ export default function Classes() {
                                   if (token)
                                     headers.Authorization = `Bearer ${token}`;
                                   const res = await fetchWithRetry(
-                                  `/api/classes/${c.id}/archive`,
-                                  { method: "PATCH", headers },
-                                );
+                                    `/api/classes/${c.id}/archive`,
+                                    { method: "PATCH", headers },
+                                  );
                                   const d = await res.json().catch(() => ({}));
                                   if (!res.ok)
                                     throw new Error(
