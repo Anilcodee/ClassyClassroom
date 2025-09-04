@@ -60,7 +60,8 @@ export default function ArchivedClasses() {
 
   return (
     <main className="container mx-auto py-10">
-      <h2 className="text-lg font-semibold mb-4">Archived classes</h2>
+      <Link to="/classes" className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
+      <h2 className="text-lg font-semibold mb-4 mt-4">Archived classes</h2>
       {loading ? (
         <p className="text-sm text-foreground/70">Loading…</p>
       ) : error ? (
