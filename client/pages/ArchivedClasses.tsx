@@ -110,9 +110,6 @@ export default function ArchivedClasses() {
           ))}
         </ul>
       )}
-      <div className="mt-6">
-        <Link to="/classes" className="text-sm text-foreground/70 hover:underline">← Back to classes</Link>
-      </div>
     </main>
   );
 }
