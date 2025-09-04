@@ -67,22 +67,35 @@ export default function Classes() {
   ): Promise<Response> {
     const { signal, ...rest } = init as any;
     try {
-      return await fetch(url, { ...rest, signal });
+      // Use globalThis.fetch to avoid potential site wrappers; ensure we always return a Response or a handled error
+      const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
+      const res = await nativeFetch(url, { ...rest, signal });
+      return res;
     } catch (e: any) {
+      // Normalize abort errors
       const aborted =
-        (signal && (signal as any).aborted) || e?.name === "AbortError";
-      if (aborted)
+        (signal && (signal as any).aborted) ||
+        e?.name === "AbortError" ||
+        e?.message === "The user aborted a request.";
+      if (aborted) {
         return new Response(JSON.stringify({ message: "aborted" }), {
           status: 499,
           headers: { "Content-Type": "application/json" },
         });
+      }
+      // Retry a few times for transient network errors
       if (
         attempt < 3 &&
         (typeof navigator === "undefined" || navigator.onLine !== false)
       ) {
         await new Promise((r) => setTimeout(r, 300 * attempt));
-        return fetchWithRetry(url, init, attempt + 1);
+        try {
+          return await fetchWithRetry(url, init, attempt + 1);
+        } catch (err) {
+          // If recursive call somehow throws, fallthrough to return network error
+        }
       }
+      // Return a synthetic Response instead of throwing so callers can handle uniformly
       return new Response(JSON.stringify({ message: "Network error" }), {
         status: 0,
         headers: { "Content-Type": "application/json" },
