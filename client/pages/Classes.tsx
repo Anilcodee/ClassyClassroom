@@ -416,46 +416,50 @@ export default function Classes() {
                       <div className="p-5 relative">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex flex-col items-start gap-2 min-w-0">
-                            <p className="font-medium truncate">{c.name}</p>
-                            <button
-                              className="p-1 rounded border border-border hover:bg-accent group"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const code = c.joinCode;
-                                navigator.clipboard
-                                  .writeText(code)
-                                  .then(() => {
-                                    toast({ title: "Copied", description: "Join code copied" });
-                                  })
-                                  .catch(() => {});
-                              }}
-                              onMouseEnter={(e) => {
-                                e.stopPropagation();
-                                setShowCodeFor(c.id);
-                              }}
-                              onMouseLeave={() => setShowCodeFor("")}
-                              title="Copy join code"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                              </svg>
-                            </button>
-                            {showCodeFor === c.id && (
-                              <span className="font-mono px-1.5 py-0.5 rounded bg-muted text-foreground/80 shadow">
-                                {c.joinCode}
-                              </span>
-                            )}
+                            <div className="flex items-center gap-3 w-full min-w-0">
+                              <p className="font-medium truncate flex-1 min-w-0">{c.name}</p>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <button
+                                  className="p-1 rounded border border-border hover:bg-accent group"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const code = c.joinCode;
+                                    navigator.clipboard
+                                      .writeText(code)
+                                      .then(() => {
+                                        toast({ title: "Copied", description: "Join code copied" });
+                                      })
+                                      .catch(() => {});
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.stopPropagation();
+                                    setShowCodeFor(c.id);
+                                  }}
+                                  onMouseLeave={() => setShowCodeFor("")}
+                                  title="Copy join code"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                  </svg>
+                                </button>
+                                {showCodeFor === c.id && (
+                                  <span className="ml-2 inline-block font-mono px-1.5 py-0.5 rounded bg-muted text-foreground/80 shadow">
+                                    {c.joinCode}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
 
                             <div className="mt-1 flex flex-row gap-2">
                               <Link
