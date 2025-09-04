@@ -233,7 +233,7 @@ export default function Classes() {
         <div className="md:col-span-2">
           <MakeClassCard onCreated={load} />
         </div>
-        <aside className="md:col-span-1 space-y-5 self-start">
+        <aside className="md:col-span-1 space-y-5 flex flex-col">
           <div className="rounded-2xl border border-border p-5 bg-card shadow">
             <h3 className="font-semibold mb-2">Downloads</h3>
             <p className="text-sm text-foreground/70 mb-3">
