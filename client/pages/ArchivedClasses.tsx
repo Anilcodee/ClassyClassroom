@@ -99,8 +99,8 @@ export default function ArchivedClasses() {
                   <button disabled className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background text-center opacity-50 cursor-not-allowed">Modify</button>
                 </div>
                 {archMenuFor === c.id && (
-                  <div className="absolute z-20 right-4 top-12 w-40 rounded-md border border-border bg-background shadow">
-                    <button className="w-full text-left px-3 py-2 text-sm hover:bg-accent" onClick={() => unarchive(c.id)}>
+                  <div className="absolute z-20 right-4 top-12 rounded-md border border-border bg-background shadow flex flex-col items-end">
+                    <button className="text-left px-2 py-1 text-sm hover:bg-accent whitespace-nowrap ml-auto" onClick={() => unarchive(c.id)}>
                       Unarchive
                     </button>
                   </div>
