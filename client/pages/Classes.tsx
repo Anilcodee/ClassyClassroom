@@ -293,7 +293,7 @@ export default function Classes() {
         <div className="md:col-span-2">
           <MakeClassCard onCreated={load} />
         </div>
-        <aside className="md:col-span-1 space-y-5 flex flex-col">
+        <aside className="md:col-span-1 space-y-5 flex flex-col h-full">
           <div className="rounded-2xl border border-border p-5 bg-card shadow flex-none">
             <h3 className="font-semibold mb-2">Downloads</h3>
             <p className="text-sm text-foreground/70 mb-3">
@@ -341,7 +341,7 @@ export default function Classes() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border p-5 bg-card shadow flex-1 flex flex-col">
+          <div className="rounded-2xl border border-border p-5 bg-card shadow flex-1 flex flex-col h-full">
             <h3 className="font-semibold mb-2">Archived classes</h3>
             <Link to="/classes/archived" className="flex-1">
               <button className="w-full h-full flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium">
@@ -660,7 +660,7 @@ function MakeClassCard({
   }
 
   return (
-    <div className="rounded-2xl border border-border p-6 bg-card shadow">
+    <div className="rounded-2xl border border-border p-6 bg-card shadow h-full">
       <div className="flex flex-col md:flex-row items-center gap-6">
         <div className="flex-1">
           <h2 className="text-2xl font-bold">Make your class</h2>
