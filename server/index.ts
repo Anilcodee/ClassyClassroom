@@ -10,6 +10,10 @@ import {
   signupTeacher,
   loginStudent,
   loginTeacher,
+  googleRedirect,
+  googleCallback,
+  googleComplete,
+  me,
 } from "./routes/auth";
 import { requireAuth } from "./middleware/auth";
 import { listClasses, createClass, updateClassImage } from "./routes/classes";
@@ -81,6 +85,12 @@ export function createServer() {
   app.post("/api/auth/signup/teacher", signupTeacher);
   app.post("/api/auth/login/student", loginStudent);
   app.post("/api/auth/login/teacher", loginTeacher);
+
+  // Google OAuth
+  app.get("/api/auth/google", googleRedirect);
+  app.get("/api/auth/google/callback", googleCallback);
+  app.post("/api/auth/google/complete", googleComplete);
+  app.get("/api/auth/me", requireAuth, me);
 
   // Classes
   app.get("/api/classes", requireAuth, listClasses);
