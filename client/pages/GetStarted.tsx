@@ -23,13 +23,13 @@ export default function GetStarted() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               to="/auth"
-              className="px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:opacity-95 shadow-md"
+              className="px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:opacity-95 shadow-md w-full sm:w-auto text-center"
             >
               Get started as Teacher
             </Link>
             <Link
               to="/student-auth"
-              className="px-5 py-3 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground"
+              className="px-5 py-3 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground w-full sm:w-auto text-center"
             >
               Try as Student
             </Link>
