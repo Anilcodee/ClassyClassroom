@@ -75,8 +75,12 @@ export default function Header() {
           to={user ? (role === "teacher" ? "/classes" : "/student") : "/"}
           className="flex min-w-0 items-center gap-2 font-extrabold text-primary"
         >
-          <span className="inline-block h-7 w-7 rounded-md bg-gradient-to-br from-brand-500 to-brand-700"></span>
-          <span className="truncate">Attendify</span>
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets%2F90e67de179a242f89a562f2630372521%2F391d17bbac48437d8d7c714743a9009e?format=webp&width=800"
+            alt="ClassyClassroom"
+            className="inline-block h-7 w-7 rounded-md object-cover"
+          />
+          <span className="truncate">ClassyClassroom</span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
           {dynamicNav.map((n) => (
