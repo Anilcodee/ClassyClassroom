@@ -757,9 +757,11 @@ function MakeClassCard({
             </div>
           </div>
         </div>
-        <div className="w-40 h-40 md:w-48 md:h-48 relative">
+        <div className="w-full sm:w-40 h-40 sm:h-40 md:w-48 md:h-48 relative">
           <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-brand-400/30 to-brand-700/30 blur-2xl" />
-          <TeacherLoop />
+          <div className="relative w-full h-full flex items-center justify-center">
+            <TeacherLoop />
+          </div>
         </div>
       </div>
 
