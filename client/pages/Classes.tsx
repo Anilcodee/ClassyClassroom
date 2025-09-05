@@ -472,7 +472,7 @@ export default function Classes() {
                               </div>
                             </div>
 
-                            <div className="mt-1 flex flex-col sm:flex-row gap-2">
+                            <div className="mt-1 flex flex-row flex-wrap gap-2">
                               <Link
                                 to={`/classes/${c.id}`}
                                 onClick={(e) => e.stopPropagation()}
