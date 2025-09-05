@@ -1,5 +1,5 @@
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 export default function StudentAuth() {
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -10,6 +10,7 @@ export default function StudentAuth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const nav = useNavigate();
+  const location = useLocation();
 
   // If already authenticated, handle role: keep students, auto-logout teachers to allow student auth
   useEffect(() => {
@@ -27,6 +28,28 @@ export default function StudentAuth() {
     localStorage.removeItem("user");
     window.dispatchEvent(new Event("auth-changed"));
   }, [nav]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    if (!token) return;
+    (async () => {
+      try {
+        localStorage.setItem("token", token);
+        const resp = await fetch("/api/auth/me", { headers: { Authorization: `Bearer ${token}` } });
+        if (!resp.ok) {
+          localStorage.removeItem("token");
+          return;
+        }
+        const user = await resp.json();
+        localStorage.setItem("user", JSON.stringify(user));
+        window.dispatchEvent(new Event("auth-changed"));
+        nav("/student");
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, [location.search, nav]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -88,6 +111,10 @@ export default function StudentAuth() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function startGoogle() {
+    window.location.href = `/api/auth/google?role=student`;
   }
 
   return (
@@ -154,9 +181,20 @@ export default function StudentAuth() {
             className="w-full rounded-lg bg-primary text-primary-foreground py-2 font-semibold hover:opacity-90 disabled:opacity-60"
             type="submit"
           >
-            {loading ? "Please wait…" : mode === "signup" ? "Create student account" : "Log in"}
+            {loading ? "Please wait��" : mode === "signup" ? "Create student account" : "Log in"}
           </button>
         </form>
+
+        <div className="mt-4">
+          <button
+            onClick={startGoogle}
+            className="w-full rounded-lg border border-border py-2 flex items-center justify-center gap-2 hover:bg-muted"
+          >
+            <img src="/placeholder.svg" alt="Google" className="w-5 h-5" />
+            <span>Sign in with Google</span>
+          </button>
+        </div>
+
         <p className="mt-4 text-xs text-foreground/60">
           Students can join classes using a code from their teacher and see their joined classes here.
         </p>

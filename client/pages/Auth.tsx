@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function Auth() {
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -9,6 +9,30 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const nav = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    if (!token) return;
+    (async () => {
+      try {
+        localStorage.setItem("token", token);
+        const resp = await fetch("/api/auth/me", { headers: { Authorization: `Bearer ${token}` } });
+        if (!resp.ok) {
+          // clear token on failure
+          localStorage.removeItem("token");
+          return;
+        }
+        const user = await resp.json();
+        localStorage.setItem("user", JSON.stringify(user));
+        window.dispatchEvent(new Event("auth-changed"));
+        nav(user?.role === "student" ? "/student" : "/classes");
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, [location.search, nav]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -51,6 +75,11 @@ export default function Auth() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function startGoogle() {
+    // open backend endpoint that starts Google OAuth
+    window.location.href = `/api/auth/google?role=teacher`;
   }
 
   return (
@@ -109,6 +138,17 @@ export default function Auth() {
             {loading ? "Please wait…" : mode === "signup" ? "Create account" : "Log in"}
           </button>
         </form>
+
+        <div className="mt-4">
+          <button
+            onClick={startGoogle}
+            className="w-full rounded-lg border border-border py-2 flex items-center justify-center gap-2 hover:bg-muted"
+          >
+            <img src="/placeholder.svg" alt="Google" className="w-5 h-5" />
+            <span>Sign in with Google</span>
+          </button>
+        </div>
+
         <p className="mt-4 text-xs text-foreground/60">
           Secure by design. We use JWT for sessions and store your data in MongoDB.
         </p>
