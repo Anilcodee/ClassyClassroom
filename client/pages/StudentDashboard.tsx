@@ -150,10 +150,9 @@ export default function StudentDashboard() {
                 <li
                   key={cid}
                   className="w-full rounded-xl border border-border overflow-hidden relative"
-                  style={{ minHeight: "10rem" }}
                 >
                   {c.imageUrl ? (
-                    <div className="w-full h-28 md:h-40">
+                    <div className="w-full h-36 sm:h-28 md:h-40 lg:h-48">
                       <img
                         src={c.imageUrl}
                         alt="Class cover"
@@ -161,7 +160,7 @@ export default function StudentDashboard() {
                       />
                     </div>
                   ) : (
-                    <div className="w-full h-28 md:h-40 bg-muted/50" />
+                    <div className="w-full h-36 sm:h-28 md:h-40 lg:h-48 bg-muted/50" />
                   )}
                   <div className="p-5 relative">
                     <div className="flex items-start justify-between gap-2">
