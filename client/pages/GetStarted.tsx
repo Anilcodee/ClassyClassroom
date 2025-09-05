@@ -83,9 +83,9 @@ export default function GetStarted() {
 
 function TeacherAnimation() {
   return (
-    <div className="relative mx-auto max-w-2xl lg:max-w-3xl rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-8 sm:p-10 overflow-hidden">
-      <div className="absolute -top-20 -right-20 h-72 w-72 lg:h-80 lg:w-80 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
-      <svg viewBox="0 0 200 200" className="mx-auto h-44 sm:h-56">
+    <div className="relative w-full rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-4 sm:p-6 overflow-hidden">
+      <div className="absolute -top-12 -right-12 sm:-top-20 sm:-right-20 h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
+      <svg viewBox="0 0 200 200" className="w-full max-w-[240px] mx-auto h-44 sm:h-56">
         <circle cx="100" cy="100" r="90" className="fill-[hsl(var(--muted))]" />
         <g className="origin-[120px_70px] animate-wave">
           <circle
