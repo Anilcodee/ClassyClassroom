@@ -144,7 +144,12 @@ export default function Auth() {
             onClick={startGoogle}
             className="w-full rounded-lg border border-border py-2 flex items-center justify-center gap-2 hover:bg-muted"
           >
-            <img src="/placeholder.svg" alt="Google" className="w-5 h-5" />
+            <svg className="w-5 h-5" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path fill="#4285F4" d="M24 12c3.31 0 6.11 1.2 8.19 2.99l6.13-6.13C34.86 5.04 29.7 3 24 3 14.62 3 6.86 8.9 3.7 17.7l7.3 5.64C12.9 15.77 17.98 12 24 12z" />
+              <path fill="#34A853" d="M46.5 24c0-1.6-.14-3.14-.4-4.63H24v8.78h12.91c-.56 3.03-2.27 5.6-4.86 7.32l7.45 5.78C43.97 36.69 46.5 30.78 46.5 24z" />
+              <path fill="#FBBC05" d="M10.99 28.34A13.95 13.95 0 0 1 9 24c0-1.33.2-2.6.57-3.79L3.7 14.7A23.84 23.84 0 0 0 0 24c0 3.7.9 7.2 2.7 10.3l8.29-6z" />
+              <path fill="#EA4335" d="M24 45c6.7 0 12.86-2.04 17.32-5.54l-7.45-5.78C30.11 34.8 27.31 36 24 36c-6.02 0-11.1-3.77-13.01-9.34l-7.3 5.64C6.86 39.1 14.62 45 24 45z" />
+            </svg>
             <span>Sign in with Google</span>
           </button>
         </div>
