@@ -73,7 +73,8 @@ export default function Classes() {
           : url;
       // Diagnostic: resolved URL
       try { console.debug("fetchWithRetry resolvedUrl:", resolvedUrl); } catch {}
-      const res = await nativeFetch(resolvedUrl, { ...rest, signal });
+      const options = { ...rest, signal, credentials: (rest as any).credentials ?? 'same-origin', mode: (rest as any).mode ?? 'cors' } as any;
+      const res = await nativeFetch(resolvedUrl, options);
       return res;
     } catch (e: any) {
       // Diagnostic logging to help identify failing URL and error
@@ -90,7 +91,7 @@ export default function Classes() {
         const xhrRes = await new Promise<Response>((resolve, reject) => {
           try {
             const xhr = new XMLHttpRequest();
-            xhr.open(method, url, true);
+            xhr.open(method, resolvedUrl, true);
             Object.keys(headers || {}).forEach((hk) => {
               try {
                 xhr.setRequestHeader(hk, (headers as any)[hk]);
