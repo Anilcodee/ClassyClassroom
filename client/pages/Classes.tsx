@@ -402,7 +402,7 @@ export default function Classes() {
                         </button>
                       )}
                       {c.imageUrl ? (
-                        <div className="w-full h-28 md:h-40">
+                        <div className="w-full h-36 sm:h-28 md:h-40 lg:h-48">
                           <img
                             src={c.imageUrl}
                             alt="Class cover"
@@ -410,7 +410,7 @@ export default function Classes() {
                           />
                         </div>
                       ) : (
-                        <div className="w-full h-28 md:h-40 bg-muted/50" />
+                        <div className="w-full h-36 sm:h-28 md:h-40 lg:h-48 bg-muted/50" />
                       )}
                       <div className="p-5 relative">
                         <div className="flex items-start justify-between gap-2">
