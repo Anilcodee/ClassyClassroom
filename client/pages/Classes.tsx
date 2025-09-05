@@ -386,7 +386,7 @@ export default function Classes() {
                   {filtered.map((c) => (
                     <li
                       key={c.id}
-                      className="rounded-xl border border-border overflow-hidden relative min-h-40 md:min-h-56"
+                      className="rounded-xl border border-border overflow-hidden relative"
                     >
                       {!c.imageUrl && (
                         <button
