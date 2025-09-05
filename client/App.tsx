@@ -42,6 +42,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<GetStarted />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/auth/google/complete" element={<GoogleComplete />} />
           <Route path="/student-auth" element={<StudentAuth />} />
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/classes" element={<Classes />} />
