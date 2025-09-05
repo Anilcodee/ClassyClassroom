@@ -16,8 +16,8 @@ export default function GetStarted() {
           </h1>
 
           <p className="mt-4 text-base sm:text-lg text-foreground/70">
-            Create classes, take attendance with QR, share announcements, and keep
-            students engaged. Designed to be fast and mobile friendly.
+            Create classes, take attendance with QR, share announcements, and
+            keep students engaged. Designed to be fast and mobile friendly.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -37,12 +37,15 @@ export default function GetStarted() {
 
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
-              'Create and manage classes with cover images',
-              'Start timed QR attendance sessions',
-              'Download PDFs and view attendance history',
-              'Post announcements and comments',
+              "Create and manage classes with cover images",
+              "Start timed QR attendance sessions",
+              "Download PDFs and view attendance history",
+              "Post announcements and comments",
             ].map((t) => (
-              <div key={t} className="flex items-start justify-start gap-3 p-3 rounded-lg border border-border bg-white/50">
+              <div
+                key={t}
+                className="flex items-start justify-start gap-3 p-3 rounded-lg border border-border bg-white/50"
+              >
                 <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
                 <div className="text-sm text-foreground/80">{t}</div>
               </div>
@@ -57,23 +60,40 @@ export default function GetStarted() {
               <div className="rounded-lg p-3 sm:p-4 bg-background/80 border border-border flex flex-col items-center">
                 <TeacherAnimation />
                 <div className="mt-3 text-sm font-semibold">For Teachers</div>
-                <div className="text-xs text-foreground/60 mt-1">Create classes, take attendance</div>
+                <div className="text-xs text-foreground/60 mt-1">
+                  Create classes, take attendance
+                </div>
               </div>
               <div className="rounded-lg p-3 sm:p-4 bg-background/80 border border-border flex flex-col items-center">
                 <StudentAnimation />
                 <div className="mt-3 text-sm font-semibold">For Students</div>
-                <div className="text-xs text-foreground/60 mt-1">Join classes, view attendance</div>
+                <div className="text-xs text-foreground/60 mt-1">
+                  Join classes, view attendance
+                </div>
               </div>
             </div>
             <div className="mt-4 flex gap-3 justify-center">
-              <Link to="/auth" className="px-4 py-2 rounded-md bg-primary text-primary-foreground">Teacher</Link>
-              <Link to="/student-auth" className="px-4 py-2 rounded-md border border-border">Student</Link>
+              <Link
+                to="/auth"
+                className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
+              >
+                Teacher
+              </Link>
+              <Link
+                to="/student-auth"
+                className="px-4 py-2 rounded-md border border-border"
+              >
+                Student
+              </Link>
             </div>
           </div>
 
           <div className="rounded-2xl border border-border p-4 sm:p-6 bg-card text-foreground/80 shadow-sm">
             <h3 className="text-sm font-semibold mb-2">Why ClassyClassroom?</h3>
-            <p className="text-sm">Fast, private, and built for classrooms. No clutter — just the tools teachers and students need.</p>
+            <p className="text-sm">
+              Fast, private, and built for classrooms. No clutter — just the
+              tools teachers and students need.
+            </p>
           </div>
         </div>
       </section>
@@ -85,7 +105,10 @@ function TeacherAnimation() {
   return (
     <div className="relative w-full rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-4 sm:p-6 overflow-hidden">
       <div className="absolute -top-12 -right-12 sm:-top-20 sm:-right-20 h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
-      <svg viewBox="0 0 200 200" className="w-full max-w-[240px] mx-auto h-44 sm:h-56">
+      <svg
+        viewBox="0 0 200 200"
+        className="w-full max-w-[240px] mx-auto h-44 sm:h-56"
+      >
         <circle cx="100" cy="100" r="90" className="fill-[hsl(var(--muted))]" />
         <g className="origin-[120px_70px] animate-wave">
           <circle
@@ -135,7 +158,10 @@ function StudentAnimation() {
   return (
     <div className="relative w-full rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-4 sm:p-6 overflow-hidden">
       <div className="absolute -bottom-8 -left-8 sm:-bottom-16 sm:-left-16 h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-gradient-to-tr from-blue-400/40 to-cyan-700/40 blur-3xl" />
-      <svg viewBox="0 0 200 200" className="w-full max-w-[240px] mx-auto h-44 sm:h-56">
+      <svg
+        viewBox="0 0 200 200"
+        className="w-full max-w-[240px] mx-auto h-44 sm:h-56"
+      >
         <circle cx="100" cy="100" r="90" className="fill-[hsl(var(--muted))]" />
         {/* Head */}
         <circle cx="90" cy="70" r="12" className="fill-blue-500" />

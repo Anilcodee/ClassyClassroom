@@ -42,7 +42,11 @@ export default function GoogleComplete() {
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
-        throw new Error((data && (data.message || data.error)) || res.statusText || "Request failed");
+        throw new Error(
+          (data && (data.message || data.error)) ||
+            res.statusText ||
+            "Request failed",
+        );
       }
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
@@ -58,11 +62,17 @@ export default function GoogleComplete() {
   return (
     <main className="container mx-auto min-h-[calc(100vh-56px)] grid place-items-center py-12">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-xl">
-        <h2 className="text-lg font-semibold mb-4">Finish signing up with Google</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          Finish signing up with Google
+        </h2>
         <form onSubmit={handleComplete} className="space-y-4">
           <div>
             <label className="block text-sm mb-1">Email</label>
-            <input className="w-full rounded-lg border border-input bg-background px-3 py-2" value={email} readOnly />
+            <input
+              className="w-full rounded-lg border border-input bg-background px-3 py-2"
+              value={email}
+              readOnly
+            />
           </div>
 
           {roleParam === "student" && (
@@ -97,13 +107,24 @@ export default function GoogleComplete() {
               required
               minLength={6}
             />
-            <p className="text-xs text-foreground/60 mt-1">This password will be used to link or create your account for email/password sign-in.</p>
+            <p className="text-xs text-foreground/60 mt-1">
+              This password will be used to link or create your account for
+              email/password sign-in.
+            </p>
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
 
-          <button disabled={loading} className="w-full rounded-lg bg-primary text-primary-foreground py-2 font-semibold hover:opacity-90 disabled:opacity-60" type="submit">
-            {loading ? "Please wait…" : existing ? "Verify and link account" : "Create account"}
+          <button
+            disabled={loading}
+            className="w-full rounded-lg bg-primary text-primary-foreground py-2 font-semibold hover:opacity-90 disabled:opacity-60"
+            type="submit"
+          >
+            {loading
+              ? "Please wait…"
+              : existing
+                ? "Verify and link account"
+                : "Create account"}
           </button>
         </form>
       </div>

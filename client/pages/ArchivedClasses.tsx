@@ -17,9 +17,12 @@ export default function ArchivedClasses() {
       if (token) headers.Authorization = `Bearer ${token}`;
       let res: Response;
       const resolvedUrl =
-        typeof location !== "undefined" ? `${location.origin}/api/classes/archived` : "/api/classes/archived";
+        typeof location !== "undefined"
+          ? `${location.origin}/api/classes/archived`
+          : "/api/classes/archived";
       try {
-        const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
+        const nativeFetch =
+          (globalThis as any).fetch?.bind(globalThis) ?? fetch;
         try {
           res = await nativeFetch(resolvedUrl, { headers, cache: "no-store" });
         } catch (e) {
@@ -40,16 +43,22 @@ export default function ArchivedClasses() {
                 const hdrs: Record<string, string> = {};
                 try {
                   const raw = xhr.getAllResponseHeaders() || "";
-                  raw.trim().split(/\r?\n/).forEach((line) => {
-                    const idx = line.indexOf(":");
-                    if (idx > 0) {
-                      const k = line.slice(0, idx).trim();
-                      const v = line.slice(idx + 1).trim();
-                      hdrs[k] = v;
-                    }
-                  });
+                  raw
+                    .trim()
+                    .split(/\r?\n/)
+                    .forEach((line) => {
+                      const idx = line.indexOf(":");
+                      if (idx > 0) {
+                        const k = line.slice(0, idx).trim();
+                        const v = line.slice(idx + 1).trim();
+                        hdrs[k] = v;
+                      }
+                    });
                 } catch {}
-                const responseInit: ResponseInit = { status: xhr.status, headers: hdrs };
+                const responseInit: ResponseInit = {
+                  status: xhr.status,
+                  headers: hdrs,
+                };
                 resolve(new Response(xhr.responseText, responseInit));
               };
               xhr.onerror = () => reject(new Error("XHR error"));
@@ -64,7 +73,8 @@ export default function ArchivedClasses() {
         throw e;
       }
       const d = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(d?.message || res.statusText || "Failed to load");
+      if (!res.ok)
+        throw new Error(d?.message || res.statusText || "Failed to load");
       const list = (d.classes || []).map((c: any) => ({
         id: c._id,
         name: c.name,
@@ -85,9 +95,14 @@ export default function ArchivedClasses() {
   async function unarchive(id: string) {
     try {
       const token = localStorage.getItem("token");
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
       if (token) headers.Authorization = `Bearer ${token}`;
-      const res = await fetch(`/api/classes/${id}/unarchive`, { method: "PATCH", headers });
+      const res = await fetch(`/api/classes/${id}/unarchive`, {
+        method: "PATCH",
+        headers,
+      });
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d?.message || res.statusText);
       toast({ title: "Class unarchived" });
@@ -101,7 +116,12 @@ export default function ArchivedClasses() {
 
   return (
     <main className="container mx-auto py-10 px-4">
-      <Link to="/classes" className="text-sm text-foreground/70 hover:text-foreground">← Back to classes</Link>
+      <Link
+        to="/classes"
+        className="text-sm text-foreground/70 hover:text-foreground"
+      >
+        ← Back to classes
+      </Link>
       <h2 className="text-lg font-semibold mb-4 mt-4">Archived classes</h2>
       {loading ? (
         <p className="text-sm text-foreground/70">Loading…</p>
@@ -112,10 +132,17 @@ export default function ArchivedClasses() {
       ) : (
         <ul className="space-y-3">
           {archived.map((c) => (
-            <li key={c.id} className="rounded-xl border border-border overflow-hidden relative">
+            <li
+              key={c.id}
+              className="rounded-xl border border-border overflow-hidden relative"
+            >
               {c.imageUrl ? (
                 <div className="w-full h-36 sm:h-28 md:h-40 lg:h-48">
-                  <img src={c.imageUrl} alt="Class cover" className="w-full h-full object-cover" />
+                  <img
+                    src={c.imageUrl}
+                    alt="Class cover"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               ) : (
                 <div className="w-full h-36 sm:h-28 md:h-40 lg:h-48 bg-muted/50" />
@@ -135,16 +162,39 @@ export default function ArchivedClasses() {
                   </button>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <button disabled className="px-2.5 py-1.5 rounded-md text-xs bg-primary text-primary-foreground text-center opacity-50 cursor-not-allowed w-full sm:w-auto">Attendance</button>
-                  <button disabled className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground text-center opacity-50 cursor-not-allowed w-full sm:w-auto">Messages</button>
-                  <button disabled className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background text-center opacity-50 cursor-not-allowed w-full sm:w-auto">Modify</button>
+                  <button
+                    disabled
+                    className="px-2.5 py-1.5 rounded-md text-xs bg-primary text-primary-foreground text-center opacity-50 cursor-not-allowed w-full sm:w-auto"
+                  >
+                    Attendance
+                  </button>
+                  <button
+                    disabled
+                    className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground text-center opacity-50 cursor-not-allowed w-full sm:w-auto"
+                  >
+                    Messages
+                  </button>
+                  <button
+                    disabled
+                    className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background text-center opacity-50 cursor-not-allowed w-full sm:w-auto"
+                  >
+                    Modify
+                  </button>
                 </div>
                 {archMenuFor === c.id && (
                   <div className="absolute z-20 right-2 top-12 rounded-md border border-border bg-background shadow flex flex-col items-end max-w-xs sm:max-w-sm overflow-auto">
                     <div className="sm:hidden block w-full px-2 py-1 text-right">
-                      <button className="text-sm" onClick={() => setArchMenuFor("")}>Close</button>
+                      <button
+                        className="text-sm"
+                        onClick={() => setArchMenuFor("")}
+                      >
+                        Close
+                      </button>
                     </div>
-                    <button className="text-left px-2 py-1 text-sm hover:bg-accent whitespace-nowrap ml-auto" onClick={() => unarchive(c.id)}>
+                    <button
+                      className="text-left px-2 py-1 text-sm hover:bg-accent whitespace-nowrap ml-auto"
+                      onClick={() => unarchive(c.id)}
+                    >
                       Unarchive
                     </button>
                   </div>

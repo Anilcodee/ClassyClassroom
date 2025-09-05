@@ -49,14 +49,32 @@ const App = () => (
           <Route path="/get-started" element={<GetStarted />} />
           <Route path="/classes/:id" element={<ClassDetail />} />
           <Route path="/classes/:id/history" element={<AttendanceHistory />} />
-          <Route path="/student/classes/:id/attendance" element={<StudentAttendance />} />
+          <Route
+            path="/student/classes/:id/attendance"
+            element={<StudentAttendance />}
+          />
           <Route path="/classes/:id/messages" element={<ClassMessages />} />
-          <Route path="/classes/:id/messages/new" element={<ClassMessageCompose />} />
-          <Route path="/classes/:id/assignments" element={<ClassAssignments />} />
-          <Route path="/classes/:id/assignments/new" element={<AssignmentCreate />} />
+          <Route
+            path="/classes/:id/messages/new"
+            element={<ClassMessageCompose />}
+          />
+          <Route
+            path="/classes/:id/assignments"
+            element={<ClassAssignments />}
+          />
+          <Route
+            path="/classes/:id/assignments/new"
+            element={<AssignmentCreate />}
+          />
           <Route path="/assign/:assignmentId" element={<AssignmentSubmit />} />
-          <Route path="/assign/:assignmentId/edit" element={<AssignmentEdit />} />
-          <Route path="/classes/:id/assignments/drafts" element={<AssignmentDrafts />} />
+          <Route
+            path="/assign/:assignmentId/edit"
+            element={<AssignmentEdit />}
+          />
+          <Route
+            path="/classes/:id/assignments/drafts"
+            element={<AssignmentDrafts />}
+          />
           <Route path="/classes/:id/modify" element={<ModifyClass />} />
           <Route path="/classes/archived" element={<ArchivedClasses />} />
           <Route path="/session/:sessionId" element={<Session />} />

@@ -68,19 +68,35 @@ export default function Classes() {
       // Use globalThis.fetch to avoid potential site wrappers; ensure we always return a Response or a handled error
       const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
       const resolvedUrl =
-        typeof location !== "undefined" && typeof url === "string" && url.startsWith("/")
+        typeof location !== "undefined" &&
+        typeof url === "string" &&
+        url.startsWith("/")
           ? `${location.origin}${url}`
           : url;
       // Diagnostic: resolved URL
-      try { console.debug("fetchWithRetry resolvedUrl:", resolvedUrl); } catch {}
-      const options = { ...rest, signal, credentials: (rest as any).credentials ?? 'same-origin', mode: (rest as any).mode ?? 'cors' } as any;
+      try {
+        console.debug("fetchWithRetry resolvedUrl:", resolvedUrl);
+      } catch {}
+      const options = {
+        ...rest,
+        signal,
+        credentials: (rest as any).credentials ?? "same-origin",
+        mode: (rest as any).mode ?? "cors",
+      } as any;
       const res = await nativeFetch(resolvedUrl, options);
       return res;
     } catch (e: any) {
       // Diagnostic logging to help identify failing URL and error
       try {
         // eslint-disable-next-line no-console
-        console.error("fetchWithRetry error", JSON.stringify({ url, attempt, error: String(e && e.message ? e.message : e) }));
+        console.error(
+          "fetchWithRetry error",
+          JSON.stringify({
+            url,
+            attempt,
+            error: String(e && e.message ? e.message : e),
+          }),
+        );
       } catch {}
 
       // If fetch throws synchronously (some wrappers may), try an XHR fallback for GET/POST/PATCH
@@ -102,16 +118,22 @@ export default function Classes() {
               const hdrs: Record<string, string> = {};
               try {
                 const raw = xhr.getAllResponseHeaders() || "";
-                raw.trim().split(/\r?\n/).forEach((line) => {
-                  const idx = line.indexOf(":");
-                  if (idx > 0) {
-                    const k = line.slice(0, idx).trim();
-                    const v = line.slice(idx + 1).trim();
-                    hdrs[k] = v;
-                  }
-                });
+                raw
+                  .trim()
+                  .split(/\r?\n/)
+                  .forEach((line) => {
+                    const idx = line.indexOf(":");
+                    if (idx > 0) {
+                      const k = line.slice(0, idx).trim();
+                      const v = line.slice(idx + 1).trim();
+                      hdrs[k] = v;
+                    }
+                  });
               } catch {}
-              const responseInit: ResponseInit = { status: xhr.status, headers: hdrs };
+              const responseInit: ResponseInit = {
+                status: xhr.status,
+                headers: hdrs,
+              };
               resolve(new Response(xhr.responseText, responseInit));
             };
             xhr.onerror = () => reject(new Error("XHR error"));
@@ -168,12 +190,23 @@ export default function Classes() {
 
       // Quick server ping to detect CORS / connectivity issues early
       try {
-        const pingRes = await fetchWithRetry("/api/ping", { headers, cache: 'no-store', timeoutMs: 3000 });
-        if (!pingRes || pingRes.status === 0 || pingRes.status === 499 || !pingRes.ok) {
-          throw new Error('Server ping failed');
+        const pingRes = await fetchWithRetry("/api/ping", {
+          headers,
+          cache: "no-store",
+          timeoutMs: 3000,
+        });
+        if (
+          !pingRes ||
+          pingRes.status === 0 ||
+          pingRes.status === 499 ||
+          !pingRes.ok
+        ) {
+          throw new Error("Server ping failed");
         }
       } catch (e) {
-        throw new Error('Cannot reach API server (ping failed). Please check network or server logs.');
+        throw new Error(
+          "Cannot reach API server (ping failed). Please check network or server logs.",
+        );
       }
 
       const res = await fetchWithRetry("/api/classes", {
@@ -428,7 +461,9 @@ export default function Classes() {
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex flex-col items-start gap-2 min-w-0">
                             <div className="flex items-center gap-0.5 min-w-0">
-                              <p className="font-medium truncate flex-1 min-w-0 mr-1">{c.name}</p>
+                              <p className="font-medium truncate flex-1 min-w-0 mr-1">
+                                {c.name}
+                              </p>
                               <div className="flex items-center gap-0.5 flex-shrink-0">
                                 <button
                                   className="p-1 rounded border border-border hover:bg-accent group"
@@ -438,7 +473,10 @@ export default function Classes() {
                                     navigator.clipboard
                                       .writeText(code)
                                       .then(() => {
-                                        toast({ title: "Copied", description: "Join code copied" });
+                                        toast({
+                                          title: "Copied",
+                                          description: "Join code copied",
+                                        });
                                       })
                                       .catch(() => {});
                                   }}
@@ -460,7 +498,14 @@ export default function Classes() {
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                   >
-                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <rect
+                                      x="9"
+                                      y="9"
+                                      width="13"
+                                      height="13"
+                                      rx="2"
+                                      ry="2"
+                                    ></rect>
                                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                                   </svg>
                                 </button>
@@ -510,7 +555,8 @@ export default function Classes() {
                                     meta &&
                                     meta.latestAt &&
                                     (!userId ||
-                                      String(meta.latestBy) !== String(userId)) &&
+                                      String(meta.latestBy) !==
+                                        String(userId)) &&
                                     meta.latestAt > seen;
                                   return isNew ? (
                                     <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 shadow ring-2 ring-background" />
@@ -542,7 +588,12 @@ export default function Classes() {
                         {menuOpenFor === c.id && (
                           <div className="absolute z-20 right-4 top-12 sm:right-4 sm:top-12 rounded-md border border-border bg-background shadow flex flex-col items-end max-w-xs sm:max-w-sm overflow-auto">
                             <div className="sm:hidden block w-full px-2 py-1 text-right">
-                              <button className="text-sm" onClick={() => setMenuOpenFor("")}>Close</button>
+                              <button
+                                className="text-sm"
+                                onClick={() => setMenuOpenFor("")}
+                              >
+                                Close
+                              </button>
                             </div>
                             <button
                               className="text-left px-2 py-1 text-sm hover:bg-accent whitespace-nowrap ml-auto"
