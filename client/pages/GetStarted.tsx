@@ -42,7 +42,7 @@ export default function GetStarted() {
               'Download PDFs and view attendance history',
               'Post announcements and comments',
             ].map((t) => (
-              <div key={t} className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card/50">
+              <div key={t} className="flex items-start justify-start gap-3 p-3 rounded-lg border border-border bg-white/50">
                 <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
                 <div className="text-sm text-foreground/80">{t}</div>
               </div>
