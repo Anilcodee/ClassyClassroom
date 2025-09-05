@@ -134,13 +134,16 @@ export default function ArchivedClasses() {
                     <MoreVertical className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="mt-4 flex flex-row gap-2">
-                  <button disabled className="px-2.5 py-1.5 rounded-md text-xs bg-primary text-primary-foreground text-center opacity-50 cursor-not-allowed">Attendance</button>
-                  <button disabled className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground text-center opacity-50 cursor-not-allowed">Messages</button>
-                  <button disabled className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background text-center opacity-50 cursor-not-allowed">Modify</button>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button disabled className="px-2.5 py-1.5 rounded-md text-xs bg-primary text-primary-foreground text-center opacity-50 cursor-not-allowed w-full sm:w-auto">Attendance</button>
+                  <button disabled className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground text-center opacity-50 cursor-not-allowed w-full sm:w-auto">Messages</button>
+                  <button disabled className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background text-center opacity-50 cursor-not-allowed w-full sm:w-auto">Modify</button>
                 </div>
                 {archMenuFor === c.id && (
-                  <div className="absolute z-20 right-4 top-12 rounded-md border border-border bg-background shadow flex flex-col items-end">
+                  <div className="absolute z-20 right-2 top-12 rounded-md border border-border bg-background shadow flex flex-col items-end max-w-xs sm:max-w-sm overflow-auto">
+                    <div className="sm:hidden block w-full px-2 py-1 text-right">
+                      <button className="text-sm" onClick={() => setArchMenuFor("")}>Close</button>
+                    </div>
                     <button className="text-left px-2 py-1 text-sm hover:bg-accent whitespace-nowrap ml-auto" onClick={() => unarchive(c.id)}>
                       Unarchive
                     </button>
