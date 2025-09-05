@@ -26,8 +26,6 @@ export default function Classes() {
   const userId = userRaw ? JSON.parse(userRaw)?.id || null : null;
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
-  const [archived, setArchived] = React.useState<ClassItem[]>([]);
-  const [archMenuFor, setArchMenuFor] = React.useState<string>("");
   const [selectedId, setSelectedId] = React.useState<string>("");
   const [showCodeFor, setShowCodeFor] = React.useState<string>("");
   const [menuOpenFor, setMenuOpenFor] = React.useState<string>("");
@@ -67,22 +65,113 @@ export default function Classes() {
   ): Promise<Response> {
     const { signal, ...rest } = init as any;
     try {
-      return await fetch(url, { ...rest, signal });
+      // Use globalThis.fetch to avoid potential site wrappers; ensure we always return a Response or a handled error
+      const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
+      const resolvedUrl =
+        typeof location !== "undefined" &&
+        typeof url === "string" &&
+        url.startsWith("/")
+          ? `${location.origin}${url}`
+          : url;
+      // Diagnostic: resolved URL
+      try {
+        console.debug("fetchWithRetry resolvedUrl:", resolvedUrl);
+      } catch {}
+      const options = {
+        ...rest,
+        signal,
+        credentials: (rest as any).credentials ?? "same-origin",
+        mode: (rest as any).mode ?? "cors",
+      } as any;
+      const res = await nativeFetch(resolvedUrl, options);
+      return res;
     } catch (e: any) {
+      // Diagnostic logging to help identify failing URL and error
+      try {
+        // eslint-disable-next-line no-console
+        console.error(
+          "fetchWithRetry error",
+          JSON.stringify({
+            url,
+            attempt,
+            error: String(e && e.message ? e.message : e),
+          }),
+        );
+      } catch {}
+
+      // If fetch throws synchronously (some wrappers may), try an XHR fallback for GET/POST/PATCH
+      try {
+        const method = (rest && rest.method) || "GET";
+        const headers = (rest && rest.headers) || {};
+        const body = (rest && rest.body) || null;
+        const xhrRes = await new Promise<Response>((resolve, reject) => {
+          try {
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, resolvedUrl, true);
+            Object.keys(headers || {}).forEach((hk) => {
+              try {
+                xhr.setRequestHeader(hk, (headers as any)[hk]);
+              } catch {}
+            });
+            xhr.onreadystatechange = () => {
+              if (xhr.readyState !== 4) return;
+              const hdrs: Record<string, string> = {};
+              try {
+                const raw = xhr.getAllResponseHeaders() || "";
+                raw
+                  .trim()
+                  .split(/\r?\n/)
+                  .forEach((line) => {
+                    const idx = line.indexOf(":");
+                    if (idx > 0) {
+                      const k = line.slice(0, idx).trim();
+                      const v = line.slice(idx + 1).trim();
+                      hdrs[k] = v;
+                    }
+                  });
+              } catch {}
+              const responseInit: ResponseInit = {
+                status: xhr.status,
+                headers: hdrs,
+              };
+              resolve(new Response(xhr.responseText, responseInit));
+            };
+            xhr.onerror = () => reject(new Error("XHR error"));
+            if (body) xhr.send(body as any);
+            else xhr.send();
+          } catch (err) {
+            reject(err);
+          }
+        });
+        return xhrRes;
+      } catch (xhrErr) {
+        // ignore and continue to other handling
+      }
+
+      // Normalize abort errors
       const aborted =
-        (signal && (signal as any).aborted) || e?.name === "AbortError";
-      if (aborted)
+        (signal && (signal as any).aborted) ||
+        e?.name === "AbortError" ||
+        e?.message === "The user aborted a request.";
+      if (aborted) {
         return new Response(JSON.stringify({ message: "aborted" }), {
           status: 499,
           headers: { "Content-Type": "application/json" },
         });
+      }
+      // Retry a few times for transient network errors
       if (
         attempt < 3 &&
         (typeof navigator === "undefined" || navigator.onLine !== false)
       ) {
         await new Promise((r) => setTimeout(r, 300 * attempt));
-        return fetchWithRetry(url, init, attempt + 1);
+        try {
+          return await fetchWithRetry(url, init, attempt + 1);
+        } catch (err) {
+          // If recursive call somehow throws, fallthrough to return network error
+        }
       }
+      // Return a synthetic Response instead of throwing so callers can handle uniformly
       return new Response(JSON.stringify({ message: "Network error" }), {
         status: 0,
         headers: { "Content-Type": "application/json" },
@@ -98,6 +187,28 @@ export default function Classes() {
       if (token) headers.Authorization = `Bearer ${token}`;
       const ok = await canReachOrigin();
       if (!ok) throw new Error("Network error. Please retry.");
+
+      // Quick server ping to detect CORS / connectivity issues early
+      try {
+        const pingRes = await fetchWithRetry("/api/ping", {
+          headers,
+          cache: "no-store",
+          timeoutMs: 3000,
+        });
+        if (
+          !pingRes ||
+          pingRes.status === 0 ||
+          pingRes.status === 499 ||
+          !pingRes.ok
+        ) {
+          throw new Error("Server ping failed");
+        }
+      } catch (e) {
+        throw new Error(
+          "Cannot reach API server (ping failed). Please check network or server logs.",
+        );
+      }
+
       const res = await fetchWithRetry("/api/classes", {
         headers,
         cache: "no-store",
@@ -140,24 +251,6 @@ export default function Classes() {
           };
         });
         setLatestMap(map);
-      }
-      // archived list
-      const ar = await fetchWithRetry("/api/classes/archived", {
-        headers,
-        cache: "no-store",
-      });
-      if (ar.status !== 0 && ar.status !== 499) {
-        const ad = await ar.json().catch(() => ({}));
-        if (ar.ok)
-          setArchived(
-            (ad.classes || []).map((c: any) => ({
-              id: c._id,
-              name: c.name,
-              joinCode: "",
-              isActive: false,
-              imageUrl: c.imageUrl,
-            })),
-          );
       }
     } catch (e: any) {
       setError(e.message || "Network error");
@@ -229,12 +322,12 @@ export default function Classes() {
           void handlePickedFile(f, imagePickFor);
         }}
       />
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
         <div className="md:col-span-2">
           <MakeClassCard onCreated={load} />
         </div>
-        <aside className="md:col-span-1 space-y-5 self-start">
-          <div className="rounded-2xl border border-border p-5 bg-card shadow">
+        <aside className="md:col-span-1 space-y-5 flex flex-col h-full">
+          <div className="rounded-2xl border border-border p-5 bg-card shadow flex-none">
             <h3 className="font-semibold mb-2">Downloads</h3>
             <p className="text-sm text-foreground/70 mb-3">
               Download PDF list (all days) for a specific class.
@@ -281,66 +374,13 @@ export default function Classes() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border p-5 bg-card shadow">
+          <div className="rounded-2xl border border-border p-5 bg-card shadow flex-1 flex flex-col h-full">
             <h3 className="font-semibold mb-2">Archived classes</h3>
-            {archived.length === 0 ? (
-              <p className="text-sm text-foreground/70">No archived classes.</p>
-            ) : (
-              <ul className="divide-y divide-border">
-                {archived.map((c) => (
-                  <li
-                    key={c.id}
-                    className="py-2 flex items-center justify-between gap-2"
-                  >
-                    <span className="truncate">{c.name}</span>
-                    <div className="relative">
-                      <button
-                        className="p-1 rounded hover:bg-accent"
-                        onClick={() =>
-                          setArchMenuFor(archMenuFor === c.id ? "" : c.id)
-                        }
-                        title="More"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-                      {archMenuFor === c.id && (
-                        <div className="absolute right-0 top-6 z-20 w-40 rounded-md border border-border bg-background shadow">
-                          <button
-                            className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
-                            onClick={async () => {
-                              try {
-                                const token = localStorage.getItem("token");
-                                const headers: Record<string, string> = {
-                                  "Content-Type": "application/json",
-                                };
-                                if (token)
-                                  headers.Authorization = `Bearer ${token}`;
-                                const res = await fetch(
-                                  `/api/classes/${c.id}/unarchive`,
-                                  { method: "PATCH", headers },
-                                );
-                                const d = await res.json().catch(() => ({}));
-                                if (!res.ok)
-                                  throw new Error(d?.message || res.statusText);
-                                setArchMenuFor("");
-                                await load();
-                              } catch (e: any) {
-                                toast({
-                                  title: "Failed to unarchive",
-                                  description: e.message || "",
-                                });
-                              }
-                            }}
-                          >
-                            Unarchive
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <Link to="/classes/archived" className="flex-1">
+              <button className="w-full h-full flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium">
+                View archived classes
+              </button>
+            </Link>
           </div>
         </aside>
         <div className="md:col-span-3">
@@ -392,7 +432,6 @@ export default function Classes() {
                     <li
                       key={c.id}
                       className="rounded-xl border border-border overflow-hidden relative"
-                      style={{ minHeight: "10rem" }}
                     >
                       {!c.imageUrl && (
                         <button
@@ -408,7 +447,7 @@ export default function Classes() {
                         </button>
                       )}
                       {c.imageUrl ? (
-                        <div className="w-full h-28 md:h-40">
+                        <div className="w-full h-36 sm:h-28 md:h-40 lg:h-48">
                           <img
                             src={c.imageUrl}
                             alt="Class cover"
@@ -416,11 +455,125 @@ export default function Classes() {
                           />
                         </div>
                       ) : (
-                        <div className="w-full h-28 md:h-40 bg-muted/50" />
+                        <div className="w-full h-36 sm:h-28 md:h-40 lg:h-48 bg-muted/50" />
                       )}
                       <div className="p-5 relative">
                         <div className="flex items-start justify-between gap-2">
-                          <p className="font-medium truncate pr-8">{c.name}</p>
+                          <div className="flex flex-col items-start gap-2 min-w-0">
+                            <div className="flex items-center gap-0.5 min-w-0">
+                              <p className="font-medium truncate flex-1 min-w-0 mr-1">
+                                {c.name}
+                              </p>
+                              <div className="flex items-center gap-0.5 flex-shrink-0">
+                                <button
+                                  className="p-1 rounded border border-border hover:bg-accent group"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const code = c.joinCode;
+                                    navigator.clipboard
+                                      .writeText(code)
+                                      .then(() => {
+                                        toast({
+                                          title: "Copied",
+                                          description: "Join code copied",
+                                        });
+                                      })
+                                      .catch(() => {});
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.stopPropagation();
+                                    setShowCodeFor(c.id);
+                                  }}
+                                  onMouseLeave={() => setShowCodeFor("")}
+                                  title="Copy join code"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <rect
+                                      x="9"
+                                      y="9"
+                                      width="13"
+                                      height="13"
+                                      rx="2"
+                                      ry="2"
+                                    ></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                  </svg>
+                                </button>
+                                {showCodeFor === c.id && (
+                                  <span className="ml-2 inline-block font-mono px-1.5 py-0.5 rounded bg-muted text-foreground/80 shadow">
+                                    {c.joinCode}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="mt-1 flex flex-row gap-2 flex-nowrap sm:flex-wrap">
+                              <Link
+                                to={`/classes/${c.id}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="h-8 px-2.5 rounded-md text-xs inline-flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90"
+                                title="View attendance"
+                              >
+                                Attendance
+                              </Link>
+                              <div className="relative inline-block">
+                                <Link
+                                  to={`/classes/${c.id}/messages`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    try {
+                                      localStorage.setItem(
+                                        `lastSeenMsgs:${c.id}`,
+                                        String(Date.now()),
+                                      );
+                                    } catch {}
+                                  }}
+                                  className="h-8 px-2.5 rounded-md text-xs inline-flex items-center justify-center bg-secondary text-secondary-foreground hover:opacity-90"
+                                  title="Messages"
+                                >
+                                  Messages
+                                </Link>
+                                {(() => {
+                                  const meta = latestMap[c.id];
+                                  const key = `lastSeenMsgs:${c.id}`;
+                                  const seen = Number(
+                                    typeof window !== "undefined"
+                                      ? localStorage.getItem(key) || 0
+                                      : 0,
+                                  );
+                                  const isNew =
+                                    meta &&
+                                    meta.latestAt &&
+                                    (!userId ||
+                                      String(meta.latestBy) !==
+                                        String(userId)) &&
+                                    meta.latestAt > seen;
+                                  return isNew ? (
+                                    <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 shadow ring-2 ring-background" />
+                                  ) : null;
+                                })()}
+                              </div>
+                              <Link
+                                to={`/classes/${c.id}/modify`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="h-8 px-2.5 rounded-md text-xs inline-flex items-center justify-center border border-border bg-background hover:bg-accent hover:text-accent-foreground"
+                                title="Modify class"
+                              >
+                                Modify
+                              </Link>
+                            </div>
+                          </div>
+
                           <button
                             className="p-1 rounded hover:bg-accent"
                             title="More"
@@ -432,77 +585,18 @@ export default function Classes() {
                             <MoreVertical className="h-4 w-4" />
                           </button>
                         </div>
-                        <div className="mt-2 text-xs text-foreground/60 flex items-center gap-2">
-                          <span className="relative inline-flex items-center">
-                            <button
-                              className="p-1 rounded border border-border hover:bg-accent group"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const code = c.joinCode;
-                                navigator.clipboard
-                                  .writeText(code)
-                                  .then(() => {
-                                    toast({
-                                      title: "Copied",
-                                      description: "Join code copied",
-                                    });
-                                  })
-                                  .catch(() => {
-                                    try {
-                                      const ta =
-                                        document.createElement("textarea");
-                                      ta.value = code;
-                                      document.body.appendChild(ta);
-                                      ta.select();
-                                      document.execCommand("copy");
-                                      document.body.removeChild(ta);
-                                      toast({
-                                        title: "Copied",
-                                        description: "Join code copied",
-                                      });
-                                    } catch {}
-                                  });
-                              }}
-                              onMouseEnter={(e) => {
-                                e.stopPropagation();
-                                setShowCodeFor(c.id);
-                              }}
-                              onMouseLeave={() => setShowCodeFor("")}
-                              title="Copy join code"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <rect
-                                  x="9"
-                                  y="9"
-                                  width="13"
-                                  height="13"
-                                  rx="2"
-                                  ry="2"
-                                ></rect>
-                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                              </svg>
-                            </button>
-                            {showCodeFor === c.id && (
-                              <span className="absolute left-full ml-2 font-mono px-1.5 py-0.5 rounded bg-muted text-foreground/80 shadow">
-                                {c.joinCode}
-                              </span>
-                            )}
-                          </span>
-                        </div>
                         {menuOpenFor === c.id && (
-                          <div className="absolute z-20 right-4 top-12 w-40 rounded-md border border-border bg-background shadow">
+                          <div className="absolute z-20 right-4 top-12 sm:right-4 sm:top-12 rounded-md border border-border bg-background shadow flex flex-col items-end max-w-xs sm:max-w-sm overflow-auto">
+                            <div className="sm:hidden block w-full px-2 py-1 text-right">
+                              <button
+                                className="text-sm"
+                                onClick={() => setMenuOpenFor("")}
+                              >
+                                Close
+                              </button>
+                            </div>
                             <button
-                              className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                              className="text-left px-2 py-1 text-sm hover:bg-accent whitespace-nowrap ml-auto"
                               onClick={async () => {
                                 try {
                                   const token = localStorage.getItem("token");
@@ -511,7 +605,7 @@ export default function Classes() {
                                   };
                                   if (token)
                                     headers.Authorization = `Bearer ${token}`;
-                                  const res = await fetch(
+                                  const res = await fetchWithRetry(
                                     `/api/classes/${c.id}/archive`,
                                     { method: "PATCH", headers },
                                   );
@@ -547,61 +641,6 @@ export default function Classes() {
                       >
                         {c.isActive ? "Active" : "Inactive"}
                       </span>
-                      {/* Action buttons bottom-right */}
-                      <div className="absolute bottom-3 right-3 z-10 flex flex-row gap-2">
-                        <Link
-                          to={`/classes/${c.id}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="px-2.5 py-1.5 rounded-md text-xs bg-primary text-primary-foreground hover:opacity-90 text-center"
-                          title="View attendance"
-                        >
-                          Attendance
-                        </Link>
-                        <div className="relative inline-block">
-                          <Link
-                            to={`/classes/${c.id}/messages`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              try {
-                                localStorage.setItem(
-                                  `lastSeenMsgs:${c.id}`,
-                                  String(Date.now()),
-                                );
-                              } catch {}
-                            }}
-                            className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground hover:opacity-90 text-center"
-                            title="Messages"
-                          >
-                            Messages
-                          </Link>
-                          {(() => {
-                            const meta = latestMap[c.id];
-                            const key = `lastSeenMsgs:${c.id}`;
-                            const seen = Number(
-                              typeof window !== "undefined"
-                                ? localStorage.getItem(key) || 0
-                                : 0,
-                            );
-                            const isNew =
-                              meta &&
-                              meta.latestAt &&
-                              (!userId ||
-                                String(meta.latestBy) !== String(userId)) &&
-                              meta.latestAt > seen;
-                            return isNew ? (
-                              <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 shadow ring-2 ring-background" />
-                            ) : null;
-                          })()}
-                        </div>
-                        <Link
-                          to={`/classes/${c.id}/modify`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background hover:bg-accent hover:text-accent-foreground text-center"
-                          title="Modify class"
-                        >
-                          Modify
-                        </Link>
-                      </div>
                     </li>
                   ))}
                 </ul>
@@ -672,7 +711,7 @@ function MakeClassCard({
   }
 
   return (
-    <div className="rounded-2xl border border-border p-6 bg-card shadow">
+    <div className="rounded-2xl border border-border p-6 bg-card shadow h-full">
       <div className="flex flex-col md:flex-row items-center gap-6">
         <div className="flex-1">
           <h2 className="text-2xl font-bold">Make your class</h2>
@@ -781,9 +820,11 @@ function MakeClassCard({
             </div>
           </div>
         </div>
-        <div className="w-48 h-48 relative">
+        <div className="w-full sm:w-40 h-40 sm:h-40 md:w-48 md:h-48 relative">
           <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-brand-400/30 to-brand-700/30 blur-2xl" />
-          <TeacherLoop />
+          <div className="relative w-full h-full flex items-center justify-center">
+            <TeacherLoop />
+          </div>
         </div>
       </div>
 

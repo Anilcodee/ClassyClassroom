@@ -20,6 +20,7 @@ import StudentAuth from "./pages/StudentAuth";
 import StudentDashboard from "./pages/StudentDashboard";
 import GetStarted from "./pages/GetStarted";
 import ClassMessages from "./pages/ClassMessages";
+import GoogleComplete from "./pages/GoogleComplete";
 import ClassMessageCompose from "./pages/ClassMessageCompose";
 import ClassAssignments from "./pages/ClassAssignments";
 import AssignmentSubmit from "./pages/AssignmentSubmit";
@@ -27,6 +28,7 @@ import AssignmentCreate from "./pages/AssignmentCreate";
 import AssignmentEdit from "./pages/AssignmentEdit";
 import AssignmentDrafts from "./pages/AssignmentDrafts";
 import ModifyClass from "./pages/ModifyClass";
+import ArchivedClasses from "./pages/ArchivedClasses";
 
 const queryClient = new QueryClient();
 
@@ -40,21 +42,41 @@ const App = () => (
         <Routes>
           <Route path="/" element={<GetStarted />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/auth/google/complete" element={<GoogleComplete />} />
           <Route path="/student-auth" element={<StudentAuth />} />
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/classes" element={<Classes />} />
           <Route path="/get-started" element={<GetStarted />} />
           <Route path="/classes/:id" element={<ClassDetail />} />
           <Route path="/classes/:id/history" element={<AttendanceHistory />} />
-          <Route path="/student/classes/:id/attendance" element={<StudentAttendance />} />
+          <Route
+            path="/student/classes/:id/attendance"
+            element={<StudentAttendance />}
+          />
           <Route path="/classes/:id/messages" element={<ClassMessages />} />
-          <Route path="/classes/:id/messages/new" element={<ClassMessageCompose />} />
-          <Route path="/classes/:id/assignments" element={<ClassAssignments />} />
-          <Route path="/classes/:id/assignments/new" element={<AssignmentCreate />} />
+          <Route
+            path="/classes/:id/messages/new"
+            element={<ClassMessageCompose />}
+          />
+          <Route
+            path="/classes/:id/assignments"
+            element={<ClassAssignments />}
+          />
+          <Route
+            path="/classes/:id/assignments/new"
+            element={<AssignmentCreate />}
+          />
           <Route path="/assign/:assignmentId" element={<AssignmentSubmit />} />
-          <Route path="/assign/:assignmentId/edit" element={<AssignmentEdit />} />
-          <Route path="/classes/:id/assignments/drafts" element={<AssignmentDrafts />} />
+          <Route
+            path="/assign/:assignmentId/edit"
+            element={<AssignmentEdit />}
+          />
+          <Route
+            path="/classes/:id/assignments/drafts"
+            element={<AssignmentDrafts />}
+          />
           <Route path="/classes/:id/modify" element={<ModifyClass />} />
+          <Route path="/classes/archived" element={<ArchivedClasses />} />
           <Route path="/session/:sessionId" element={<Session />} />
           <Route path="/attend/:sessionId" element={<Attend />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

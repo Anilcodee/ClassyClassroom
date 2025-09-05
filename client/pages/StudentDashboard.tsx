@@ -150,10 +150,9 @@ export default function StudentDashboard() {
                 <li
                   key={cid}
                   className="w-full rounded-xl border border-border overflow-hidden relative"
-                  style={{ minHeight: "10rem" }}
                 >
                   {c.imageUrl ? (
-                    <div className="w-full h-28 md:h-40">
+                    <div className="w-full h-36 sm:h-28 md:h-40 lg:h-48">
                       <img
                         src={c.imageUrl}
                         alt="Class cover"
@@ -161,7 +160,7 @@ export default function StudentDashboard() {
                       />
                     </div>
                   ) : (
-                    <div className="w-full h-28 md:h-40 bg-muted/50" />
+                    <div className="w-full h-36 sm:h-28 md:h-40 lg:h-48 bg-muted/50" />
                   )}
                   <div className="p-5 relative">
                     <div className="flex items-start justify-between gap-2">
@@ -183,7 +182,15 @@ export default function StudentDashboard() {
                       Joined
                     </div>
                     {menuOpenFor === String(cid) && (
-                      <div className="absolute z-20 right-4 top-12 w-40 rounded-md border border-border bg-background shadow">
+                      <div className="absolute z-20 right-2 top-12 w-44 sm:w-40 rounded-md border border-border bg-background shadow max-w-xs overflow-auto">
+                        <div className="sm:hidden block w-full px-2 py-1 text-right">
+                          <button
+                            className="text-sm"
+                            onClick={() => setMenuOpenFor("")}
+                          >
+                            Close
+                          </button>
+                        </div>
                         <button
                           className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
                           onClick={async () => {

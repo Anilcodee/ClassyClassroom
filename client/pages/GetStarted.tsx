@@ -4,100 +4,96 @@ import { CheckCircle } from "lucide-react";
 export default function GetStarted() {
   return (
     <main className="min-h-[calc(100vh-56px)] bg-gradient-to-b from-background via-background to-background">
-      <section className="container mx-auto px-4 grid lg:grid-cols-2 gap-12 sm:gap-14 py-10 sm:py-14 lg:py-16 items-center">
-        <div>
+      <section className="container mx-auto px-4 grid lg:grid-cols-2 gap-8 sm:gap-12 py-10 sm:py-12 items-center">
+        <div className="max-w-[975px]">
           <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-foreground/70 mb-4">
             <span className="h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
             Fast, secure classroom platform for teachers and students
           </div>
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
-            All‑in‑one classroom: attendance, messages, and more.
+
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
+            The smarter way to run your class — attendance, messages, and more.
           </h1>
-          <p className="mt-4 text-base sm:text-lg text-foreground/70 max-w-xl">
-            Teachers can create classes, run timed QR attendance, and post
-            announcements. Students join with a code, comment on posts, and
-            track their own attendance. PDFs, history, class covers, and
-            role‑based access included.
+
+          <p className="mt-4 text-base sm:text-lg text-foreground/70">
+            Create classes, take attendance with QR, share announcements, and
+            keep students engaged. Designed to be fast and mobile friendly.
           </p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <Link
-              to="/student-auth"
-              className="px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:opacity-90 w-full xs:w-auto text-center"
-            >
-              Sign in as Student
-            </Link>
+
+          <div className="mt-8 flex flex-wrap gap-3">
             <Link
               to="/auth"
-              className="px-5 py-3 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground w-full xs:w-auto text-center"
+              className="px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:opacity-95 shadow-md w-full sm:w-auto text-center"
             >
-              Sign in as Teacher
+              Get started as Teacher
+            </Link>
+            <Link
+              to="/student-auth"
+              className="px-5 py-3 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground w-full sm:w-auto text-center"
+            >
+              Try as Student
             </Link>
           </div>
-        </div>
-        <div className="space-y-10">
-          <div className="w-full max-w-3xl mx-auto">
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-4 text-sm text-foreground/80">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                <span className="flex-1">
-                  Create and manage classes with cover images
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                <span className="flex-1">
-                  Start timed QR attendance sessions
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                <span className="flex-1">
-                  Download PDFs and view attendance history
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                <span className="flex-1">
-                  Post announcements; edit/delete your posts
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                <span className="flex-1">Join classes via secure code</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                <span className="flex-1">
-                  See your classes and attendance days
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                <span className="flex-1">
-                  Comment on announcements (except your own)
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                <span className="flex-1">
-                  Clean, mobile‑friendly experience
-                </span>
-              </li>
-            </ul>
+
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[
+              "Create and manage classes with cover images",
+              "Start timed QR attendance sessions",
+              "Download PDFs and view attendance history",
+              "Post announcements and comments",
+            ].map((t) => (
+              <div
+                key={t}
+                className="flex items-start justify-start gap-3 p-3 rounded-lg border border-border bg-white/50"
+              >
+                <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                <div className="text-sm text-foreground/80">{t}</div>
+              </div>
+            ))}
           </div>
-          <div className="grid sm:grid-cols-2 gap-8 items-start text-center">
-            <div className="flex flex-col items-center">
-              <TeacherAnimation />
-              <div className="mt-2 text-sm font-semibold text-foreground/80">
-                For Teachers
+        </div>
+
+        <div className="flex flex-col items-stretch gap-6">
+          <div className="relative rounded-2xl border border-border bg-card shadow-xl overflow-hidden p-4 sm:p-6">
+            <div className="absolute -top-12 -right-12 sm:-top-16 sm:-right-16 h-40 w-40 sm:h-48 sm:w-48 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="rounded-lg p-3 sm:p-4 bg-background/80 border border-border flex flex-col items-center">
+                <TeacherAnimation />
+                <div className="mt-3 text-sm font-semibold">For Teachers</div>
+                <div className="text-xs text-foreground/60 mt-1">
+                  Create classes, take attendance
+                </div>
+              </div>
+              <div className="rounded-lg p-3 sm:p-4 bg-background/80 border border-border flex flex-col items-center">
+                <StudentAnimation />
+                <div className="mt-3 text-sm font-semibold">For Students</div>
+                <div className="text-xs text-foreground/60 mt-1">
+                  Join classes, view attendance
+                </div>
               </div>
             </div>
-            <div className="flex flex-col items-center">
-              <StudentAnimation />
-              <div className="mt-2 text-sm font-semibold text-foreground/80">
-                For Students
-              </div>
+            <div className="mt-4 flex gap-3 justify-center">
+              <Link
+                to="/auth"
+                className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
+              >
+                Teacher
+              </Link>
+              <Link
+                to="/student-auth"
+                className="px-4 py-2 rounded-md border border-border"
+              >
+                Student
+              </Link>
             </div>
+          </div>
+
+          <div className="rounded-2xl border border-border p-4 sm:p-6 bg-card text-foreground/80 shadow-sm">
+            <h3 className="text-sm font-semibold mb-2">Why ClassyClassroom?</h3>
+            <p className="text-sm">
+              Fast, private, and built for classrooms. No clutter — just the
+              tools teachers and students need.
+            </p>
           </div>
         </div>
       </section>
@@ -107,9 +103,12 @@ export default function GetStarted() {
 
 function TeacherAnimation() {
   return (
-    <div className="relative mx-auto max-w-2xl lg:max-w-3xl rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-8 sm:p-10 overflow-hidden">
-      <div className="absolute -top-20 -right-20 h-72 w-72 lg:h-80 lg:w-80 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
-      <svg viewBox="0 0 200 200" className="mx-auto h-56">
+    <div className="relative w-full rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-4 sm:p-6 overflow-hidden">
+      <div className="absolute -top-12 -right-12 sm:-top-20 sm:-right-20 h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
+      <svg
+        viewBox="0 0 200 200"
+        className="w-full max-w-[240px] mx-auto h-44 sm:h-56"
+      >
         <circle cx="100" cy="100" r="90" className="fill-[hsl(var(--muted))]" />
         <g className="origin-[120px_70px] animate-wave">
           <circle
@@ -157,9 +156,12 @@ function TeacherAnimation() {
 
 function StudentAnimation() {
   return (
-    <div className="relative mx-auto max-w-2xl lg:max-w-3xl rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-8 sm:p-10 overflow-hidden">
-      <div className="absolute -bottom-16 -left-16 h-72 w-72 lg:h-80 lg:w-80 rounded-full bg-gradient-to-tr from-blue-400/40 to-cyan-700/40 blur-3xl" />
-      <svg viewBox="0 0 200 200" className="mx-auto h-56">
+    <div className="relative w-full rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-4 sm:p-6 overflow-hidden">
+      <div className="absolute -bottom-8 -left-8 sm:-bottom-16 sm:-left-16 h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-gradient-to-tr from-blue-400/40 to-cyan-700/40 blur-3xl" />
+      <svg
+        viewBox="0 0 200 200"
+        className="w-full max-w-[240px] mx-auto h-44 sm:h-56"
+      >
         <circle cx="100" cy="100" r="90" className="fill-[hsl(var(--muted))]" />
         {/* Head */}
         <circle cx="90" cy="70" r="12" className="fill-blue-500" />

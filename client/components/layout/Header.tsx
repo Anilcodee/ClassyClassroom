@@ -75,8 +75,14 @@ export default function Header() {
           to={user ? (role === "teacher" ? "/classes" : "/student") : "/"}
           className="flex min-w-0 items-center gap-2 font-extrabold text-primary"
         >
-          <span className="inline-block h-7 w-7 rounded-md bg-gradient-to-br from-brand-500 to-brand-700"></span>
-          <span className="truncate">Attendify</span>
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-white p-0.5">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2F90e67de179a242f89a562f2630372521%2F391d17bbac48437d8d7c714743a9009e?format=webp&width=800"
+              alt="ClassyClassroom"
+              className="h-full w-full object-contain"
+            />
+          </span>
+          <span className="truncate">ClassyClassroom</span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
           {dynamicNav.map((n) => (
@@ -92,7 +98,7 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           {user ? (
             <>
               <span className="hidden sm:inline text-sm text-foreground/70">
@@ -109,15 +115,15 @@ export default function Header() {
             <div className="flex items-center gap-2">
               <Link
                 to="/student-auth"
-                className="px-3 py-1.5 rounded-md border border-border hover:bg-accent hover:text-accent-foreground"
+                className="px-2 py-1 rounded-md border border-border hover:bg-accent hover:text-accent-foreground text-sm sm:text-sm"
               >
-                Student login
+                Student
               </Link>
               <Link
                 to="/auth"
-                className="px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:opacity-90"
+                className="px-2 py-1 rounded-md bg-primary text-primary-foreground hover:opacity-90 text-sm sm:text-sm"
               >
-                Teacher login
+                Teacher
               </Link>
             </div>
           )}
