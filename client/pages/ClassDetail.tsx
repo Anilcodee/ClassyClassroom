@@ -169,17 +169,19 @@ export default function ClassDetail() {
               <img src={cls.imageUrl} alt="Class cover" className="w-full h-full object-cover" />
             </div>
           )}
-          <div className="flex items-start justify-between flex-wrap gap-3">
-            <h1 className="text-2xl font-bold flex items-center gap-3">
-              {cls.name}
-              {cls.isActive && mm && ss && (
-                <span className="text-base font-mono px-2 py-1 rounded-md bg-muted text-foreground/80">{mm}:{ss}</span>
-              )}
-            </h1>
-            <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <h1 className="text-2xl font-bold truncate">
+                {cls.name}
+                {cls.isActive && mm && ss && (
+                  <span className="text-base font-mono px-2 py-1 rounded-md bg-muted text-foreground/80 ml-2">{mm}:{ss}</span>
+                )}
+              </h1>
               <button disabled={cls.isActive} onClick={activate} className="px-3 py-2 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground disabled:opacity-50">
                 {cls.isActive ? "Inactive class" : "Activate class"}
               </button>
+            </div>
+            <div className="flex items-center gap-3">
               <button onClick={async ()=>{
                 const token = localStorage.getItem('token');
                 const headers: Record<string,string> = {};
