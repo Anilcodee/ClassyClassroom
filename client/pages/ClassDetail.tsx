@@ -18,20 +18,35 @@ export default function ClassDetail() {
   async function fetchWithRetry(url: string, init: RequestInit & { timeoutMs?: number } = {}, attempt = 1): Promise<Response> {
     const { timeoutMs = 8000, signal, ...rest } = init as any;
     const ac = new AbortController();
-    const onAbort = () => ac.abort();
-    if (signal) signal.addEventListener('abort', onAbort, { once: true });
-    const t = setTimeout(() => ac.abort(), timeoutMs);
+    let removedListener = false;
+    const onAbort = () => {
+      try { ac.abort(); } catch (e) { /* ignore */ }
+    };
     try {
-      return await fetch(url, { ...rest, signal: ac.signal });
-    } catch (e) {
-      if (attempt < 2 && (!signal || !(signal as any).aborted)) {
-        await new Promise(r => setTimeout(r, 400));
-        return fetchWithRetry(url, init, attempt + 1);
+      if (signal) {
+        if ((signal as AbortSignal).aborted) {
+          // Propagate immediately
+          ac.abort();
+        } else {
+          try { (signal as AbortSignal).addEventListener('abort', onAbort, { once: true }); } catch (e) { /* ignore */ }
+        }
       }
-      throw e;
+      const t = setTimeout(() => { try { ac.abort(); } catch {} }, timeoutMs);
+      try {
+        return await fetch(url, { ...rest, signal: ac.signal });
+      } catch (e: any) {
+        if (attempt < 2 && (!signal || !(signal as any).aborted)) {
+          await new Promise(r => setTimeout(r, 400));
+          return fetchWithRetry(url, init, attempt + 1);
+        }
+        throw e;
+      } finally {
+        clearTimeout(t);
+      }
     } finally {
-      clearTimeout(t);
-      if (signal) signal.removeEventListener('abort', onAbort as any);
+      try {
+        if (signal && (signal as any).removeEventListener) (signal as any).removeEventListener('abort', onAbort as any);
+      } catch (e) {}
     }
   }
 
