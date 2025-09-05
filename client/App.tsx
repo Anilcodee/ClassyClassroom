@@ -20,6 +20,7 @@ import StudentAuth from "./pages/StudentAuth";
 import StudentDashboard from "./pages/StudentDashboard";
 import GetStarted from "./pages/GetStarted";
 import ClassMessages from "./pages/ClassMessages";
+import GoogleComplete from "./pages/GoogleComplete";
 import ClassMessageCompose from "./pages/ClassMessageCompose";
 import ClassAssignments from "./pages/ClassAssignments";
 import AssignmentSubmit from "./pages/AssignmentSubmit";
