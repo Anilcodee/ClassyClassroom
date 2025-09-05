@@ -528,7 +528,10 @@ export default function Classes() {
                           </button>
                         </div>
                         {menuOpenFor === c.id && (
-                          <div className="absolute z-20 right-4 top-12 rounded-md border border-border bg-background shadow flex flex-col items-end">
+                          <div className="absolute z-20 right-4 top-12 sm:right-4 sm:top-12 rounded-md border border-border bg-background shadow flex flex-col items-end max-w-xs sm:max-w-sm overflow-auto">
+                            <div className="sm:hidden block w-full px-2 py-1 text-right">
+                              <button className="text-sm" onClick={() => setMenuOpenFor("")}>Close</button>
+                            </div>
                             <button
                               className="text-left px-2 py-1 text-sm hover:bg-accent whitespace-nowrap ml-auto"
                               onClick={async () => {
