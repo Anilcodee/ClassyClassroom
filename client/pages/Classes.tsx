@@ -648,7 +648,7 @@ function MakeClassCard({
   }
 
   return (
-    <div className="rounded-2xl border border-border p-6 bg-card shadow min-h-[20rem] md:min-h-[24rem]">
+    <div className="rounded-2xl border border-border p-6 bg-card shadow">
       <div className="flex flex-col md:flex-row items-center gap-6">
         <div className="flex-1">
           <h2 className="text-2xl font-bold">Make your class</h2>
