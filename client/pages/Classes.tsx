@@ -277,7 +277,7 @@ export default function Classes() {
           void handlePickedFile(f, imagePickFor);
         }}
       />
-      <div className="grid md:grid-cols-3 gap-6 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
         <div className="md:col-span-2">
           <MakeClassCard onCreated={load} />
         </div>
