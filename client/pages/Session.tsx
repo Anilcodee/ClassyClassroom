@@ -56,10 +56,23 @@ export default function Session() {
     return () => { cancelled = true; clearTimeout(handle as any); };
   }, [expiresAt, isActive]);
 
-  const link = useMemo(() => `${window.location.origin}/attend/${sessionId ?? ""}`, [sessionId]);
+  const link = useMemo(() => (typeof window !== 'undefined' ? `${window.location.origin}/attend/${sessionId ?? ""}` : `/attend/${sessionId ?? ""}`), [sessionId]);
   const remaining = expiresAt ? Math.max(0, Math.floor((expiresAt.getTime() - now) / 1000)) : null;
   const mm = remaining != null ? Math.floor(remaining / 60).toString().padStart(2, "0") : "--";
   const ss = remaining != null ? (remaining % 60).toString().padStart(2, "0") : "--";
+
+  const [qrSize, setQrSize] = useState<number>(220);
+  useEffect(() => {
+    function update() {
+      try {
+        const w = Math.min(520, Math.max(160, Math.floor((window.innerWidth || 360) * 0.6)));
+        setQrSize(w);
+      } catch {}
+    }
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   const userRole = useMemo(() => {
     try { const raw = localStorage.getItem("user"); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; }
