@@ -51,15 +51,15 @@ export default function GetStarted() {
         </div>
 
         <div className="flex flex-col items-stretch gap-6">
-          <div className="relative rounded-2xl border border-border bg-card shadow-xl overflow-hidden p-6">
-            <div className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-lg p-4 bg-background/80 border border-border flex flex-col items-center">
+          <div className="relative rounded-2xl border border-border bg-card shadow-xl overflow-hidden p-4 sm:p-6">
+            <div className="absolute -top-12 -right-12 sm:-top-16 sm:-right-16 h-40 w-40 sm:h-48 sm:w-48 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="rounded-lg p-3 sm:p-4 bg-background/80 border border-border flex flex-col items-center">
                 <TeacherAnimation />
                 <div className="mt-3 text-sm font-semibold">For Teachers</div>
                 <div className="text-xs text-foreground/60 mt-1">Create classes, take attendance</div>
               </div>
-              <div className="rounded-lg p-4 bg-background/80 border border-border flex flex-col items-center">
+              <div className="rounded-lg p-3 sm:p-4 bg-background/80 border border-border flex flex-col items-center">
                 <StudentAnimation />
                 <div className="mt-3 text-sm font-semibold">For Students</div>
                 <div className="text-xs text-foreground/60 mt-1">Join classes, view attendance</div>
@@ -71,7 +71,7 @@ export default function GetStarted() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border p-6 bg-card text-foreground/80 shadow-sm">
+          <div className="rounded-2xl border border-border p-4 sm:p-6 bg-card text-foreground/80 shadow-sm">
             <h3 className="text-sm font-semibold mb-2">Why ClassyClassroom?</h3>
             <p className="text-sm">Fast, private, and built for classrooms. No clutter — just the tools teachers and students need.</p>
           </div>
