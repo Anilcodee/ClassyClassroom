@@ -165,6 +165,17 @@ export default function Classes() {
       if (token) headers.Authorization = `Bearer ${token}`;
       const ok = await canReachOrigin();
       if (!ok) throw new Error("Network error. Please retry.");
+
+      // Quick server ping to detect CORS / connectivity issues early
+      try {
+        const pingRes = await fetchWithRetry("/api/ping", { headers, cache: 'no-store', timeoutMs: 3000 });
+        if (!pingRes || pingRes.status === 0 || pingRes.status === 499 || !pingRes.ok) {
+          throw new Error('Server ping failed');
+        }
+      } catch (e) {
+        throw new Error('Cannot reach API server (ping failed). Please check network or server logs.');
+      }
+
       const res = await fetchWithRetry("/api/classes", {
         headers,
         cache: "no-store",
