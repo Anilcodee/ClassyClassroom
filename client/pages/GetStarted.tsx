@@ -14,6 +14,18 @@ function useIsDesktop() {
   return isDesktop;
 }
 
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsDesktop(!!mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return isDesktop;
+}
+
 export default function GetStarted() {
   return (
     <main className="min-h-[calc(100vh-56px)] bg-gradient-to-b from-background via-background to-background">
@@ -122,6 +134,8 @@ export default function GetStarted() {
 
 function TeacherAnimation() {
   const isDesktop = useIsDesktop();
+  if (!isDesktop) return null;
+  const isDesktop = useIsDesktop();
   return (
     <div className="relative w-full rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-4 sm:p-6 overflow-hidden">
       <div className="absolute -top-12 -right-12 sm:-top-20 sm:-right-20 h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
@@ -176,6 +190,8 @@ function TeacherAnimation() {
 
 function StudentAnimation() {
   const isDesktop = useIsDesktop();
+  if (!isDesktop) return null;
+  const isDesktop = useIsDesktop();
   return (
     <div className="relative w-full rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-4 sm:p-6 overflow-hidden">
       <div className="absolute -bottom-8 -left-8 sm:-bottom-16 sm:-left-16 h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-gradient-to-tr from-blue-400/40 to-cyan-700/40 blur-3xl" />
@@ -216,21 +232,19 @@ function StudentAnimation() {
 }
 
 function NameSwitcher() {
+  const isDesktop = useIsDesktop();
   const [active, setActive] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const update = () => setIsDesktop(!!mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
+    if (!isDesktop) setActive(false);
+  }, [isDesktop]);
 
   const toggle = () => {
     if (!isDesktop) return;
     setActive((v) => !v);
   };
+
+  if (!isDesktop) return null;
 
   return (
     <div className="relative w-full max-w-[360px]">
