@@ -97,14 +97,27 @@ export default function ClassDetail() {
       Authorization: `Bearer ${token}`,
     };
     try {
-      const res = await fetchWithRetry(`/api/classes/${id}`, {
-        headers,
-        cache: "no-store",
-        signal,
-      });
-      const raw = await res.text();
+      let res: Response | null = null;
+      try {
+        res = await fetchWithRetry(`/api/classes/${id}`, {
+          headers,
+          cache: "no-store",
+          signal,
+        });
+      } catch (err: any) {
+        // Network-level failure
+        setError(err?.message || "Network error: failed to reach API");
+        setLoading(false);
+        return;
+      }
+
+      const raw = await res.text().catch(() => "");
       const data = raw ? JSON.parse(raw) : {};
-      if (!res.ok) throw new Error(data?.message || res.statusText);
+      if (!res.ok) {
+        setError(data?.message || res.statusText || "Request failed");
+        setLoading(false);
+        return;
+      }
       setCls(data.class);
 
       // Attendance is best-effort
@@ -114,11 +127,12 @@ export default function ClassDetail() {
           cache: "no-store",
           signal,
         });
-        const rraw = await r.text();
+        const rraw = await r.text().catch(() => "");
         const rd = rraw ? JSON.parse(rraw) : {};
         setRecords(r.ok ? rd.records || [] : []);
       } catch (e: any) {
-        if (e?.name !== "AbortError") setRecords([]);
+        // ignore attendance fetch failures (network or abort)
+        setRecords([]);
       }
     } catch (e: any) {
       if (e?.name === "AbortError") return;
