@@ -148,7 +148,15 @@ export default function ClassDetail() {
       return;
     }
     const ac = new AbortController();
-    void load(ac.signal);
+    (async () => {
+      try {
+        await load(ac.signal);
+      } catch (e) {
+        console.error('ClassDetail load error (caught):', e);
+        // show friendly message
+        setError((e as any)?.message || 'Network error');
+      }
+    })();
     return () => {
       try {
         ac.abort();
