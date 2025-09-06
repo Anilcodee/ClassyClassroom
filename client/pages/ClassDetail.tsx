@@ -277,6 +277,8 @@ export default function ClassDetail() {
                   </span>
                 )}
               </h1>
+            </div>
+            <div className="flex items-center gap-3">
               <button
                 disabled={cls.isActive}
                 onClick={activate}
@@ -284,8 +286,6 @@ export default function ClassDetail() {
               >
                 {cls.isActive ? "Inactive class" : "Activate class"}
               </button>
-            </div>
-            <div className="flex items-center gap-3">
               <button
                 onClick={async () => {
                   const token = localStorage.getItem("token");
