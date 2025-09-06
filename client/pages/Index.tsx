@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function Index() {
   return (
-    <main className="min-h-[calc(100vh-56px)] bg-gradient-to-b from-background via-background to-background">
+    <main className="min-h-[calc(100dvh-56px)] pb-[env(safe-area-inset-bottom)] bg-gradient-to-b from-background via-background to-background">
       <section className="container mx-auto py-16">
         <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-center">Welcome</h1>
         <p className="mt-3 text-center text-foreground/70 max-w-2xl mx-auto">Choose how you want to continue.</p>
