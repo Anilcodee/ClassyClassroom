@@ -210,12 +210,22 @@ export default function ClassDetail() {
   async function activate() {
     try {
       if (!token) throw new Error("Please log in");
-      const res = await fetch(`/api/classes/${id}/activate`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || res.statusText);
+      let res: Response | null = null;
+      try {
+        res = await fetchWithRetry(`/api/classes/${id}/activate`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          timeoutMs: 8000,
+        });
+      } catch (err: any) {
+        setError(err?.message || "Network error: failed to activate class");
+        return;
+      }
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(data?.message || res.statusText || "Activation failed");
+        return;
+      }
       nav(`/session/${data.sessionId}`, { state: { classId: id } });
     } catch (e: any) {
       setError(e.message);
