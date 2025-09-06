@@ -182,22 +182,21 @@ export default function ClassDetail() {
     let stop = false;
     const tick = async () => {
       try {
-        try {
-          const r = await fetchWithRetry(`/api/session/${cls.activeSession}`, { timeoutMs: 5000 });
-          const d = await r.json().catch(() => null);
-          if (d?.expiresAt) setExpiresAt(new Date(d.expiresAt));
-          if (!stop && d && d.isActive === false) {
-            setCls((prev) =>
-              prev
-                ? { ...prev, isActive: false, activeSession: null as any }
-                : prev,
-            );
-            setExpiresAt(null);
-          }
-        } catch (e) {
-          // ignore network errors for session polling
+        if (typeof window !== "undefined" && !navigator.onLine) return;
+        const r = await fetchWithRetry(`/api/session/${cls.activeSession}`, { timeoutMs: 5000 });
+        const d = await r.json().catch(() => null);
+        if (d?.expiresAt) setExpiresAt(new Date(d.expiresAt));
+        if (!stop && d && d.isActive === false) {
+          setCls((prev) =>
+            prev
+              ? { ...prev, isActive: false, activeSession: null as any }
+              : prev,
+          );
+          setExpiresAt(null);
         }
-      } catch {}
+      } catch (e) {
+        // ignore network errors for session polling
+      }
     };
     const i = setInterval(tick, 1000);
     return () => {
