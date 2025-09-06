@@ -369,6 +369,12 @@ export default function ClassDetail() {
           </div>
         </div>
       ) : null}
+      {/* Mobile-only bottom spacer to avoid cutoff behind OS UI */}
+      <div className="h-24 lg:hidden pb-[env(safe-area-inset-bottom)]" />
+
+      {/* Mobile-only bottom spacer to avoid cutoff behind OS UI */}
+      <div className="h-24 lg:hidden pb-[env(safe-area-inset-bottom)]" />
+
     </main>
   );
 }

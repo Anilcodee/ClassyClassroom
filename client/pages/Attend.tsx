@@ -38,6 +38,9 @@ export default function Attend() {
         {msg && <p className={"text-sm " + (msg.includes("✅") ? "text-green-600" : "text-destructive")}>{msg}</p>}
         <button disabled={loading || marked} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground disabled:opacity-50" type="submit">{marked ? 'Marked' : loading? 'Submitting…' : 'Submit'}</button>
       </form>
+      {/* Mobile-only bottom spacer to avoid cutoff behind OS UI */}
+      <div className="h-24 lg:hidden pb-[env(safe-area-inset-bottom)]" />
+
     </main>
   );
 }

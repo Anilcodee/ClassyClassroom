@@ -47,6 +47,9 @@ export default function StudentAttendance() {
           {items.length === 0 && <li className="p-3 text-sm text-foreground/70">No attendance records yet.</li>}
         </ul>
       )}
+      {/* Mobile-only bottom spacer to avoid cutoff behind OS UI */}
+      <div className="h-24 lg:hidden pb-[env(safe-area-inset-bottom)]" />
+
     </main>
   );
 }

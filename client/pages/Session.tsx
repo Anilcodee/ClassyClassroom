@@ -147,6 +147,9 @@ export default function Session() {
           </button>
         )}
       </div>
+      {/* Mobile-only bottom spacer to avoid cutoff behind OS UI */}
+      <div className="h-24 lg:hidden pb-[env(safe-area-inset-bottom)]" />
+
     </main>
   );
 }

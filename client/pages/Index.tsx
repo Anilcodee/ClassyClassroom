@@ -20,6 +20,9 @@ export default function Index() {
           <Link to="/get-started" className="underline">Learn more and get started</Link>
         </div>
       </section>
+      {/* Mobile-only bottom spacer to avoid cutoff behind OS UI */}
+      <div className="h-24 lg:hidden pb-[env(safe-area-inset-bottom)]" />
+
     </main>
   );
 }
