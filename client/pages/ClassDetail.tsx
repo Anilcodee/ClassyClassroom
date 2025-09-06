@@ -91,6 +91,14 @@ export default function ClassDetail() {
       nav("/auth");
       return;
     }
+
+    // Avoid noisy fetch errors when offline
+    if (typeof window !== "undefined" && !navigator.onLine) {
+      setError("You appear to be offline — check your connection.");
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     const headers: Record<string, string> = {
@@ -122,14 +130,18 @@ export default function ClassDetail() {
 
       // Attendance is best-effort
       try {
-        const r = await fetchWithRetry(`/api/classes/${id}/attendance/today`, {
-          headers,
-          cache: "no-store",
-          signal,
-        });
-        const rraw = await r.text().catch(() => "");
-        const rd = rraw ? JSON.parse(rraw) : {};
-        setRecords(r.ok ? rd.records || [] : []);
+        if (typeof window !== "undefined" && !navigator.onLine) {
+          setRecords([]);
+        } else {
+          const r = await fetchWithRetry(`/api/classes/${id}/attendance/today`, {
+            headers,
+            cache: "no-store",
+            signal,
+          });
+          const rraw = await r.text().catch(() => "");
+          const rd = rraw ? JSON.parse(rraw) : {};
+          setRecords(r.ok ? rd.records || [] : []);
+        }
       } catch (e: any) {
         // ignore attendance fetch failures (network or abort)
         setRecords([]);
