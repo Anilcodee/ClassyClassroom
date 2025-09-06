@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function GetStarted() {
   return (
     <main className="min-h-[calc(100vh-56px)] bg-gradient-to-b from-background via-background to-background">
       <section className="container mx-auto px-4 grid lg:grid-cols-2 gap-8 sm:gap-12 py-10 sm:py-12 items-center lg:items-stretch">
-        <div className="max-w-[975px] h-full flex flex-col gap-6 lg:gap-12 justify-between">
+        <div className="max-w-[975px] h-full flex flex-col">
           <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-foreground/70 mb-4">
             <span className="h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
             Fast, secure classroom platform for teachers and students
@@ -50,6 +51,12 @@ export default function GetStarted() {
                 <div className="text-sm text-foreground/80">{t}</div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-6 flex-1 flex items-center justify-center">
+            <div className="w-full h-full rounded-2xl border border-border bg-card p-4 sm:p-6 flex items-center justify-center">
+              <NameSwitcher />
+            </div>
           </div>
         </div>
 
@@ -194,6 +201,36 @@ function StudentAnimation() {
         @keyframes wave { 0%{transform:rotate(0deg)} 50%{transform:rotate(20deg)} 100%{transform:rotate(0deg)} }
         .animate-wave{ animation: wave 2.2s ease-in-out infinite; }
       `}</style>
+    </div>
+  );
+}
+
+function NameSwitcher() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setIndex((i) => (i + 1) % 2), 2500);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div className="relative w-full max-w-[360px]">
+      <div className="relative h-14 sm:h-16">
+        <span
+          className={`absolute inset-0 flex items-center justify-center text-lg sm:text-2xl font-semibold transition-opacity duration-700 ${
+            index === 0 ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          Teacher
+        </span>
+        <span
+          className={`absolute inset-0 flex items-center justify-center text-lg sm:text-2xl font-semibold transition-opacity duration-700 ${
+            index === 1 ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          Student
+        </span>
+      </div>
     </div>
   );
 }
