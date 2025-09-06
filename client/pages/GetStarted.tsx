@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
-import { useEffect, useState } from "react";
 
 export default function GetStarted() {
   return (
@@ -206,30 +205,22 @@ function StudentAnimation() {
 }
 
 function NameSwitcher() {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(() => setIndex((i) => (i + 1) % 2), 2500);
-    return () => clearInterval(id);
-  }, []);
-
   return (
     <div className="relative w-full max-w-[360px]">
-      <div className="relative h-14 sm:h-16">
-        <span
-          className={`absolute inset-0 flex items-center justify-center text-lg sm:text-2xl font-semibold transition-opacity duration-700 ${
-            index === 0 ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          Teacher
-        </span>
-        <span
-          className={`absolute inset-0 flex items-center justify-center text-lg sm:text-2xl font-semibold transition-opacity duration-700 ${
-            index === 1 ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          Student
-        </span>
+      {/* Mask: overflow-hidden area showing one label at a time */}
+      <div className="overflow-hidden rounded-md">
+        {/* Group to enable desktop-only hover via lg:group-hover */}
+        <div className="group lg:cursor-pointer">
+          {/* Track: 200% width containing both labels side-by-side. On lg hover, slide left by 50% of track (-translate-x-1/2) */}
+          <div className="w-[200%] flex transform transition-transform duration-500 ease-in-out lg:group-hover:-translate-x-1/2">
+            <div className="w-1/2 flex items-center justify-center h-14 sm:h-16 text-lg sm:text-2xl font-semibold">
+              Teacher
+            </div>
+            <div className="w-1/2 flex items-center justify-center h-14 sm:h-16 text-lg sm:text-2xl font-semibold">
+              Student
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
