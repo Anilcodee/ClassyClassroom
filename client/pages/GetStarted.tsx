@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { CheckCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function GetStarted() {
   return (
@@ -205,18 +206,41 @@ function StudentAnimation() {
 }
 
 function NameSwitcher() {
+  const [active, setActive] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsDesktop(!!mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  const toggle = () => {
+    if (!isDesktop) return;
+    setActive((v) => !v);
+  };
+
   return (
     <div className="relative w-full max-w-[360px]">
-      {/* Mask: overflow-hidden area showing one label at a time */}
-      <div className="overflow-hidden rounded-md">
-        {/* Group to enable desktop-only hover via lg:group-hover */}
-        <div className="group lg:cursor-pointer">
-          {/* Track: 200% width containing both labels side-by-side. On lg hover, slide left by 50% of track (-translate-x-1/2) */}
-          <div className="w-[200%] flex transform transition-transform duration-500 ease-in-out lg:group-hover:-translate-x-1/2">
-            <div className="w-1/2 flex items-center justify-center h-14 sm:h-16 text-lg sm:text-2xl font-semibold">
+      <div className="overflow-hidden rounded-md shadow-md">
+        <div
+          className="cursor-pointer select-none"
+          onMouseEnter={toggle}
+          onClick={toggle}
+          role="button"
+          aria-pressed={active}
+        >
+          <div
+            className={`w-[200%] flex transform transition-transform duration-500 ease-in-out ${
+              active ? "-translate-x-1/2" : "translate-x-0"
+            }`}
+          >
+            <div className="w-1/2 flex items-center justify-center h-14 sm:h-16 text-lg sm:text-2xl font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white">
               Teacher
             </div>
-            <div className="w-1/2 flex items-center justify-center h-14 sm:h-16 text-lg sm:text-2xl font-semibold">
+            <div className="w-1/2 flex items-center justify-center h-14 sm:h-16 text-lg sm:text-2xl font-semibold bg-gradient-to-r from-sky-400 to-indigo-600 text-white">
               Student
             </div>
           </div>
