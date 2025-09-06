@@ -121,8 +121,7 @@ export default function GetStarted() {
 }
 
 function TeacherAnimation() {
-  const isDesktop = useIsDesktop();
-  if (!isDesktop) return null;
+
   return (
     <div className="relative w-full rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-4 sm:p-6 overflow-hidden">
       <div className="absolute -top-12 -right-12 sm:-top-20 sm:-right-20 h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
@@ -131,7 +130,7 @@ function TeacherAnimation() {
         className="w-full max-w-[240px] mx-auto h-44 sm:h-56"
       >
         <circle cx="100" cy="100" r="90" className="fill-[hsl(var(--muted))]" />
-        <g className={isDesktop ? "origin-[120px_70px] animate-wave" : "origin-[120px_70px]"}>
+        <g className="origin-[120px_70px] animate-wave">
           <circle
             cx="120"
             cy="60"
@@ -176,8 +175,7 @@ function TeacherAnimation() {
 }
 
 function StudentAnimation() {
-  const isDesktop = useIsDesktop();
-  if (!isDesktop) return null;
+
   return (
     <div className="relative w-full rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-4 sm:p-6 overflow-hidden">
       <div className="absolute -bottom-8 -left-8 sm:-bottom-16 sm:-left-16 h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-gradient-to-tr from-blue-400/40 to-cyan-700/40 blur-3xl" />
@@ -189,7 +187,7 @@ function StudentAnimation() {
         {/* Head */}
         <circle cx="90" cy="70" r="12" className="fill-blue-500" />
         {/* Waving hand */}
-        <g className={isDesktop ? "origin-[130px_70px] animate-wave" : "origin-[130px_70px]"}>
+        <g className="origin-[130px_70px] animate-wave">
           <circle cx="130" cy="70" r="8" className="fill-cyan-500" />
         </g>
         {/* Body/backpack */}
