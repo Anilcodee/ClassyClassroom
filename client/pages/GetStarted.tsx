@@ -15,6 +15,7 @@ function useIsDesktop() {
 }
 
 export default function GetStarted() {
+  const isDesktop = useIsDesktop();
   return (
     <main className="min-h-[calc(100vh-56px)] bg-gradient-to-b from-background via-background to-background">
       <section className="container mx-auto px-4 grid lg:grid-cols-2 gap-8 sm:gap-12 py-10 sm:py-12 items-center lg:items-stretch">
@@ -65,11 +66,13 @@ export default function GetStarted() {
             ))}
           </div>
 
-          <div className="mt-6 flex-1 flex items-center justify-center">
-            <div className="w-full h-full rounded-2xl border border-border bg-card p-4 sm:p-6 flex items-center justify-center">
-              <NameSwitcher />
+          {isDesktop && (
+            <div className="mt-6 flex-1 flex items-center justify-center">
+              <div className="w-full h-full rounded-2xl border border-border bg-card p-4 sm:p-6 flex items-center justify-center">
+                <NameSwitcher />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="h-full flex flex-col items-stretch gap-6">
