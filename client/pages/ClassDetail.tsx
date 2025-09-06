@@ -229,6 +229,10 @@ export default function ClassDetail() {
   async function activate() {
     try {
       if (!token) throw new Error("Please log in");
+      if (typeof window !== "undefined" && !navigator.onLine) {
+        setError("You appear to be offline — cannot activate class.");
+        return;
+      }
       let res: Response | null = null;
       try {
         res = await fetchWithRetry(`/api/classes/${id}/activate`, {
