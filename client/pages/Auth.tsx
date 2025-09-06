@@ -101,7 +101,7 @@ export default function Auth() {
   }
 
   return (
-    <main className="container mx-auto min-h-[calc(100vh-56px)] grid place-items-center py-12">
+    <main className="container mx-auto min-h-[calc(100dvh-56px)] pb-[env(safe-area-inset-bottom)] grid place-items-center py-12">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-xl">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">
