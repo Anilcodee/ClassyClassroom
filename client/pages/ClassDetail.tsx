@@ -69,6 +69,10 @@ export default function ClassDetail() {
       try {
         return await fetch(url, { ...rest, signal: ac.signal });
       } catch (e: any) {
+        // Log failing fetch for easier debugging
+        try {
+          console.error("fetchWithRetry failed", { url, attempt, error: e });
+        } catch {}
         if (attempt < 2 && (!signal || !(signal as any).aborted)) {
           await new Promise((r) => setTimeout(r, 400));
           return fetchWithRetry(url, init, attempt + 1);
