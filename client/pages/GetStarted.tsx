@@ -5,7 +5,7 @@ export default function GetStarted() {
   return (
     <main className="min-h-[calc(100vh-56px)] bg-gradient-to-b from-background via-background to-background">
       <section className="container mx-auto px-4 grid lg:grid-cols-2 gap-8 sm:gap-12 py-10 sm:py-12 items-center lg:items-stretch">
-        <div className="max-w-[975px] h-full flex flex-col">
+        <div className="max-w-[975px] h-full flex flex-col gap-6 lg:gap-12 justify-between">
           <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-foreground/70 mb-4">
             <span className="h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
             Fast, secure classroom platform for teachers and students
