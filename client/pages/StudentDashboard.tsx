@@ -164,23 +164,74 @@ export default function StudentDashboard() {
                   )}
                   <div className="p-5 relative">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="font-medium truncate pr-8">{c.name}</p>
+                      <div className="flex flex-col items-start gap-2 min-w-0">
+                        <div className="flex items-center gap-0.5 min-w-0">
+                          <p className="font-medium truncate flex-1 min-w-0 mr-1">
+                            {c.name}
+                          </p>
+                        </div>
+
+                        <div className="mt-1 flex flex-row gap-2 flex-nowrap sm:flex-wrap">
+                          <div className="relative inline-block">
+                            <Link
+                              to={`/classes/${cid}/messages`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                try {
+                                  localStorage.setItem(
+                                    `lastSeenMsgs:${cid}`,
+                                    String(Date.now()),
+                                  );
+                                } catch {}
+                              }}
+                              className="h-8 px-2.5 rounded-md text-xs inline-flex items-center justify-center bg-secondary text-secondary-foreground hover:opacity-90"
+                              title="Messages"
+                            >
+                              Messages
+                            </Link>
+                            {(() => {
+                              const meta = latestMap[cid];
+                              const key = `lastSeenMsgs:${cid}`;
+                              const seen = Number(
+                                typeof window !== "undefined"
+                                  ? localStorage.getItem(key) || 0
+                                  : 0,
+                              );
+                              const isNew =
+                                meta &&
+                                meta.latestAt &&
+                                (!userId || String(meta.latestBy) !== String(userId)) &&
+                                meta.latestAt > seen;
+                              return isNew ? (
+                                <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 shadow ring-2 ring-background" />
+                              ) : null;
+                            })()}
+                          </div>
+
+                          <Link
+                            to={`/student/classes/${cid}/attendance`}
+                            className="h-8 px-2.5 rounded-md text-xs border border-border bg-background hover:bg-accent hover:text-accent-foreground"
+                            title="My Attendance"
+                          >
+                            Attendance
+                          </Link>
+                        </div>
+
+                        <div className="mt-2 text-xs text-foreground/60">Joined</div>
+                      </div>
+
                       <button
                         className="p-1 rounded hover:bg-accent"
                         title="More"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setMenuOpenFor(
-                            menuOpenFor === cid ? "" : String(cid),
-                          );
+                          setMenuOpenFor(menuOpenFor === cid ? "" : String(cid));
                         }}
                       >
                         <MoreVertical className="h-4 w-4" />
                       </button>
                     </div>
-                    <div className="mt-2 text-xs text-foreground/60">
-                      Joined
-                    </div>
+
                     {menuOpenFor === String(cid) && (
                       <div className="absolute z-20 right-2 top-12 w-44 sm:w-40 rounded-md border border-border bg-background shadow max-w-xs overflow-auto">
                         <div className="sm:hidden block w-full px-2 py-1 text-right">
@@ -197,19 +248,15 @@ export default function StudentDashboard() {
                             try {
                               const token = localStorage.getItem("token");
                               const headers: Record<string, string> = {};
-                              if (token)
-                                headers.Authorization = `Bearer ${token}`;
+                              if (token) headers.Authorization = `Bearer ${token}`;
                               const res = await fetch(
                                 `/api/student/classes/${cid}/unenroll`,
                                 { method: "DELETE", headers },
                               );
                               const d = await res.json().catch(() => ({}));
-                              if (!res.ok)
-                                throw new Error(d?.message || res.statusText);
+                              if (!res.ok) throw new Error(d?.message || res.statusText);
                               setClasses((prev) =>
-                                prev.filter(
-                                  (x) => (x.id || (x as any)._id) !== cid,
-                                ),
+                                prev.filter((x) => (x.id || (x as any)._id) !== cid),
                               );
                             } catch (e: any) {
                               setError(e.message || "Failed to unenroll");
@@ -226,57 +273,11 @@ export default function StudentDashboard() {
                   <span
                     className={
                       "absolute top-2 right-2 text-xs px-2 py-1 rounded-full " +
-                      (c.isActive
-                        ? "bg-green-600 text-white"
-                        : "bg-muted text-foreground/70")
+                      (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")
                     }
                   >
                     {c.isActive ? "Active" : "Inactive"}
                   </span>
-                  <div className="absolute bottom-3 right-3 z-10 flex flex-row gap-2">
-                    <div className="relative inline-block">
-                      <Link
-                        to={`/classes/${cid}/messages`}
-                        className="px-2.5 py-1.5 rounded-md text-xs bg-secondary text-secondary-foreground hover:opacity-90 text-center"
-                        title="Messages"
-                        onClick={() => {
-                          try {
-                            localStorage.setItem(
-                              `lastSeenMsgs:${cid}`,
-                              String(Date.now()),
-                            );
-                          } catch {}
-                        }}
-                      >
-                        Messages
-                      </Link>
-                      {(() => {
-                        const meta = latestMap[cid];
-                        const key = `lastSeenMsgs:${cid}`;
-                        const seen = Number(
-                          typeof window !== "undefined"
-                            ? localStorage.getItem(key) || 0
-                            : 0,
-                        );
-                        const isNew =
-                          meta &&
-                          meta.latestAt &&
-                          (!userId ||
-                            String(meta.latestBy) !== String(userId)) &&
-                          meta.latestAt > seen;
-                        return isNew ? (
-                          <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 shadow ring-2 ring-background" />
-                        ) : null;
-                      })()}
-                    </div>
-                    <Link
-                      to={`/student/classes/${cid}/attendance`}
-                      className="px-2.5 py-1.5 rounded-md text-xs border border-border bg-background hover:bg-accent hover:text-accent-foreground text-center"
-                      title="My Attendance"
-                    >
-                      Attendance
-                    </Link>
-                  </div>
                 </li>
               );
             })}
