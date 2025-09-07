@@ -116,14 +116,12 @@ export default function ArchivedClasses() {
 
   return (
     <main className="container mx-auto py-10 px-4">
-      <div className="flex justify-center">
-        <Link
-          to="/classes"
-          className="text-sm text-foreground/70 hover:text-foreground"
-        >
-          ← Back to classes
-        </Link>
-      </div>
+      <Link
+        to="/classes"
+        className="text-sm text-foreground/70 hover:text-foreground"
+      >
+        <span className="back-arrow">←</span>&nbsp;Back to classes
+      </Link>
       <h2 className="text-lg font-semibold mb-4 mt-4">Archived classes</h2>
       {loading ? (
         <p className="text-sm text-foreground/70">Loading…</p>
