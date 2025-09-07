@@ -13,8 +13,17 @@ export default function Session() {
     if (!sessionId) return;
     let cancelled = false;
     const poll = async () => {
+      // avoid noisy fetch attempts when offline
+      if (typeof window !== "undefined" && !navigator.onLine) {
+        // schedule a retry later
+        if (!cancelled && isActive) setTimeout(poll, 1000);
+        return;
+      }
+
+      const ac = new AbortController();
+      const timeout = setTimeout(() => ac.abort(), 5000);
       try {
-        const r = await fetch(`/api/session/${sessionId}`);
+        const r = await fetch(`/api/session/${sessionId}`, { signal: ac.signal });
         if (!r.ok) {
           // stop polling on not found/invalid
           if (r.status === 404 || r.status === 400) {
@@ -23,13 +32,24 @@ export default function Session() {
           }
           return; // transient
         }
-        const d = await r.json();
+        const d = await r.json().catch(() => null);
         if (cancelled) return;
-        setIsActive(Boolean(d.isActive));
-        if (d.expiresAt) setExpiresAt(new Date(d.expiresAt));
-      } catch {
-        // network issue; ignore and retry on next tick
+        setIsActive(Boolean(d?.isActive));
+        if (d?.expiresAt) setExpiresAt(new Date(d.expiresAt));
+      } catch (e: any) {
+        // Log network errors for easier debugging but do not crash
+        try {
+          if (e && e.name === "AbortError") {
+            // request aborted due to timeout or cancellation
+          } else {
+            console.warn("Session poll fetch failed:", e);
+          }
+        } catch (err) {}
       } finally {
+        clearTimeout(timeout);
+        try {
+          ac.abort();
+        } catch {}
         if (!cancelled && isActive) setTimeout(poll, 1000);
       }
     };
