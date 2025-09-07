@@ -305,7 +305,43 @@ export const listSubmissions: RequestHandler = async (req: AuthRequest, res) => 
     if (!isOwnerOrCo(cls, userId)) return res.status(403).json({ message: "Unauthorized" });
 
     const subs = await Submission.find({ assignmentId }).sort({ submittedAt: -1 }).lean();
-    res.json({ submissions: subs });
+    // attach basic user info
+    const userIds = subs.map((s:any)=> String(s.userId));
+    const users = await User.find({ _id: { $in: userIds } }).select('name rollNo').lean();
+    const byId: Record<string, any> = {};
+    users.forEach(u=> byId[String(u._id)] = u);
+    const mapped = subs.map(s => ({ ...s, user: byId[String(s.userId)] || null }));
+    res.json({ submissions: mapped });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const gradeSubmission: RequestHandler = async (req: AuthRequest, res) => {
+  if (mongoose.connection.readyState !== 1)
+    return res.status(503).json({ message: "Database not connected" });
+  try {
+    const { assignmentId, submissionId } = req.params as { assignmentId: string; submissionId: string };
+    const a = await Assignment.findById(assignmentId).lean();
+    if (!a) return res.status(404).json({ message: "Assignment not found" });
+    const cls = await ClassModel.findById(a.classId).select("teacher coTeachers").lean();
+    const userId = String((req as any).userId || "");
+    if (!isOwnerOrCo(cls, userId)) return res.status(403).json({ message: "Unauthorized" });
+
+    const payload = req.body as any;
+    const score = typeof payload.score === 'number' ? payload.score : (payload.score ? Number(payload.score) : null);
+    const feedback = typeof payload.feedback === 'string' ? payload.feedback : '';
+
+    const sub = await Submission.findById(submissionId);
+    if (!sub) return res.status(404).json({ message: "Submission not found" });
+    sub.score = score;
+    sub.feedback = feedback;
+    sub.gradedBy = userId;
+    sub.gradedAt = new Date();
+    await sub.save();
+
+    res.json({ submission: sub });
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Server error" });
