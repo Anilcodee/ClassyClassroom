@@ -41,10 +41,19 @@ const AssignmentSchema = new Schema<IAssignment>({
   attachments: { type: [{ name: String, type: String, size: Number, dataUrl: String }], default: [] },
   dueAt: { type: Date, default: null },
   publishAt: { type: Date, default: null },
+  points: { type: Number, default: 100 },
   isDraft: { type: Boolean, default: true },
   allowLate: { type: Boolean, default: true },
   allowedRollNos: { type: [String], default: [] },
 }, { timestamps: true });
+
+// Extend Submission with grading info
+(SubmissionSchema as any).add({
+  score: { type: Number, default: null },
+  gradedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+  gradedAt: { type: Date, default: null },
+  feedback: { type: String, default: '' },
+});
 
 export const Assignment = mongoose.models.Assignment || mongoose.model<IAssignment>("Assignment", AssignmentSchema);
 
