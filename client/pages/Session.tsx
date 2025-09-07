@@ -206,44 +206,51 @@ export default function Session() {
       : "/classes";
 
   return (
-    <main className="container mx-auto py-10 text-center">
-      <Link
-        to={backHref}
-        className="text-sm text-foreground/70 hover:text-foreground"
-      >
-        ← Back to class
-      </Link>
-      <h1 className="mt-2 text-2xl font-bold">Scan to mark attendance</h1>
-      <p className="text-foreground/70">Share this QR or link with students.</p>
-      <div className="mt-6 grid place-items-center">
-        <div ref={containerRef} className="p-4 rounded-xl border border-border bg-card w-full max-w-[520px]">
-          <QRCodeCanvas value={link} size={qrSize} includeMargin style={{ width: '100%', height: 'auto' }} />
-        </div>
-        {isActive && (
-          <a href={link} className="mt-3 text-sm underline break-words max-w-[90vw]">
-            {link}
-          </a>
-        )}
-        <div className="mt-4 text-xl font-mono">
-          {mm}:{ss}
-        </div>
-        {!isActive && (
-          <p className="mt-4 text-destructive glow-text text-lg font-semibold">
-            Session ended
-          </p>
-        )}
-        {!isActive && (
-          <button
-            className="mt-4 px-4 py-2 rounded-lg border border-border"
-            onClick={() => nav(-1)}
+    <main className="min-h-[calc(100vh-56px)] flex items-center justify-center py-10">
+      <div className="w-full max-w-lg px-4 text-center">
+        <div className="mb-4">
+          <Link
+            to={backHref}
+            className="text-sm text-foreground/70 hover:text-foreground"
           >
-            Return
-          </button>
-        )}
-      </div>
-      {/* Mobile-only bottom spacer to avoid cutoff behind OS UI */}
-      <div className="h-24 lg:hidden pb-[env(safe-area-inset-bottom)]" />
+            ← Back to class
+          </Link>
+        </div>
 
+        <h1 className="mt-2 text-2xl font-bold">Scan to mark attendance</h1>
+        <p className="text-foreground/70">Share this QR or link with students.</p>
+
+        <div className="mt-6 flex flex-col items-center gap-4">
+          <div ref={containerRef} className="p-4 rounded-xl border border-border bg-card w-full max-w-[520px]">
+            <QRCodeCanvas value={link} size={qrSize} includeMargin style={{ width: '100%', height: 'auto' }} />
+          </div>
+
+          {isActive && (
+            <a href={link} className="mt-3 text-sm underline break-words max-w-[90vw]">
+              {link}
+            </a>
+          )}
+
+          <div className="mt-2 text-xl font-mono">
+            {mm}:{ss}
+          </div>
+
+          {!isActive && (
+            <>
+              <p className="mt-4 text-destructive glow-text text-lg font-semibold">
+                Session ended
+              </p>
+              <button
+                className="mt-4 px-4 py-2 rounded-lg border border-border"
+                onClick={() => nav(-1)}
+              >
+                Return
+              </button>
+            </>
+          )}
+        </div>
+
+      </div>
     </main>
   );
 }
