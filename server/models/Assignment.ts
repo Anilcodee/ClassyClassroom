@@ -47,14 +47,6 @@ const AssignmentSchema = new Schema<IAssignment>({
   allowedRollNos: { type: [String], default: [] },
 }, { timestamps: true });
 
-// Extend Submission with grading info
-(SubmissionSchema as any).add({
-  score: { type: Number, default: null },
-  gradedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
-  gradedAt: { type: Date, default: null },
-  feedback: { type: String, default: '' },
-});
-
 export const Assignment = mongoose.models.Assignment || mongoose.model<IAssignment>("Assignment", AssignmentSchema);
 
 export interface ISubmission extends Document {
@@ -73,6 +65,11 @@ const SubmissionSchema = new Schema<ISubmission>({
   attachments: { type: [{ name: String, type: String, size: Number, dataUrl: String }], default: [] },
   submittedAt: { type: Date, default: () => new Date() },
   status: { type: String, enum: ["on_time", "late", "closed"], default: "on_time" },
+  // grading fields
+  score: { type: Number, default: null },
+  gradedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+  gradedAt: { type: Date, default: null },
+  feedback: { type: String, default: '' },
 }, { timestamps: true });
 
 SubmissionSchema.index({ assignmentId: 1, userId: 1 }, { unique: true });
