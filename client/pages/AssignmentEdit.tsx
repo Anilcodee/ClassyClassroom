@@ -47,7 +47,7 @@ export default function AssignmentEdit(){
     try {
       const token = localStorage.getItem('token');
       const r = await fetch(`/api/assignments/${assignmentId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' }, body: JSON.stringify({
-        title, description, dueAt: dueAt ? new Date(dueAt).toISOString() : null, publishAt: publishAt ? new Date(publishAt).toISOString() : null, isDraft, allowLate, allowedRollNos: allowedRollNos.split(',').map((s)=>s.trim()).filter(Boolean)
+        title, description, points: typeof points === 'number' ? points : (points === '' ? null : Number(points)), dueAt: dueAt ? new Date(dueAt).toISOString() : null, publishAt: publishAt ? new Date(publishAt).toISOString() : null, isDraft, allowLate, allowedRollNos: allowedRollNos.split(',').map((s)=>s.trim()).filter(Boolean)
       }) });
       const d = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
