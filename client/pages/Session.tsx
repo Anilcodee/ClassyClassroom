@@ -11,7 +11,9 @@ export default function Session() {
 
   useEffect(() => {
     if (!sessionId) return;
+
     let cancelled = false;
+    let scheduled: any = null;
 
     const safeLog = (e: any) => {
       try {
@@ -21,7 +23,7 @@ export default function Session() {
 
     const scheduleNext = () => {
       try {
-        setTimeout(() => {
+        scheduled = setTimeout(() => {
           poll().catch(safeLog);
         }, 1000);
       } catch (e) {
@@ -31,10 +33,16 @@ export default function Session() {
       }
     };
 
+    const shouldSkip = () => {
+      if (typeof window === 'undefined') return false;
+      if (!navigator.onLine) return true;
+      if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return true;
+      return false;
+    };
+
     const poll = async () => {
-      // avoid noisy fetch attempts when offline
-      if (typeof window !== "undefined" && !navigator.onLine) {
-        // schedule a retry later
+      // avoid noisy fetch attempts when offline or when page hidden
+      if (shouldSkip()) {
         if (!cancelled && isActive) scheduleNext();
         return;
       }
@@ -76,10 +84,25 @@ export default function Session() {
     // kick off the first poll and ensure any rejection is handled
     poll().catch(safeLog);
 
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible' && !cancelled) {
+        // try immediately when tab becomes visible
+        poll().catch(safeLog);
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibility);
+
     return () => {
       cancelled = true;
+      try {
+        if (scheduled) clearTimeout(scheduled);
+      } catch {}
+      try {
+        document.removeEventListener('visibilitychange', onVisibility);
+      } catch {}
     };
-  }, [sessionId]);
+  }, [sessionId, isActive]);
 
   useEffect(() => {
     if (expiresAt && Date.now() > expiresAt.getTime()) setIsActive(false);
