@@ -13,6 +13,7 @@ export default function AssignmentCreate(){
   const [description, setDescription] = useState("");
   const [dueAt, setDueAt] = useState<string>("");
   const [publishAt, setPublishAt] = useState<string>("");
+  const [points, setPoints] = useState<number|string>(100);
   const [isDraft, setIsDraft] = useState(true);
   const [allowLate, setAllowLate] = useState(true);
   const [allowedRollNos, setAllowedRollNos] = useState<string>("");
