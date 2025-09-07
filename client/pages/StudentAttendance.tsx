@@ -30,9 +30,9 @@ export default function StudentAttendance() {
 
   return (
     <main className="container mx-auto py-8">
-      <div className="flex justify-center">
-        <Link to={backHref} className="text-sm text-foreground/70 hover:text-foreground">← Back to class</Link>
-      </div>
+      <Link to={backHref} className="text-sm text-foreground/70 hover:text-foreground">
+        <span className="back-arrow">←</span>&nbsp;Back to class
+      </Link>
       <h1 className="mt-2 text-2xl font-bold">My attendance</h1>
       {loading ? <p className="text-sm text-foreground/70">Loading…</p> : error ? <p className="text-sm text-destructive">{error}</p> : (
         <ul className="mt-4 divide-y divide-border rounded-lg border border-border overflow-hidden">
