@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
@@ -84,19 +84,42 @@ export default function Session() {
     remaining != null ? (remaining % 60).toString().padStart(2, "0") : "--";
 
   const [qrSize, setQrSize] = useState<number>(220);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    function update() {
+    if (!containerRef.current) {
+      const w = Math.min(520, Math.max(120, Math.floor((window.innerWidth || 360) * 0.6)));
+      setQrSize(w);
+    }
+
+    let ro: ResizeObserver | null = null;
+
+    function updateSize() {
       try {
-        const w = Math.min(
-          520,
-          Math.max(160, Math.floor((window.innerWidth || 360) * 0.6)),
-        );
-        setQrSize(w);
+        const el = containerRef.current;
+        if (!el) return;
+        const style = getComputedStyle(el);
+        const paddingLeft = parseFloat(style.paddingLeft || "0");
+        const paddingRight = parseFloat(style.paddingRight || "0");
+        const available = Math.max(120, el.clientWidth - (paddingLeft + paddingRight));
+        const size = Math.min(520, Math.floor(available * 0.95));
+        setQrSize(size);
       } catch {}
     }
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+
+    if (typeof ResizeObserver !== "undefined" && containerRef.current) {
+      ro = new ResizeObserver(updateSize);
+      ro.observe(containerRef.current);
+      updateSize();
+    } else {
+      updateSize();
+      window.addEventListener("resize", updateSize);
+    }
+
+    return () => {
+      if (ro && containerRef.current) ro.unobserve(containerRef.current);
+      window.removeEventListener("resize", updateSize);
+    };
   }, []);
 
   const userRole = useMemo(() => {
@@ -128,7 +151,7 @@ export default function Session() {
       <h1 className="mt-2 text-2xl font-bold">Scan to mark attendance</h1>
       <p className="text-foreground/70">Share this QR or link with students.</p>
       <div className="mt-6 grid place-items-center">
-        <div className="p-4 rounded-xl border border-border bg-card">
+        <div ref={containerRef} className="p-4 rounded-xl border border-border bg-card" style={{ width: "min(90vw, 520px)" }}>
           <QRCodeCanvas value={link} size={qrSize} includeMargin />
         </div>
         <a href={link} className="mt-3 text-sm underline break-words">
