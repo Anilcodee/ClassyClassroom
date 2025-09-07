@@ -81,6 +81,7 @@ export const createAssignment: RequestHandler = async (req: AuthRequest, res) =>
       attachments: atts,
       dueAt: dueAt ? new Date(dueAt) : null,
       publishAt: publishAt ? new Date(publishAt) : null,
+      points: typeof points === 'number' ? points : (typeof points === 'string' && points.trim() ? Number(points) : 100),
       isDraft: Boolean(isDraft),
       allowLate: allowLate !== false,
       allowedRollNos: Array.isArray(allowedRollNos) ? allowedRollNos.filter((x: any) => typeof x === 'string' && x.trim()).map((x: any) => x.trim()) : [],
