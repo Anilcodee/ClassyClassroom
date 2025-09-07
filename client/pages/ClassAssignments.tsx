@@ -167,6 +167,7 @@ export default function ClassAssignments(){
                         Publish
                       </button>
                     )}
+                    <Link to={`/assign/${a.id}/submissions`} onClick={(e)=>e.stopPropagation()} className="px-3 py-1.5 rounded-md border border-border text-sm">Submissions</Link>
                     <Link to={`/assign/${a.id}/edit`} onClick={(e)=>e.stopPropagation()} className="px-3 py-1.5 rounded-md border border-border text-sm">Edit</Link>
                     <button className="px-3 py-1.5 rounded-md border border-border text-sm text-destructive" onClick={(e)=>{ e.stopPropagation(); setConfirmId(a.id); }}>Delete</button>
                   </>
