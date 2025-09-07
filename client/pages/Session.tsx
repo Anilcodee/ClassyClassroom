@@ -211,9 +211,10 @@ export default function Session() {
         <div className="mb-4">
           <Link
             to={backHref}
-            className="text-sm text-foreground/70 hover:text-foreground"
+            className="inline-flex items-center justify-center gap-3 text-sm text-foreground/70 hover:text-foreground"
           >
-            ← Back to class
+            <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-muted text-foreground/80">←</span>
+            <span className="font-medium">Back to class</span>
           </Link>
         </div>
 
@@ -232,7 +233,7 @@ export default function Session() {
           )}
 
           <div className="mt-2 text-xl font-mono">
-            {mm}:{ss}
+            {isActive ? `${mm}:${ss}` : '00:00'}
           </div>
 
           {!isActive && (
@@ -249,6 +250,9 @@ export default function Session() {
             </>
           )}
         </div>
+
+        {/* Mobile-only bottom spacer to avoid cutoff behind OS UI */}
+        <div className="h-24 lg:hidden pb-[env(safe-area-inset-bottom)]" />
 
       </div>
     </main>
