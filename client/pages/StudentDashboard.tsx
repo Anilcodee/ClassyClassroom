@@ -162,35 +162,110 @@ export default function StudentDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role]);
 
+  // XHR-based fetch to bypass instrumented window.fetch (eg. FullStory) for critical API calls
+  async function xhrFetch(url: string, options: RequestInit = {}): Promise<Response> {
+    return new Promise<Response>((resolve, reject) => {
+      try {
+        const method = (options && (options as any).method) || "GET";
+        const headers = (options && (options as any).headers) || {};
+        const body = (options && (options as any).body) || null;
+        const resolvedUrl =
+          typeof location !== "undefined" && typeof url === "string" && url.startsWith("/")
+            ? `${location.origin}${url}`
+            : url;
+        const xhr = new XMLHttpRequest();
+        xhr.open(method, resolvedUrl, true);
+        try {
+          Object.keys(headers || {}).forEach((hk) => {
+            try {
+              xhr.setRequestHeader(hk, (headers as any)[hk]);
+            } catch {}
+          });
+        } catch {}
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState !== 4) return;
+          const hdrs: Record<string, string> = {};
+          try {
+            const raw = xhr.getAllResponseHeaders() || "";
+            raw
+              .trim()
+              .split(/\r?\n/)
+              .forEach((line) => {
+                const idx = line.indexOf(":");
+                if (idx > 0) {
+                  const k = line.slice(0, idx).trim();
+                  const v = line.slice(idx + 1).trim();
+                  hdrs[k] = v;
+                }
+              });
+          } catch {}
+          const responseInit: ResponseInit = {
+            status: xhr.status,
+            headers: hdrs,
+          };
+          resolve(new Response(xhr.responseText, responseInit));
+        };
+        xhr.onerror = () => reject(new Error("XHR error"));
+        if (body) xhr.send(body as any);
+        else xhr.send();
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
   async function refresh() {
     try {
       setError(null);
-      const res = await fetchWithRetry("/api/student/classes", {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data?.message || res.statusText);
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      let res: Response | null = null;
+      // Try XHR first to avoid FullStory or other fetch wrappers interfering
+      try {
+        res = await xhrFetch("/api/student/classes", { headers });
+      } catch (xhrErr) {
+        // Fallback to fetchWithRetry
+        try {
+          res = await fetchWithRetry("/api/student/classes", { headers });
+        } catch (fErr) {
+          throw fErr;
+        }
+      }
+
+      const data = await res!.json().catch(() => ({}));
+      if (!res!.ok) throw new Error(data?.message || res!.statusText);
       const list = data?.classes || [];
       setClasses(list);
-      // Fetch latest message metadata for each class
-      const headers = token
-        ? { Authorization: `Bearer ${token}` }
-        : ({} as any);
+
+      // Fetch latest message metadata for each class (XHR-first)
       const results = await Promise.allSettled(
         list.map((c: any) =>
-          fetchWithRetry(`/api/classes/${c.id || c._id}/messages?latest=1`, { headers })
-            .then((r) => r.json().catch(() => ({})))
-            .then((d) => ({
-              id: c.id || c._id,
-              latestAt: d?.latestAt ? new Date(d.latestAt).getTime() : null,
-              latestBy: d?.latestBy ? String(d.latestBy) : null,
-            })),
+          (async () => {
+            try {
+              const r = await xhrFetch(`/api/classes/${c.id || c._id}/messages?latest=1`, { headers });
+              const d = await r.json().catch(() => ({}));
+              return {
+                id: c.id || c._id,
+                latestAt: d?.latestAt ? new Date(d.latestAt).getTime() : null,
+                latestBy: d?.latestBy ? String(d.latestBy) : null,
+              };
+            } catch (err) {
+              // fallback to fetchWithRetry
+              try {
+                const r2 = await fetchWithRetry(`/api/classes/${c.id || c._id}/messages?latest=1`, { headers });
+                const d2 = await r2.json().catch(() => ({}));
+                return {
+                  id: c.id || c._id,
+                  latestAt: d2?.latestAt ? new Date(d2.latestAt).getTime() : null,
+                  latestBy: d2?.latestBy ? String(d2.latestBy) : null,
+                };
+              } catch (e2) {
+                return { id: c.id || c._id, latestAt: null, latestBy: null };
+              }
+            }
+          })(),
         ),
       );
-      const map: Record<
-        string,
-        { latestAt: number | null; latestBy: string | null }
-      > = {};
+      const map: Record<string, { latestAt: number | null; latestBy: string | null }> = {};
       results.forEach((r) => {
         if (r.status === "fulfilled")
           map[(r.value as any).id] = {
