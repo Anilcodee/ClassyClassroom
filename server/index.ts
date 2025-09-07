@@ -150,6 +150,11 @@ export function createServer() {
     requireAuth,
     listSubmissions,
   );
+  app.post(
+    "/api/assignments/:assignmentId/submissions/:submissionId/grade",
+    requireAuth,
+    gradeSubmission,
+  );
   app.delete("/api/assignments/:assignmentId", requireAuth, deleteAssignment);
 
   // Student
