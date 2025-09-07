@@ -157,4 +157,10 @@
       text-shadow: none;
     }
   }
+
+  /* Slight upward lift for back arrow to align with text */
+  .back-arrow {
+    display: inline-block;
+    transform: translateY(-2px);
+  }
 }
