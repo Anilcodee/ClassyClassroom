@@ -69,16 +69,16 @@ export default function ClassDetail() {
       try {
         return await fetch(url, { ...rest, signal: ac.signal });
       } catch (e: any) {
-        // Log failing fetch for easier debugging
         try {
-          console.error("fetchWithRetry failed", url, { attempt, error: e });
+          const emsg = e && e.message ? e.message : String(e);
+          console.error(`fetchWithRetry failed: url=${url} attempt=${attempt} error=${emsg}`, e);
         } catch {}
         if (attempt < 2 && (!signal || !(signal as any).aborted)) {
           await new Promise((r) => setTimeout(r, 400));
           return fetchWithRetry(url, init, attempt + 1);
         }
-        // Normalize thrown value to an Error with readable message
-        const toThrow = e instanceof Error ? e : new Error(typeof e === 'string' ? e : JSON.stringify(e));
+        // Normalize thrown value to an Error with readable message including the url
+        const toThrow = e instanceof Error ? e : new Error(`Fetch failed for ${url}: ${typeof e === 'string' ? e : JSON.stringify(e)}`);
         throw toThrow;
       } finally {
         clearTimeout(t);
