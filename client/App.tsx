@@ -26,6 +26,7 @@ import ClassAssignments from "./pages/ClassAssignments";
 import AssignmentSubmit from "./pages/AssignmentSubmit";
 import AssignmentCreate from "./pages/AssignmentCreate";
 import AssignmentEdit from "./pages/AssignmentEdit";
+import AssignmentSubmissions from "./pages/AssignmentSubmissions";
 import AssignmentDrafts from "./pages/AssignmentDrafts";
 import ModifyClass from "./pages/ModifyClass";
 import ArchivedClasses from "./pages/ArchivedClasses";
