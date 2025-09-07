@@ -105,6 +105,10 @@ export default function AssignmentCreate(){
             <label className="text-sm">Publish at</label>
             <input type="datetime-local" className="rounded-lg border border-input bg-background px-3 py-2" value={publishAt} onChange={(e)=>setPublishAt(e.target.value)} />
           </div>
+          <div className="grid gap-2">
+            <label className="text-sm">Points (total points for grading)</label>
+            <input type="number" min="0" className="rounded-lg border border-input bg-background px-3 py-2" value={(points ?? '') as any} onChange={(e)=> setPoints(e.target.value === '' ? '' : Number(e.target.value))} />
+          </div>
           <div className="flex items-center gap-3">
             <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={isDraft} onChange={(e)=>setIsDraft(e.target.checked)} /> Draft</label>
             <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={allowLate} onChange={(e)=>setAllowLate(e.target.checked)} /> Allow late</label>
