@@ -46,6 +46,8 @@ export default function AssignmentSubmit(){
     }
   }
 
+  const [submission, setSubmission] = useState<any>(null);
+
   async function load(signal?: AbortSignal){
     setLoading(true); setError(null);
     try {
@@ -56,6 +58,7 @@ export default function AssignmentSubmit(){
       const d = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
       setA(d.assignment);
+      setSubmission(d.submission || null);
     } catch(e:any){ if (e?.name !== 'AbortError') setError(e.message||'Failed'); }
     finally { setLoading(false); }
   }
