@@ -32,6 +32,7 @@ export default function AssignmentEdit(){
       setDescription(d.assignment.description || "");
       setDueAt(d.assignment.dueAt ? new Date(d.assignment.dueAt).toISOString().slice(0,16) : "");
       setPublishAt(d.assignment.publishAt ? new Date(d.assignment.publishAt).toISOString().slice(0,16) : "");
+      setPoints(d.assignment.points ?? 100);
       setIsDraft(Boolean(d.assignment.isDraft));
       setAllowLate(Boolean(d.assignment.allowLate));
       setAllowedRollNos((d.assignment.allowedRollNos||[]).join(", "));
