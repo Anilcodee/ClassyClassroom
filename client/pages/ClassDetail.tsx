@@ -308,14 +308,12 @@ export default function ClassDetail() {
 
   return (
     <main className="container mx-auto py-8">
-      <div className="flex justify-center">
-        <Link
-          to="/classes"
-          className="text-sm text-foreground/70 hover:text-foreground"
-        >
-          ← Back to classes
-        </Link>
-      </div>
+      <Link
+        to="/classes"
+        className="text-sm text-foreground/70 hover:text-foreground"
+      >
+        <span className="back-arrow">←</span>&nbsp;Back to classes
+      </Link>
       {loading ? (
         <p className="mt-4 text-sm text-foreground/70">Loading…</p>
       ) : error ? (
