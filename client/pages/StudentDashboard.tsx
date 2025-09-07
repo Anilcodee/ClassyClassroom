@@ -28,14 +28,25 @@ export default function StudentDashboard() {
   const userId = userRaw ? JSON.parse(userRaw)?.id || null : null;
   const role = userRaw ? JSON.parse(userRaw)?.role || "teacher" : null;
 
-  async function fetchWithRetry(url: string, init: RequestInit = {}, attempt = 1): Promise<Response> {
+  async function fetchWithRetry(
+    url: string,
+    init: RequestInit = {},
+    attempt = 1,
+  ): Promise<Response> {
     const { signal, ...rest } = init as any;
     try {
+      // Use globalThis.fetch to avoid potential site wrappers; ensure we always return a Response or a handled error
       const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
       const resolvedUrl =
-        typeof location !== "undefined" && typeof url === "string" && url.startsWith("/")
+        typeof location !== "undefined" &&
+        typeof url === "string" &&
+        url.startsWith("/")
           ? `${location.origin}${url}`
           : url;
+      // Diagnostic: resolved URL
+      try {
+        console.debug("fetchWithRetry resolvedUrl:", resolvedUrl);
+      } catch {}
       const options = {
         ...rest,
         signal,
@@ -45,19 +56,92 @@ export default function StudentDashboard() {
       const res = await nativeFetch(resolvedUrl, options);
       return res;
     } catch (e: any) {
-      const aborted = (signal && (signal as any).aborted) || e?.name === "AbortError" || e?.message === "The user aborted a request.";
+      // Diagnostic logging to help identify failing URL and error
+      try {
+        // eslint-disable-next-line no-console
+        console.error(
+          "fetchWithRetry error",
+          JSON.stringify({
+            url,
+            attempt,
+            error: String(e && e.message ? e.message : e),
+          }),
+        );
+      } catch {}
+
+      // If fetch throws synchronously (some wrappers may), try an XHR fallback for GET/POST/PATCH
+      try {
+        const method = (rest && rest.method) || "GET";
+        const headers = (rest && rest.headers) || {};
+        const body = (rest && rest.body) || null;
+        const xhrRes = await new Promise<Response>((resolve, reject) => {
+          try {
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, resolvedUrl, true);
+            Object.keys(headers || {}).forEach((hk) => {
+              try {
+                xhr.setRequestHeader(hk, (headers as any)[hk]);
+              } catch {}
+            });
+            xhr.onreadystatechange = () => {
+              if (xhr.readyState !== 4) return;
+              const hdrs: Record<string, string> = {};
+              try {
+                const raw = xhr.getAllResponseHeaders() || "";
+                raw
+                  .trim()
+                  .split(/\r?\n/)
+                  .forEach((line) => {
+                    const idx = line.indexOf(":");
+                    if (idx > 0) {
+                      const k = line.slice(0, idx).trim();
+                      const v = line.slice(idx + 1).trim();
+                      hdrs[k] = v;
+                    }
+                  });
+              } catch {}
+              const responseInit: ResponseInit = {
+                status: xhr.status,
+                headers: hdrs,
+              };
+              resolve(new Response(xhr.responseText, responseInit));
+            };
+            xhr.onerror = () => reject(new Error("XHR error"));
+            if (body) xhr.send(body as any);
+            else xhr.send();
+          } catch (err) {
+            reject(err);
+          }
+        });
+        return xhrRes;
+      } catch (xhrErr) {
+        // ignore and continue to other handling
+      }
+
+      // Normalize abort errors
+      const aborted =
+        (signal && (signal as any).aborted) ||
+        e?.name === "AbortError" ||
+        e?.message === "The user aborted a request.";
       if (aborted) {
         return new Response(JSON.stringify({ message: "aborted" }), {
           status: 499,
           headers: { "Content-Type": "application/json" },
         });
       }
-      if (attempt < 3 && (typeof navigator === "undefined" || navigator.onLine !== false)) {
+      // Retry a few times for transient network errors
+      if (
+        attempt < 3 &&
+        (typeof navigator === "undefined" || navigator.onLine !== false)
+      ) {
         await new Promise((r) => setTimeout(r, 300 * attempt));
         try {
           return await fetchWithRetry(url, init, attempt + 1);
-        } catch {}
+        } catch (err) {
+          // If recursive call somehow throws, fallthrough to return network error
+        }
       }
+      // Return a synthetic Response instead of throwing so callers can handle uniformly
       return new Response(JSON.stringify({ message: "Network error" }), {
         status: 0,
         headers: { "Content-Type": "application/json" },
