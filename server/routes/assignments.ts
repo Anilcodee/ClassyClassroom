@@ -56,7 +56,7 @@ export const createAssignment: RequestHandler = async (req: AuthRequest, res) =>
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { id } = req.params as { id: string }; // class id
-    const { title, description, type, questions, dueAt, publishAt, isDraft, allowLate, allowedRollNos, attachments } = req.body as any;
+    const { title, description, type, questions, dueAt, publishAt, points, isDraft, allowLate, allowedRollNos, attachments } = req.body as any;
 
     const cls = await ClassModel.findById(id).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
