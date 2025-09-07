@@ -209,12 +209,8 @@ export default function Session() {
     <main className="min-h-[calc(100vh-56px)] flex items-center justify-center py-10">
       <div className="w-full max-w-lg px-4 text-center">
         <div className="mb-4">
-          <Link
-            to={backHref}
-            className="inline-flex items-center justify-center gap-3 text-sm text-foreground/70 hover:text-foreground"
-          >
-            <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-muted text-foreground/80">←</span>
-            <span className="font-medium">Back to class</span>
+          <Link to={backHref} className="text-sm text-foreground/70 hover:text-foreground">
+            <span className="back-arrow">←</span>&nbsp;Back to class
           </Link>
         </div>
 
