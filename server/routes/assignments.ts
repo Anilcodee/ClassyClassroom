@@ -207,7 +207,16 @@ export const getAssignment: RequestHandler = async (req: AuthRequest, res) => {
       if (!allowed || !published) return res.status(403).json({ message: "Unauthorized" });
     }
 
-    res.json({ assignment: a });
+    // If student, include their submission and grade (if any)
+    let submission = null;
+    try {
+      if (user && (user as any).role === 'student') {
+        const sub = await Submission.findOne({ assignmentId, userId }).lean();
+        submission = sub || null;
+      }
+    } catch (e) { /* ignore */ }
+
+    res.json({ assignment: a, submission });
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Server error" });
