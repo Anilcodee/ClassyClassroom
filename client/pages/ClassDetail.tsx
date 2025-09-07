@@ -120,8 +120,13 @@ export default function ClassDetail() {
         });
       } catch (err: any) {
         // Network-level failure
-        const msg = err && err.message ? err.message : String(err || '');
-        setError(msg || "Network error: failed to reach API");
+        try {
+          const emsg = err && err.message ? err.message : String(err || '');
+          console.warn(`load() network error for /api/classes/${id}:`, emsg, err);
+          setError(emsg || "Network error: failed to reach API");
+        } catch {
+          setError("Network error: failed to reach API");
+        }
         setLoading(false);
         return;
       }
