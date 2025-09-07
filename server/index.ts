@@ -54,6 +54,7 @@ import {
   submitAssignment,
   listSubmissions,
   deleteAssignment,
+  gradeSubmission,
 } from "./routes/assignments";
 
 export function createServer() {
