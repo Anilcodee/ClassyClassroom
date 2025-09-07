@@ -76,9 +76,9 @@ export default function AssignmentCreate(){
 
   return (
     <main className="container mx-auto py-8">
-      <div className="flex justify-center">
-        <Link to={`/classes/${id}/assignments`} className="text-sm text-foreground/70 hover:text-foreground">← Back to assignments</Link>
-      </div>
+      <Link to={`/classes/${id}/assignments`} className="text-sm text-foreground/70 hover:text-foreground">
+        <span className="back-arrow">←</span>&nbsp;Back to assignments
+      </Link>
       <h1 className="mt-2 text-2xl font-bold">Create assignment or quiz</h1>
       <div className="mt-4 rounded-xl border border-border p-4 bg-card">
         <div className="grid gap-3 md:grid-cols-2">
