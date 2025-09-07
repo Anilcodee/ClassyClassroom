@@ -134,6 +134,7 @@ export const updateAssignment: RequestHandler = async (req: AuthRequest, res) =>
     if (typeof payload.title === 'string') a.title = payload.title.trim() || a.title;
     if (typeof payload.description === 'string') a.description = payload.description;
     if (typeof payload.type === 'string') a.type = payload.type === 'quiz' ? 'quiz' : 'assignment';
+    if (typeof payload.points === 'number' || (typeof payload.points === 'string' && payload.points.trim())) a.points = typeof payload.points === 'number' ? payload.points : Number(payload.points);
     if (Array.isArray(payload.questions)) a.questions = payload.questions;
     if (Array.isArray(payload.attachments) && payload.attachments.length > 0) {
       const atts = payload.attachments.slice(0,5).map((a:any)=> ({
