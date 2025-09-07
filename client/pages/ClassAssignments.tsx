@@ -63,7 +63,8 @@ export default function ClassAssignments(){
   useEffect(()=>{
     mountedRef.current = true;
     const ac = new AbortController();
-    void load(ac.signal);
+    // ensure any rejection (including AbortError) is handled to avoid uncaught promise
+    load(ac.signal).catch(() => {});
     return () => { mountedRef.current = false; try { ac.abort(); } catch {} };
   }, [id]);
 
