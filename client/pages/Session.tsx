@@ -53,7 +53,15 @@ export default function Session() {
         if (!cancelled && isActive) setTimeout(poll, 1000);
       }
     };
-    poll();
+    const safeLog = (e: any) => {
+      try {
+        console.warn('Session poll top-level error', e);
+      } catch {}
+    };
+
+    // kick off the first poll and ensure any rejection is handled
+    poll().catch(safeLog);
+
     return () => {
       cancelled = true;
     };
