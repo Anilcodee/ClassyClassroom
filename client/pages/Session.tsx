@@ -219,9 +219,11 @@ export default function Session() {
         <div ref={containerRef} className="p-4 rounded-xl border border-border bg-card w-full max-w-[520px]">
           <QRCodeCanvas value={link} size={qrSize} includeMargin style={{ width: '100%', height: 'auto' }} />
         </div>
-        <a href={link} className="mt-3 text-sm underline break-words max-w-[90vw]">
-          {link}
-        </a>
+        {isActive && (
+          <a href={link} className="mt-3 text-sm underline break-words max-w-[90vw]">
+            {link}
+          </a>
+        )}
         <div className="mt-4 text-xl font-mono">
           {mm}:{ss}
         </div>
