@@ -57,6 +57,7 @@ export default function AssignmentCreate(){
           title,
           description: description || undefined,
           type,
+          points: typeof points === 'number' ? points : (points === '' ? undefined : Number(points)),
           questions: [],
           attachments,
           dueAt: dueAt ? new Date(dueAt).toISOString() : null,
