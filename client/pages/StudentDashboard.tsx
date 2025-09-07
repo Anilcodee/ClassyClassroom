@@ -28,6 +28,43 @@ export default function StudentDashboard() {
   const userId = userRaw ? JSON.parse(userRaw)?.id || null : null;
   const role = userRaw ? JSON.parse(userRaw)?.role || "teacher" : null;
 
+  async function fetchWithRetry(url: string, init: RequestInit = {}, attempt = 1): Promise<Response> {
+    const { signal, ...rest } = init as any;
+    try {
+      const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
+      const resolvedUrl =
+        typeof location !== "undefined" && typeof url === "string" && url.startsWith("/")
+          ? `${location.origin}${url}`
+          : url;
+      const options = {
+        ...rest,
+        signal,
+        credentials: (rest as any).credentials ?? "same-origin",
+        mode: (rest as any).mode ?? "cors",
+      } as any;
+      const res = await nativeFetch(resolvedUrl, options);
+      return res;
+    } catch (e: any) {
+      const aborted = (signal && (signal as any).aborted) || e?.name === "AbortError" || e?.message === "The user aborted a request.";
+      if (aborted) {
+        return new Response(JSON.stringify({ message: "aborted" }), {
+          status: 499,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      if (attempt < 3 && (typeof navigator === "undefined" || navigator.onLine !== false)) {
+        await new Promise((r) => setTimeout(r, 300 * attempt));
+        try {
+          return await fetchWithRetry(url, init, attempt + 1);
+        } catch {}
+      }
+      return new Response(JSON.stringify({ message: "Network error" }), {
+        status: 0,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  }
+
   useEffect(() => {
     if (!token) {
       nav("/student-auth");
@@ -44,7 +81,7 @@ export default function StudentDashboard() {
   async function refresh() {
     try {
       setError(null);
-      const res = await fetch("/api/student/classes", {
+      const res = await fetchWithRetry("/api/student/classes", {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       const data = await res.json().catch(() => ({}));
@@ -57,7 +94,7 @@ export default function StudentDashboard() {
         : ({} as any);
       const results = await Promise.allSettled(
         list.map((c: any) =>
-          fetch(`/api/classes/${c.id || c._id}/messages?latest=1`, { headers })
+          fetchWithRetry(`/api/classes/${c.id || c._id}/messages?latest=1`, { headers })
             .then((r) => r.json().catch(() => ({})))
             .then((d) => ({
               id: c.id || c._id,
