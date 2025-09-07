@@ -334,7 +334,7 @@ export default function ClassDetail() {
               <h1 className="text-2xl font-bold truncate">
                 {cls.name}
                 {cls.isActive && mm && ss && (
-                  <span className="text-base font-mono px-2 py-1 rounded-md bg-muted text-foreground/80 ml-2">
+                  <span className="text-base font-mono px-2 py-1 rounded-md bg-muted text-foreground/80 ml-2 time-lift">
                     {mm}:{ss}
                   </span>
                 )}
