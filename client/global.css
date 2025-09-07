@@ -131,3 +131,30 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Glowing text for session termination */
+  @keyframes glow {
+    0% {
+      text-shadow: 0 0 6px rgba(255, 69, 58, 0.7), 0 0 14px rgba(255, 69, 58, 0.2);
+    }
+    50% {
+      text-shadow: 0 0 18px rgba(255, 69, 58, 0.95), 0 0 28px rgba(255, 69, 58, 0.45);
+    }
+    100% {
+      text-shadow: 0 0 6px rgba(255, 69, 58, 0.7), 0 0 14px rgba(255, 69, 58, 0.2);
+    }
+  }
+
+  .glow-text {
+    animation: glow 1.6s ease-in-out infinite;
+    /* make sure color uses destructive token via Tailwind utility classes */
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glow-text {
+      animation: none;
+      text-shadow: none;
+    }
+  }
+}
