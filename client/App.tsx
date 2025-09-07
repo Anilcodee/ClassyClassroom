@@ -68,6 +68,7 @@ const App = () => (
             element={<AssignmentCreate />}
           />
           <Route path="/assign/:assignmentId" element={<AssignmentSubmit />} />
+          <Route path="/assign/:assignmentId/submissions" element={<AssignmentSubmissions />} />
           <Route
             path="/assign/:assignmentId/edit"
             element={<AssignmentEdit />}
