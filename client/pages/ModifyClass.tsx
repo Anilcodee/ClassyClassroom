@@ -51,9 +51,9 @@ export default function ModifyClass() {
 
   return (
     <main className="container mx-auto py-8">
-      <div className="flex justify-center">
-        <Link to={`/classes/${id}`} className="text-sm text-foreground/70 hover:text-foreground">← Back to class</Link>
-      </div>
+      <Link to={`/classes/${id}`} className="text-sm text-foreground/70 hover:text-foreground">
+        <span className="back-arrow">←</span>&nbsp;Back to class
+      </Link>
       <h1 className="mt-2 text-2xl font-bold">Modify class</h1>
       {loading ? (
         <p className="mt-4 text-sm text-foreground/70">Loading…</p>
