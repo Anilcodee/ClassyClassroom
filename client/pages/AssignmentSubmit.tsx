@@ -138,6 +138,14 @@ export default function AssignmentSubmit(){
           {a.dueAt && <p className="mt-1 text-sm text-foreground/60">Due on {formatDateTime(a.dueAt)}</p>}
           {closed && <p className="mt-1 text-sm text-destructive">Submissions are closed for this assignment.</p>}
 
+          {submission && (typeof submission.score !== 'undefined' && submission.score !== null) && (
+            <div className="mt-3 rounded-md border border-border p-3 bg-muted text-left">
+              <p className="font-medium">Score: {submission.score} / {a.points ?? 100}</p>
+              {submission.feedback && <p className="mt-2 text-sm">Feedback: {submission.feedback}</p>}
+              {submission.gradedAt && <p className="mt-1 text-xs text-foreground/60">Graded on {formatDateTime(submission.gradedAt)}</p>}
+            </div>
+          )}
+
           <div className="mt-4 space-y-3">
             {(a.questions||[]).length === 0 ? (
               <p className="text-sm text-foreground/70">No questions. You can still submit notes.</p>
