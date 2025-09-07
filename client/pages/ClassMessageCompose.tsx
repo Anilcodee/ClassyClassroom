@@ -81,12 +81,14 @@ export default function ClassMessageCompose() {
 
   return (
     <main className="container mx-auto py-8">
-      <Link
-        to={`/classes/${id}/messages`}
-        className="text-sm text-foreground/70 hover:text-foreground"
-      >
-        ← Back to messages
-      </Link>
+      <div className="flex justify-center">
+        <Link
+          to={`/classes/${id}/messages`}
+          className="text-sm text-foreground/70 hover:text-foreground"
+        >
+          ← Back to messages
+        </Link>
+      </div>
       <h1 className="mt-2 text-2xl font-bold">Make an announcement</h1>
       <div className="mt-4 rounded-xl border border-border p-4">
         <div className="grid gap-2">

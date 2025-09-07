@@ -109,7 +109,9 @@ export default function ClassAssignments(){
 
   return (
     <main className="container mx-auto py-8">
-      <Link to={`/classes/${id}/messages`} className="text-sm text-foreground/70 hover:text-foreground">← Back to class</Link>
+      <div className="flex justify-center">
+        <Link to={`/classes/${id}/messages`} className="text-sm text-foreground/70 hover:text-foreground">← Back to class</Link>
+      </div>
       <div className="mt-2 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Assignments</h1>
         {role !== 'student' && (

@@ -486,12 +486,14 @@ export default function ClassMessages() {
 
   return (
     <main className="container mx-auto py-8">
-      <Link
-        to={backHref}
-        className="text-sm text-foreground/70 hover:text-foreground"
-      >
-        ← Back to classes
-      </Link>
+      <div className="flex justify-center">
+        <Link
+          to={backHref}
+          className="text-sm text-foreground/70 hover:text-foreground"
+        >
+          ← Back to classes
+        </Link>
+      </div>
       <div className="mt-2 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Messages</h1>
         <div
