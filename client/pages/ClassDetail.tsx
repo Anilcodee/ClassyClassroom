@@ -71,13 +71,15 @@ export default function ClassDetail() {
       } catch (e: any) {
         // Log failing fetch for easier debugging
         try {
-          console.error("fetchWithRetry failed", { url, attempt, error: e });
+          console.error("fetchWithRetry failed", url, { attempt, error: e });
         } catch {}
         if (attempt < 2 && (!signal || !(signal as any).aborted)) {
           await new Promise((r) => setTimeout(r, 400));
           return fetchWithRetry(url, init, attempt + 1);
         }
-        throw e;
+        // Normalize thrown value to an Error with readable message
+        const toThrow = e instanceof Error ? e : new Error(typeof e === 'string' ? e : JSON.stringify(e));
+        throw toThrow;
       } finally {
         clearTimeout(t);
       }
@@ -118,7 +120,8 @@ export default function ClassDetail() {
         });
       } catch (err: any) {
         // Network-level failure
-        setError(err?.message || "Network error: failed to reach API");
+        const msg = err && err.message ? err.message : String(err || '');
+        setError(msg || "Network error: failed to reach API");
         setLoading(false);
         return;
       }
@@ -152,7 +155,8 @@ export default function ClassDetail() {
       }
     } catch (e: any) {
       if (e?.name === "AbortError") return;
-      setError(e?.message || "Network error");
+      const msg = e && e.message ? e.message : String(e || '');
+      setError(msg || "Network error");
     } finally {
       setLoading(false);
     }
@@ -245,7 +249,8 @@ export default function ClassDetail() {
           timeoutMs: 8000,
         });
       } catch (err: any) {
-        setError(err?.message || "Network error: failed to activate class");
+        const msg = err && err.message ? err.message : String(err || '');
+        setError(msg || "Network error: failed to activate class");
         return;
       }
       const data = await res.json().catch(() => null);
@@ -255,8 +260,9 @@ export default function ClassDetail() {
       }
       nav(`/session/${data.sessionId}`, { state: { classId: id } });
     } catch (e: any) {
-      setError(e.message);
-      if (e.message === "Please log in") nav("/auth");
+      const msg = e && e.message ? e.message : String(e || '');
+      setError(msg || 'Unexpected error');
+      if (msg === "Please log in") nav("/auth");
     }
   }
 
@@ -294,8 +300,9 @@ export default function ClassDetail() {
       if (!r.ok) throw new Error(d?.message || r.statusText);
       setRecords(d.records || []);
     } catch (e: any) {
-      setError(e.message || "Failed to update");
-      if (e.message === "Please log in") nav("/auth");
+      const msg = e && e.message ? e.message : String(e || '');
+      setError(msg || "Failed to update");
+      if (msg === "Please log in") nav("/auth");
     }
   }
 
