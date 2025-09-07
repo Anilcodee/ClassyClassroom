@@ -12,11 +12,30 @@ export default function Session() {
   useEffect(() => {
     if (!sessionId) return;
     let cancelled = false;
+
+    const safeLog = (e: any) => {
+      try {
+        console.warn('Session poll top-level error', e);
+      } catch {}
+    };
+
+    const scheduleNext = () => {
+      try {
+        setTimeout(() => {
+          poll().catch(safeLog);
+        }, 1000);
+      } catch (e) {
+        try {
+          safeLog(e);
+        } catch {}
+      }
+    };
+
     const poll = async () => {
       // avoid noisy fetch attempts when offline
       if (typeof window !== "undefined" && !navigator.onLine) {
         // schedule a retry later
-        if (!cancelled && isActive) setTimeout(poll, 1000);
+        if (!cancelled && isActive) scheduleNext();
         return;
       }
 
@@ -50,13 +69,8 @@ export default function Session() {
         try {
           ac.abort();
         } catch {}
-        if (!cancelled && isActive) setTimeout(poll, 1000);
+        if (!cancelled && isActive) scheduleNext();
       }
-    };
-    const safeLog = (e: any) => {
-      try {
-        console.warn('Session poll top-level error', e);
-      } catch {}
     };
 
     // kick off the first poll and ensure any rejection is handled
