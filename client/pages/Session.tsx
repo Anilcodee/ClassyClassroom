@@ -216,16 +216,20 @@ export default function Session() {
       <h1 className="mt-2 text-2xl font-bold">Scan to mark attendance</h1>
       <p className="text-foreground/70">Share this QR or link with students.</p>
       <div className="mt-6 grid place-items-center">
-        <div ref={containerRef} className="p-4 rounded-xl border border-border bg-card" style={{ width: "min(90vw, 520px)" }}>
-          <QRCodeCanvas value={link} size={qrSize} includeMargin />
+        <div ref={containerRef} className="p-4 rounded-xl border border-border bg-card w-full max-w-[520px]">
+          <QRCodeCanvas value={link} size={qrSize} includeMargin style={{ width: '100%', height: 'auto' }} />
         </div>
-        <a href={link} className="mt-3 text-sm underline break-words">
+        <a href={link} className="mt-3 text-sm underline break-words max-w-[90vw]">
           {link}
         </a>
         <div className="mt-4 text-xl font-mono">
           {mm}:{ss}
         </div>
-        {!isActive && <p className="mt-2 text-destructive">Session ended</p>}
+        {!isActive && (
+          <p className="mt-4 text-destructive glow-text text-lg font-semibold">
+            Session ended
+          </p>
+        )}
         {!isActive && (
           <button
             className="mt-4 px-4 py-2 rounded-lg border border-border"
