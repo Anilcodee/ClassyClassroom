@@ -62,7 +62,7 @@ export default function AssignmentSubmit(){
     } catch(e:any){ if (e?.name !== 'AbortError') setError(e.message||'Failed'); }
     finally { setLoading(false); }
   }
-  useEffect(()=>{ const ac = new AbortController(); void load(ac.signal); return ()=> { try { ac.abort(); } catch {} }; }, [assignmentId]);
+  useEffect(()=>{ const ac = new AbortController(); load(ac.signal).catch(()=>{}); return ()=> { try { ac.abort(); } catch {} }; }, [assignmentId]);
 
   async function readFiles(fs: File[]): Promise<Attachment[]> {
     const picked = fs.slice(0, MAX_FILES).filter(f => f.size <= MAX_SIZE);
