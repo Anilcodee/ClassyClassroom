@@ -576,7 +576,25 @@ export default function ClassMessages() {
           {messages.map((m) => (
             <li key={m.id} className="rounded-xl border border-border p-4">
               <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
+                <div
+                  className="flex-1 min-w-0"
+                  onClick={(e) => {
+                    try {
+                      // Only navigate when not editing, message has assignmentId, and user is a student
+                      if (editingId === m.id) return;
+                      if (!m.assignmentId) return;
+                      if (userRole !== "student") return;
+                      // don't navigate if user clicked a link or button inside the message
+                      const el = e.target as HTMLElement | null;
+                      if (el) {
+                        if (el.closest("a") || el.closest("button") || el.closest("input") || el.closest("textarea")) return;
+                      }
+                      // navigate to assignment submission/view page
+                      nav(`/assign/${m.assignmentId}`);
+                    } catch {}
+                  }}
+                  style={{ cursor: m.assignmentId && userRole === "student" ? "pointer" : undefined }}
+                >
                   {editingId === m.id ? (
                     <>
                       <input
