@@ -450,14 +450,14 @@ export default function StudentDashboard() {
                       </div>
 
                       <button
-                        className="p-1 rounded hover:bg-accent"
-                        title="More"
+                        className="h-8 px-2.5 rounded-md text-xs inline-flex items-center justify-center border border-border bg-background hover:bg-accent hover:text-accent-foreground"
+                        title="Move"
                         onClick={(e) => {
                           e.stopPropagation();
                           setMenuOpenFor(menuOpenFor === cid ? "" : String(cid));
                         }}
                       >
-                        <MoreVertical className="h-4 w-4" />
+                        Move
                       </button>
                     </div>
 
