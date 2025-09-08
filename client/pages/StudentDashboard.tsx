@@ -462,54 +462,98 @@ export default function StudentDashboard() {
                     </div>
 
                     {menuOpenFor === String(cid) && (
-                      <div className="absolute z-20 right-2 top-12 w-44 sm:w-40 rounded-md border border-border bg-background shadow max-w-xs overflow-auto">
-                        <div className="sm:hidden block w-full px-2 py-1 text-right">
+                      <>
+                        {/* small screens: full dropdown */}
+                        <div className="absolute z-20 right-2 top-12 w-44 sm:hidden rounded-md border border-border bg-background shadow max-w-xs overflow-auto">
+                          <div className="block w-full px-2 py-1 text-right">
+                            <button
+                              className="text-sm"
+                              onClick={() => setMenuOpenFor("")}
+                            >
+                              Close
+                            </button>
+                          </div>
+
                           <button
-                            className="text-sm"
-                            onClick={() => setMenuOpenFor("")}
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setMoveFor(cid);
+                              setMoveAfter(false);
+                              setMenuOpenFor("");
+                            }}
                           >
-                            Close
+                            Move…
+                          </button>
+
+                          <button
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                            onClick={async () => {
+                              try {
+                                const token = localStorage.getItem("token");
+                                const headers: Record<string, string> = {};
+                                if (token) headers.Authorization = `Bearer ${token}`;
+                                const res = await fetch(
+                                  `/api/student/classes/${cid}/unenroll`,
+                                  { method: "DELETE", headers },
+                                );
+                                const d = await res.json().catch(() => ({}));
+                                if (!res.ok) throw new Error(d?.message || res.statusText);
+                                setClasses((prev) =>
+                                  prev.filter((x) => (x.id || (x as any)._id) !== cid),
+                                );
+                              } catch (e: any) {
+                                setError(e.message || "Failed to unenroll");
+                              } finally {
+                                setMenuOpenFor("");
+                              }
+                            }}
+                          >
+                            Unenrol class
                           </button>
                         </div>
 
-                        <button
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setMoveFor(cid);
-                            setMoveAfter(false);
-                            setMenuOpenFor("");
-                          }}
-                        >
-                          Move…
-                        </button>
-
-                        <button
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
-                          onClick={async () => {
-                            try {
-                              const token = localStorage.getItem("token");
-                              const headers: Record<string, string> = {};
-                              if (token) headers.Authorization = `Bearer ${token}`;
-                              const res = await fetch(
-                                `/api/student/classes/${cid}/unenroll`,
-                                { method: "DELETE", headers },
-                              );
-                              const d = await res.json().catch(() => ({}));
-                              if (!res.ok) throw new Error(d?.message || res.statusText);
-                              setClasses((prev) =>
-                                prev.filter((x) => (x.id || (x as any)._id) !== cid),
-                              );
-                            } catch (e: any) {
-                              setError(e.message || "Failed to unenroll");
-                            } finally {
+                        {/* larger screens: inline panel next to icon */}
+                        <div className="hidden sm:flex absolute z-20 right-10 top-3 rounded-md border border-border bg-background shadow px-2 py-1 items-center gap-2">
+                          <button
+                            className="px-2 py-1 text-sm rounded hover:bg-accent"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setMoveFor(cid);
+                              setMoveAfter(false);
                               setMenuOpenFor("");
-                            }
-                          }}
-                        >
-                          Unenrol class
-                        </button>
-                      </div>
+                            }}
+                          >
+                            Move…
+                          </button>
+                          <button
+                            className="px-2 py-1 text-sm rounded hover:bg-accent"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                const token = localStorage.getItem("token");
+                                const headers: Record<string, string> = {};
+                                if (token) headers.Authorization = `Bearer ${token}`;
+                                const res = await fetch(
+                                  `/api/student/classes/${cid}/unenroll`,
+                                  { method: "DELETE", headers },
+                                );
+                                const d = await res.json().catch(() => ({}));
+                                if (!res.ok) throw new Error(d?.message || res.statusText);
+                                setClasses((prev) =>
+                                  prev.filter((x) => (x.id || (x as any)._id) !== cid),
+                                );
+                              } catch (e: any) {
+                                setError(e.message || "Failed to unenroll");
+                              } finally {
+                                setMenuOpenFor("");
+                              }
+                            }}
+                          >
+                            Unenrol
+                          </button>
+                        </div>
+                      </>
                     )}
                   </div>
                   <span
