@@ -560,6 +560,56 @@ export default function StudentDashboard() {
           </ul>
         )}
       </div>
+      {/* Move modal */}
+      {moveFor && moveMode && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
+          <div className="bg-background rounded-lg border border-border p-4 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-2">Move class — {classes.find(x => (x as any).id === moveFor || (x as any)._id === moveFor)?.name}</h3>
+            <p className="text-sm text-foreground/70 mb-3">Select a target class to move {moveMode === 'before' ? 'before' : 'after'}.</p>
+            <div className="max-h-64 overflow-auto mb-3">
+              <ul className="space-y-1">
+                {classes.filter(x => ((x as any).id || (x as any)._id) !== moveFor).map((t) => {
+                  const tid = (t as any).id || (t as any)._id;
+                  return (
+                    <li key={tid}>
+                      <button
+                        className="w-full text-left px-3 py-2 rounded hover:bg-accent"
+                        onClick={() => {
+                          setMoveError(null);
+                          try {
+                            const from = findIndexById(moveFor!);
+                            const targetIdx = findIndexById(tid);
+                            if (from === -1 || targetIdx === -1) {
+                              setMoveError('Invalid target');
+                              return;
+                            }
+                            let to = moveMode === 'before' ? targetIdx : targetIdx + 1;
+                            if (from < to) to = to - 1;
+                            moveToPosition(moveFor!, to);
+                            setMoveFor(null);
+                            setMoveMode(null);
+                          } catch (e:any) {
+                            setMoveError(e?.message || 'Failed to move');
+                          }
+                        }}
+                      >
+                        {t.name}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            {moveError && <p className="text-sm text-destructive mb-2">{moveError}</p>}
+            <div className="flex justify-end gap-2">
+              <button className="px-3 py-1.5 rounded-md border border-border" onClick={() => { setMoveFor(null); setMoveMode(null); setMoveError(null); }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile-only bottom spacer to avoid cutoff behind OS UI */}
       <div className="h-24 lg:hidden pb-[env(safe-area-inset-bottom)]" />
 
