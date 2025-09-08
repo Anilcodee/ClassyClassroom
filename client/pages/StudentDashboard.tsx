@@ -18,6 +18,9 @@ export default function StudentDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [menuOpenFor, setMenuOpenFor] = useState<string>("");
+  const [moveFor, setMoveFor] = useState<string | null>(null);
+  const [moveMode, setMoveMode] = useState<"before" | "after" | null>(null);
+  const [moveError, setMoveError] = useState<string | null>(null);
   const [latestMap, setLatestMap] = useState<
     Record<string, { latestAt: number | null; latestBy: string | null }>
   >({});
