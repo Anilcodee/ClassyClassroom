@@ -221,6 +221,7 @@ export const updateMessage: RequestHandler = async (req: AuthRequest, res) => {
         id: updated!._id,
         title: updated!.title || "",
         content: updated!.content,
+        assignmentId: updated!.assignmentId ? String(updated!.assignmentId) : undefined,
         createdAt: updated!.createdAt,
         updatedAt: updated!.updatedAt,
         pinned: !!updated!.pinned,
