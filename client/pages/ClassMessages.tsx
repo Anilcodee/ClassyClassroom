@@ -909,12 +909,21 @@ export default function ClassMessages() {
                 </>
               )}
               <p className="mt-1 text-xs text-foreground/60">
-                {m.updatedAt &&
-                new Date(m.updatedAt).getTime() >
-                  new Date(m.createdAt).getTime()
+                {m.updatedAt && new Date(m.updatedAt).getTime() > new Date(m.createdAt).getTime()
                   ? `${formatDateTime(m.updatedAt)} (edited)`
                   : formatDateTime(m.createdAt)}
               </p>
+
+              {(m.assignmentPublishAt || m.assignmentDueAt) && (
+                <p className="mt-1 text-xs text-foreground/60">
+                  {m.assignmentPublishAt && (
+                    <span className="mr-2">Published: {formatDateTime(m.assignmentPublishAt)}</span>
+                  )}
+                  {m.assignmentDueAt && (
+                    <span>Due: {formatDateTime(m.assignmentDueAt)}</span>
+                  )}
+                </p>
+              )}
 
               <div className="mt-3 border-t border-border pt-3">
                 <p className="text-sm font-medium">Comments</p>
