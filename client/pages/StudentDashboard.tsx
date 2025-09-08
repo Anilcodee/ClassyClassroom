@@ -527,11 +527,17 @@ export default function StudentDashboard() {
         )}
       </div>
       {/* Move modal */}
-      {moveFor && moveMode && (
+      {moveFor && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
           <div className="bg-background rounded-lg border border-border p-4 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold mb-2">Move class — {classes.find(x => (x as any).id === moveFor || (x as any)._id === moveFor)?.name}</h3>
-            <p className="text-sm text-foreground/70 mb-3">Select a target class to move {moveMode === 'before' ? 'before' : 'after'}.</p>
+            <p className="text-sm text-foreground/70 mb-3">Select a target class to move to. Use "Place after" to insert after the selected class.</p>
+            <div className="flex items-center gap-3 mb-3">
+              <label className="inline-flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={moveAfter} onChange={(e) => setMoveAfter(e.target.checked)} />
+                <span className="text-sm">Place after target</span>
+              </label>
+            </div>
             <div className="max-h-64 overflow-auto mb-3">
               <ul className="space-y-1">
                 {classes.filter(x => ((x as any).id || (x as any)._id) !== moveFor).map((t) => {
@@ -549,11 +555,11 @@ export default function StudentDashboard() {
                               setMoveError('Invalid target');
                               return;
                             }
-                            let to = moveMode === 'before' ? targetIdx : targetIdx + 1;
+                            let to = moveAfter ? targetIdx + 1 : targetIdx;
                             if (from < to) to = to - 1;
                             moveToPosition(moveFor!, to);
                             setMoveFor(null);
-                            setMoveMode(null);
+                            setMoveAfter(false);
                           } catch (e:any) {
                             setMoveError(e?.message || 'Failed to move');
                           }
@@ -568,7 +574,7 @@ export default function StudentDashboard() {
             </div>
             {moveError && <p className="text-sm text-destructive mb-2">{moveError}</p>}
             <div className="flex justify-end gap-2">
-              <button className="px-3 py-1.5 rounded-md border border-border" onClick={() => { setMoveFor(null); setMoveMode(null); setMoveError(null); }}>
+              <button className="px-3 py-1.5 rounded-md border border-border" onClick={() => { setMoveFor(null); setMoveAfter(false); setMoveError(null); }}>
                 Cancel
               </button>
             </div>
