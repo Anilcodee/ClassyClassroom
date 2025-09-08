@@ -406,7 +406,8 @@ export default function StudentDashboard() {
 
                           <Link
                             to={`/student/classes/${cid}/attendance`}
-                            className="h-8 px-2.5 rounded-md text-xs border border-border bg-background hover:bg-accent hover:text-accent-foreground"
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-8 px-2.5 rounded-md text-xs inline-flex items-center justify-center bg-primary text-primary-foreground hover:opacity-90"
                             title="My Attendance"
                           >
                             Attendance
