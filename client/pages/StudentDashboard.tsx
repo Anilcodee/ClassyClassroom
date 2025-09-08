@@ -514,7 +514,7 @@ export default function StudentDashboard() {
                         </div>
 
                         {/* larger screens: inline vertical panel vertically centered with the three-dot icon */}
-                        <div className="hidden sm:flex absolute z-20 right-12 top-12 flex-col items-stretch rounded-md border border-border bg-background shadow w-40 overflow-hidden">
+                        <div className="hidden sm:flex absolute z-20 top-12 flex-col items-stretch rounded-md border border-border bg-background shadow w-40 overflow-hidden" style={{ right: '56px' }}>
                           <button
                             className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
                             onClick={(e) => {
