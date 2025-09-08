@@ -593,7 +593,13 @@ export default function ClassMessages() {
                     </>
                   ) : (
                     <>
-                      {m.title && <p className="font-semibold">{m.title}</p>}
+                      {m.title && (
+                        m.assignmentId ? (
+                          <Link to={`/assign/${m.assignmentId}`} className="font-semibold text-primary hover:underline">{m.title}</Link>
+                        ) : (
+                          <p className="font-semibold">{m.title}</p>
+                        )
+                      )}
                       <p className="whitespace-pre-wrap text-foreground/90">
                         {m.content}
                       </p>
