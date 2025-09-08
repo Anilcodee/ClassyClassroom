@@ -40,7 +40,7 @@ export default function AssignmentDrafts(){
   useEffect(()=>{
     mountedRef.current = true;
     const ac = new AbortController();
-    void load(ac.signal);
+    load(ac.signal).catch(()=>{});
     return () => { mountedRef.current = false; try { ac.abort(); } catch {} };
   }, [id]);
 
