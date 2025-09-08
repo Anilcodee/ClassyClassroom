@@ -112,9 +112,35 @@ export default function AssignmentEdit(){
     setSaving(true); setError(null);
     try {
       const token = localStorage.getItem('token');
-      const r = await fetchWithRetry(`/api/assignments/${assignmentId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' }, body: JSON.stringify({
-        title, description, points: typeof points === 'number' ? points : (points === '' ? null : Number(points)), dueAt: dueAt ? new Date(dueAt).toISOString() : null, publishAt: publishAt ? new Date(publishAt).toISOString() : null, isDraft, allowLate, allowedRollNos: allowedRollNos.split(',').map((s)=>s.trim()).filter(Boolean)
-      }) });
+      function parseLocalToISOString(v: string | null) {
+        if (!v) return null;
+        // expecting 'YYYY-MM-DDTHH:mm'
+        const m = String(v).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
+        if (!m) {
+          const d = new Date(v);
+          return isNaN(d.getTime()) ? null : d.toISOString();
+        }
+        const y = Number(m[1]);
+        const mo = Number(m[2]) - 1;
+        const day = Number(m[3]);
+        const hh = Number(m[4]);
+        const mm = Number(m[5]);
+        const dt = new Date(y, mo, day, hh, mm, 0, 0); // local time
+        return isNaN(dt.getTime()) ? null : dt.toISOString();
+      }
+
+      const payload = {
+        title,
+        description,
+        points: typeof points === 'number' ? points : (points === '' ? null : Number(points)),
+        dueAt: parseLocalToISOString(dueAt),
+        publishAt: parseLocalToISOString(publishAt),
+        isDraft,
+        allowLate,
+        allowedRollNos: allowedRollNos.split(',').map((s)=>s.trim()).filter(Boolean),
+      };
+
+      const r = await fetchWithRetry(`/api/assignments/${assignmentId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' }, body: JSON.stringify(payload) });
       if (r.status === 0 || r.status === 499) throw new Error('Network error');
       const d = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
