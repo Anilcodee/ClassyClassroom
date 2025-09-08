@@ -39,9 +39,26 @@ export default function Header() {
       10 * 60 * 1000,
     );
 
+    // Global handler to suppress AbortError unhandledrejection noise
+    const onUnhandledRejection = (ev: PromiseRejectionEvent) => {
+      try {
+        const reason: any = (ev && (ev as any).reason) || ev;
+        if (!reason) return;
+        if (
+          reason?.name === "AbortError" ||
+          String(reason).toLowerCase().includes("aborted") ||
+          String(reason).toLowerCase().includes("signal")
+        ) {
+          ev.preventDefault();
+        }
+      } catch {}
+    };
+    window.addEventListener("unhandledrejection", onUnhandledRejection as any);
+
     return () => {
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("auth-changed", onAuthChanged as any);
+      window.removeEventListener("unhandledrejection", onUnhandledRejection as any);
       if (interval) clearInterval(interval);
     };
   }, []);
