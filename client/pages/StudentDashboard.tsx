@@ -471,6 +471,53 @@ export default function StudentDashboard() {
                             Close
                           </button>
                         </div>
+
+                        <button
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            moveUp(cid);
+                            setMenuOpenFor("");
+                          }}
+                        >
+                          Move up
+                        </button>
+
+                        <button
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            moveDown(cid);
+                            setMenuOpenFor("");
+                          }}
+                        >
+                          Move down
+                        </button>
+
+                        <button
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMoveFor(cid);
+                            setMoveMode("before");
+                            setMenuOpenFor("");
+                          }}
+                        >
+                          Move before…
+                        </button>
+
+                        <button
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMoveFor(cid);
+                            setMoveMode("after");
+                            setMenuOpenFor("");
+                          }}
+                        >
+                          Move after…
+                        </button>
+
                         <button
                           className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
                           onClick={async () => {
