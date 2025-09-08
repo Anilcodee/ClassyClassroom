@@ -54,6 +54,7 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
         teacherId: m.teacherId,
         title: m.title || "",
         content: m.content,
+        assignmentId: m.assignmentId ? String(m.assignmentId) : undefined,
         createdAt: m.createdAt,
         updatedAt: m.updatedAt,
         pinned: !!m.pinned,
