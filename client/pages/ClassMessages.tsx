@@ -190,35 +190,103 @@ export default function ClassMessages() {
     attempt = 1,
   ): Promise<Response> {
     const { signal, ...rest } = init as any;
+    // Prefer native fetch (globalThis) but fall back to XHR when fetch throws
     try {
-      return await fetch(url, { ...rest, signal });
+      const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
+      const resolvedUrl =
+        typeof location !== "undefined" && typeof url === "string" && url.startsWith("/")
+          ? `${location.origin}${url}`
+          : url;
+      try {
+        return await nativeFetch(resolvedUrl, { ...rest, signal });
+      } catch (e: any) {
+        // If fetch throws, try XHR fallback below
+        const aborted = (signal && (signal as any).aborted) || e?.name === "AbortError";
+        if (aborted) {
+          return new Response(JSON.stringify({ message: "aborted" }), {
+            status: 499,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+        // XHR fallback
+        try {
+          const method = (rest && rest.method) || "GET";
+          const headers = (rest && rest.headers) || {};
+          const body = (rest && rest.body) || null;
+          const xhrRes = await new Promise<Response>((resolve, reject) => {
+            try {
+              const xhr = new XMLHttpRequest();
+              xhr.open(method, resolvedUrl, true);
+              Object.keys(headers || {}).forEach((hk) => {
+                try {
+                  xhr.setRequestHeader(hk, (headers as any)[hk]);
+                } catch {}
+              });
+              xhr.onreadystatechange = () => {
+                if (xhr.readyState !== 4) return;
+                const hdrs: Record<string, string> = {};
+                try {
+                  const raw = xhr.getAllResponseHeaders() || "";
+                  raw
+                    .trim()
+                    .split(/\r?\n/)
+                    .forEach((line) => {
+                      const idx = line.indexOf(":");
+                      if (idx > 0) {
+                        const k = line.slice(0, idx).trim();
+                        const v = line.slice(idx + 1).trim();
+                        hdrs[k] = v;
+                      }
+                    });
+                } catch {}
+                const responseInit: ResponseInit = {
+                  status: xhr.status || 0,
+                  headers: hdrs,
+                };
+                resolve(new Response(xhr.responseText, responseInit));
+              };
+              xhr.onerror = () => reject(new Error("XHR error"));
+              if (body) xhr.send(body as any);
+              else xhr.send();
+            } catch (err) {
+              reject(err);
+            }
+          });
+          return xhrRes;
+        } catch (xhrErr) {
+          // continue to retry logic below
+        }
+      }
     } catch (e: any) {
-      const aborted =
-        (signal && (signal as any).aborted) || e?.name === "AbortError";
+      // top-level fetch error
+      const aborted = (signal && (signal as any).aborted) || e?.name === "AbortError";
       if (aborted) {
         return new Response(JSON.stringify({ message: "aborted" }), {
           status: 499,
           headers: { "Content-Type": "application/json" },
         });
       }
-      if (
-        attempt < 3 &&
-        (typeof navigator === "undefined" || navigator.onLine !== false)
-      ) {
-        if (attempt === 1) {
-          try {
-            await fetch("/api/ping", { cache: "no-store" });
-          } catch {}
-        }
-        await new Promise((r) => setTimeout(r, 300 * attempt));
-        return fetchWithRetry(url, init, attempt + 1);
-      }
-      const body = JSON.stringify({ message: "Network error" });
-      return new Response(body, {
-        status: 0,
-        headers: { "Content-Type": "application/json" },
-      });
     }
+
+    // If we reached here, we need to retry or return a synthetic error
+    if (
+      attempt < 3 &&
+      (typeof navigator === "undefined" || navigator.onLine !== false)
+    ) {
+      if (attempt === 1) {
+        try {
+          await fetch("/api/ping", { cache: "no-store" });
+        } catch {}
+      }
+      await new Promise((r) => setTimeout(r, 300 * attempt));
+      return fetchWithRetry(url, init, attempt + 1);
+    }
+
+    const body = JSON.stringify({ message: "Network error" });
+    return new Response(body, {
+      status: 0,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   async function load(signal?: AbortSignal) {
