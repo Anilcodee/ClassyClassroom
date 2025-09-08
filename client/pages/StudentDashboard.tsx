@@ -464,7 +464,7 @@ export default function StudentDashboard() {
                     {menuOpenFor === String(cid) && (
                       <>
                         {/* small screens: full dropdown */}
-                        <div className="absolute z-20 right-2 top-12 w-44 sm:hidden rounded-md border border-border bg-background shadow max-w-xs overflow-auto">
+                        <div className="absolute z-20 right-10 top-12 w-44 sm:hidden rounded-md border border-border bg-background shadow max-w-xs overflow-auto">
                           <div className="block w-full px-2 py-1 text-right">
                             <button
                               className="text-sm"
