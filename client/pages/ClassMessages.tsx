@@ -154,9 +154,27 @@ export default function ClassMessages() {
     const onFs = () =>
       mountedRef.current && setIsFs(Boolean(document.fullscreenElement));
     document.addEventListener("fullscreenchange", onFs);
+
+    // Suppress noisy unhandledrejection logs for AbortError (fetch aborts)
+    const onUnhandledRejection = (ev: PromiseRejectionEvent) => {
+      try {
+        const reason: any = (ev && (ev as any).reason) || ev;
+        if (!reason) return;
+        if (
+          reason?.name === "AbortError" ||
+          String(reason).toLowerCase().includes("aborted") ||
+          String(reason).toLowerCase().includes("signal")
+        ) {
+          ev.preventDefault();
+        }
+      } catch {}
+    };
+    window.addEventListener("unhandledrejection", onUnhandledRejection as any);
+
     return () => {
       mountedRef.current = false;
       document.removeEventListener("fullscreenchange", onFs);
+      window.removeEventListener("unhandledrejection", onUnhandledRejection as any);
       controllersRef.current.forEach((c) => {
         try {
           c.abort();
