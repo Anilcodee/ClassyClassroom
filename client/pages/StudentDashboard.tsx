@@ -282,6 +282,35 @@ export default function StudentDashboard() {
     }
   }
 
+  function reorderArray<T>(arr: T[], from: number, to: number) {
+    const copy = arr.slice();
+    const [item] = copy.splice(from, 1);
+    copy.splice(to, 0, item);
+    return copy;
+  }
+
+  function findIndexById(id: string) {
+    return classes.findIndex((c) => (c as any).id === id || (c as any)._id === id);
+  }
+
+  function moveUp(id: string) {
+    const idx = findIndexById(id);
+    if (idx > 0) setClasses((prev) => reorderArray(prev, idx, idx - 1));
+  }
+
+  function moveDown(id: string) {
+    const idx = findIndexById(id);
+    if (idx >= 0 && idx < classes.length - 1)
+      setClasses((prev) => reorderArray(prev, idx, idx + 1));
+  }
+
+  function moveToPosition(id: string, targetIdx: number) {
+    const idx = findIndexById(id);
+    if (idx === -1 || targetIdx < 0 || targetIdx >= classes.length || idx === targetIdx)
+      return;
+    setClasses((prev) => reorderArray(prev, idx, targetIdx));
+  }
+
   async function handleJoin(e: React.FormEvent) {
     e.preventDefault();
     if (!joinCode.trim()) return;
