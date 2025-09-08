@@ -160,7 +160,21 @@ export default function AssignmentEdit(){
 
   return (
     <main className="container mx-auto py-8">
-      <button type="button" onClick={()=>nav(-1)} className="text-sm text-foreground/70 hover:text-foreground">← Back</button>
+      <button
+        type="button"
+        onClick={() => {
+          try {
+            if (window.history.length > 1) nav(-1);
+            else if (a && (a as any).classId) nav(`/classes/${(a as any).classId}/assignments`);
+            else nav('/classes');
+          } catch {
+            nav('/classes');
+          }
+        }}
+        className="text-sm text-foreground/70 hover:text-foreground"
+      >
+        ← Back
+      </button>
       <h1 className="mt-2 text-2xl font-bold">Edit assignment</h1>
       {loading ? <p className="mt-4 text-sm text-foreground/70">Loading…</p> : error ? <p className="mt-4 text-sm text-destructive">{error}</p> : (
         <div className="mt-4 rounded-xl border border-border p-4 bg-card">
