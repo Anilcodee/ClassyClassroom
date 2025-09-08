@@ -18,6 +18,7 @@ export default function AssignmentEdit(){
   const [isDraft, setIsDraft] = useState(true);
   const [allowLate, setAllowLate] = useState(true);
   const [allowedRollNos, setAllowedRollNos] = useState<string>("");
+  const mountedRef = useRef(true);
 
   async function fetchWithRetry(url: string, init: RequestInit = {}, attempt = 1): Promise<Response> {
     const { signal, ...rest } = init as any;
