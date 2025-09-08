@@ -513,10 +513,10 @@ export default function StudentDashboard() {
                           </button>
                         </div>
 
-                        {/* larger screens: inline horizontal panel whose right edge aligns with the three-dot icon */}
-                        <div className="hidden sm:flex absolute z-20 right-2 top-3 flex-row items-center rounded-md border border-border bg-background shadow px-2 py-1 gap-2">
+                        {/* larger screens: inline vertical panel vertically centered with the three-dot icon */}
+                        <div className="hidden sm:flex absolute z-20 right-2 top-1/2 -translate-y-1/2 flex-col items-stretch rounded-md border border-border bg-background shadow w-40 overflow-hidden">
                           <button
-                            className="px-2 py-1 text-sm rounded hover:bg-accent"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
                             onClick={(e) => {
                               e.stopPropagation();
                               setMoveFor(cid);
@@ -527,7 +527,7 @@ export default function StudentDashboard() {
                             Move…
                           </button>
                           <button
-                            className="px-2 py-1 text-sm rounded hover:bg-accent"
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
                             onClick={async (e) => {
                               e.stopPropagation();
                               try {
@@ -550,7 +550,7 @@ export default function StudentDashboard() {
                               }
                             }}
                           >
-                            Unenrol
+                            Unenrol class
                           </button>
                         </div>
                       </>
