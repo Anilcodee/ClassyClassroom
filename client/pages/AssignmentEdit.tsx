@@ -30,8 +30,19 @@ export default function AssignmentEdit(){
       setA(d.assignment);
       setTitle(d.assignment.title || "");
       setDescription(d.assignment.description || "");
-      setDueAt(d.assignment.dueAt ? new Date(d.assignment.dueAt).toISOString().slice(0,16) : "");
-      setPublishAt(d.assignment.publishAt ? new Date(d.assignment.publishAt).toISOString().slice(0,16) : "");
+      function toLocalDateTimeInput(v: string | Date) {
+        const d = new Date(v);
+        if (isNaN(d.getTime())) return "";
+        const pad = (n: number) => String(n).padStart(2, "0");
+        const yyyy = d.getFullYear();
+        const mm = pad(d.getMonth() + 1);
+        const dd = pad(d.getDate());
+        const hh = pad(d.getHours());
+        const mi = pad(d.getMinutes());
+        return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+      }
+      setDueAt(d.assignment.dueAt ? toLocalDateTimeInput(d.assignment.dueAt) : "");
+      setPublishAt(d.assignment.publishAt ? toLocalDateTimeInput(d.assignment.publishAt) : "");
       setPoints(d.assignment.points ?? 100);
       setIsDraft(Boolean(d.assignment.isDraft));
       setAllowLate(Boolean(d.assignment.allowLate));
