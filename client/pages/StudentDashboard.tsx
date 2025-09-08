@@ -483,7 +483,7 @@ export default function StudentDashboard() {
                               setMenuOpenFor("");
                             }}
                           >
-                            Move…
+                            Move
                           </button>
 
                           <button
@@ -524,7 +524,7 @@ export default function StudentDashboard() {
                               setMenuOpenFor("");
                             }}
                           >
-                            Move…
+                            Move
                           </button>
                           <button
                             className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
