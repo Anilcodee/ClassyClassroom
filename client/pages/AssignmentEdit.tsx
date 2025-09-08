@@ -19,12 +19,67 @@ export default function AssignmentEdit(){
   const [allowLate, setAllowLate] = useState(true);
   const [allowedRollNos, setAllowedRollNos] = useState<string>("");
 
-  async function load(){
+  async function fetchWithRetry(url: string, init: RequestInit = {}, attempt = 1): Promise<Response> {
+    const { signal, ...rest } = init as any;
+    try {
+      const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
+      const resolvedUrl = typeof location !== 'undefined' && typeof url === 'string' && url.startsWith('/') ? `${location.origin}${url}` : url;
+      return await nativeFetch(resolvedUrl, { ...rest, signal });
+    } catch (e: any) {
+      const aborted = (signal && (signal as any).aborted) || e?.name === 'AbortError';
+      if (aborted) {
+        return new Response(JSON.stringify({ message: 'aborted' }), { status: 499, headers: { 'Content-Type': 'application/json' } });
+      }
+      // Try XHR fallback
+      try {
+        const method = (rest && rest.method) || 'GET';
+        const headers = (rest && rest.headers) || {};
+        const body = (rest && rest.body) || null;
+        const xhrRes = await new Promise<Response>((resolve, reject) => {
+          try {
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, resolvedUrl, true);
+            Object.keys(headers || {}).forEach((hk) => {
+              try { xhr.setRequestHeader(hk, (headers as any)[hk]); } catch {}
+            });
+            xhr.onreadystatechange = () => {
+              if (xhr.readyState !== 4) return;
+              const hdrs: Record<string,string> = {};
+              try {
+                const raw = xhr.getAllResponseHeaders() || '';
+                raw.trim().split(/\r?\n/).forEach((line) => {
+                  const idx = line.indexOf(':');
+                  if (idx > 0) { const k = line.slice(0,idx).trim(); const v = line.slice(idx+1).trim(); hdrs[k]=v; }
+                });
+              } catch {}
+              const responseInit: ResponseInit = { status: xhr.status || 0, headers: hdrs };
+              resolve(new Response(xhr.responseText, responseInit));
+            };
+            xhr.onerror = () => reject(new Error('XHR error'));
+            if (body) xhr.send(body as any); else xhr.send();
+          } catch (err) { reject(err); }
+        });
+        return xhrRes;
+      } catch (xhrErr) {
+        // fall through to retry logic
+      }
+
+      if (attempt < 3 && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
+        await new Promise(r => setTimeout(r, 300 * attempt));
+        return fetchWithRetry(url, init, attempt + 1);
+      }
+      return new Response(JSON.stringify({ message: 'Network error' }), { status: 0, headers: { 'Content-Type': 'application/json' } });
+    }
+  }
+
+  async function load(signal?: AbortSignal){
+    if (!mountedRef.current) return;
     setLoading(true); setError(null);
     try {
       const token = localStorage.getItem('token');
       const headers: Record<string,string> = {}; if (token) headers.Authorization = `Bearer ${token}`;
-      const r = await fetch(`/api/assignments/${assignmentId}`, { headers, cache: 'no-store' });
+      const r = await fetchWithRetry(`/api/assignments/${assignmentId}`, { headers, cache: 'no-store', signal });
+      if (r.status === 0 || r.status === 499) return;
       const d = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
       setA(d.assignment);
@@ -47,19 +102,20 @@ export default function AssignmentEdit(){
       setIsDraft(Boolean(d.assignment.isDraft));
       setAllowLate(Boolean(d.assignment.allowLate));
       setAllowedRollNos((d.assignment.allowedRollNos||[]).join(", "));
-    } catch(e:any){ setError(e.message||'Failed'); }
-    finally { setLoading(false); }
+    } catch(e:any){ if (e?.name === 'AbortError') return; setError(e.message||'Failed'); }
+    finally { if (mountedRef.current) setLoading(false); }
   }
 
-  useEffect(()=>{ void load(); }, [assignmentId]);
+  useEffect(()=>{ const ac = new AbortController(); load(ac.signal).catch(()=>{}); return ()=>{ try{ ac.abort(); } catch{} }; }, [assignmentId]);
 
   async function save(){
     setSaving(true); setError(null);
     try {
       const token = localStorage.getItem('token');
-      const r = await fetch(`/api/assignments/${assignmentId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' }, body: JSON.stringify({
+      const r = await fetchWithRetry(`/api/assignments/${assignmentId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' }, body: JSON.stringify({
         title, description, points: typeof points === 'number' ? points : (points === '' ? null : Number(points)), dueAt: dueAt ? new Date(dueAt).toISOString() : null, publishAt: publishAt ? new Date(publishAt).toISOString() : null, isDraft, allowLate, allowedRollNos: allowedRollNos.split(',').map((s)=>s.trim()).filter(Boolean)
       }) });
+      if (r.status === 0 || r.status === 499) throw new Error('Network error');
       const d = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
       nav(-1);
