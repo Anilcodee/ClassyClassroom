@@ -65,7 +65,24 @@ export default function ClassAssignments(){
     const ac = new AbortController();
     // ensure any rejection (including AbortError) is handled to avoid uncaught promise
     load(ac.signal).catch(() => {});
-    return () => { mountedRef.current = false; try { ac.abort(); } catch {} };
+
+    // Suppress noisy unhandledrejection logs for AbortError (fetch aborts)
+    const onUnhandledRejection = (ev: PromiseRejectionEvent) => {
+      try {
+        const reason: any = (ev && (ev as any).reason) || ev;
+        if (!reason) return;
+        if (
+          reason?.name === "AbortError" ||
+          String(reason).toLowerCase().includes("aborted") ||
+          String(reason).toLowerCase().includes("signal")
+        ) {
+          ev.preventDefault();
+        }
+      } catch {}
+    };
+    window.addEventListener("unhandledrejection", onUnhandledRejection as any);
+
+    return () => { mountedRef.current = false; try { ac.abort(); } catch {} finally { window.removeEventListener("unhandledrejection", onUnhandledRejection as any); } };
   }, [id]);
 
   async function readFiles(fs: File[]) {
