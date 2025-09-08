@@ -267,7 +267,7 @@ export default function ClassMessages() {
     }
     const ac = new AbortController();
     mountControllerRef.current = ac;
-    void load(ac.signal);
+    load(ac.signal).catch(()=>{});
     // Also fetch latest assignments to compute indicator
     (async () => {
       try {
