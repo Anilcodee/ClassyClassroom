@@ -127,7 +127,7 @@ export default function AssignmentSubmit(){
         <div className="mt-4 text-sm">
           <p className="text-destructive">{error || (navigator.onLine ? 'Failed to load' : 'You appear to be offline')}</p>
           <div className="mt-2 flex items-center gap-2">
-            <button className="px-3 py-1.5 rounded-md border border-border" onClick={()=>{ const ac = new AbortController(); void load(ac.signal); }}>Retry</button>
+            <button className="px-3 py-1.5 rounded-md border border-border" onClick={()=>{ const ac = new AbortController(); load(ac.signal).catch(()=>{}); }}>Retry</button>
             <button className="px-3 py-1.5 rounded-md border border-border" onClick={()=>{ if (a?.classId) nav(`/classes/${a.classId}/assignments`); else nav('/classes'); }}>Go to assignments</button>
           </div>
         </div>
