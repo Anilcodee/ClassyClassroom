@@ -206,8 +206,25 @@ export default function AssignmentEdit(){
         type="button"
         onClick={() => {
           try {
-            if (window.history.length > 1) nav(-1);
-            else if (a && (a as any).classId) nav(`/classes/${(a as any).classId}/assignments`);
+            // Prefer SPA back when available
+            const idx = (window.history && (window.history.state as any)?.idx) || 0;
+            if (typeof idx === 'number' && idx > 0) {
+              nav(-1);
+              return;
+            }
+            // Fallback to document.referrer if same-origin
+            try {
+              const ref = document.referrer;
+              if (ref) {
+                const rurl = new URL(ref);
+                if (rurl.origin === location.origin) {
+                  window.location.href = ref;
+                  return;
+                }
+              }
+            } catch {}
+            // Fallback to class assignments or classes list
+            if (a && (a as any).classId) nav(`/classes/${(a as any).classId}/assignments`);
             else nav('/classes');
           } catch {
             nav('/classes');
