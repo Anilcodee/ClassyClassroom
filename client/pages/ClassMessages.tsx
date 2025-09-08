@@ -547,7 +547,7 @@ export default function ClassMessages() {
             className="mt-2 px-3 py-1.5 rounded-md border border-border"
             onClick={() => {
               const ac = new AbortController();
-              void load(ac.signal);
+              load(ac.signal).catch(()=>{});
             }}
           >
             Retry
