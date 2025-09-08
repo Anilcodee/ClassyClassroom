@@ -53,6 +53,7 @@ const MessageSchema = new Schema<IMessage>(
     pinned: { type: Boolean, default: false },
     attachments: { type: [AttachmentSchema], default: [] },
     comments: { type: [CommentSchema], default: [] },
+    assignmentId: { type: Schema.Types.ObjectId, ref: 'Assignment', required: false },
   },
   { timestamps: true }
 );
