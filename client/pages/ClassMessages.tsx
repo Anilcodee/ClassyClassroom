@@ -310,11 +310,71 @@ export default function ClassMessages() {
         if (mountedRef.current) setLoading(false);
         return;
       }
-      const r = await fetchWithRetry(`/api/classes/${id}/messages`, {
-        headers,
-        cache: "no-store",
-        signal,
-      });
+        // Try XHR first to avoid FullStory or other fetch wrappers interfering
+      async function xhrFetchLocal(url: string, options: RequestInit = {}) {
+        return new Promise<Response>((resolve, reject) => {
+          try {
+            const method = (options && (options as any).method) || "GET";
+            const headers = (options && (options as any).headers) || {};
+            const body = (options && (options as any).body) || null;
+            const resolvedUrl =
+              typeof location !== "undefined" && typeof url === "string" && url.startsWith("/")
+                ? `${location.origin}${url}`
+                : url;
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, resolvedUrl as string, true);
+            try {
+              Object.keys(headers || {}).forEach((hk) => {
+                try {
+                  xhr.setRequestHeader(hk, (headers as any)[hk]);
+                } catch {}
+              });
+            } catch {}
+            xhr.onreadystatechange = () => {
+              if (xhr.readyState !== 4) return;
+              const hdrs: Record<string, string> = {};
+              try {
+                const raw = xhr.getAllResponseHeaders() || "";
+                raw
+                  .trim()
+                  .split(/\r?\n/)
+                  .forEach((line) => {
+                    const idx = line.indexOf(":");
+                    if (idx > 0) {
+                      const k = line.slice(0, idx).trim();
+                      const v = line.slice(idx + 1).trim();
+                      hdrs[k] = v;
+                    }
+                  });
+              } catch {}
+              const responseInit: ResponseInit = {
+                status: xhr.status || 0,
+                headers: hdrs,
+              };
+              resolve(new Response(xhr.responseText, responseInit));
+            };
+            xhr.onerror = () => reject(new Error("XHR error"));
+            if (body) xhr.send(body as any);
+            else xhr.send();
+          } catch (err) {
+            reject(err);
+          }
+        });
+      }
+
+      let r: Response | null = null;
+      try {
+        r = await xhrFetchLocal(`/api/classes/${id}/messages`, { headers });
+      } catch (xhrErr) {
+        // fallback to fetchWithRetry which has its own XHR fallback
+        r = await fetchWithRetry(`/api/classes/${id}/messages`, {
+          headers,
+          cache: "no-store",
+          signal,
+        });
+      }
+
+      if (!r) throw new Error("Network error");
       if (r.status === 0 || r.status === 499) return; // aborted or offline: silent
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
