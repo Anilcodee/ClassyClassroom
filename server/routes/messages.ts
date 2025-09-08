@@ -48,6 +48,19 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
     const msgs = await Message.find({ classId: id })
       .sort({ createdAt: -1 })
       .lean();
+
+    // Batch fetch assignment metadata for messages that reference an assignment
+    const assignmentIds = Array.from(
+      new Set(msgs.filter((m: any) => m.assignmentId).map((m: any) => String(m.assignmentId))),
+    );
+    const assignmentsById: Record<string, any> = {};
+    if (assignmentIds.length > 0) {
+      const assigns = await import('../models/Assignment').then((mod) => mod.Assignment.find({ _id: { $in: assignmentIds } }).select('publishAt dueAt').lean());
+      assigns.forEach((as: any) => {
+        assignmentsById[String(as._id)] = as;
+      });
+    }
+
     res.json({
       messages: msgs.map((m) => ({
         id: m._id,
@@ -55,6 +68,8 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
         title: m.title || "",
         content: m.content,
         assignmentId: m.assignmentId ? String(m.assignmentId) : undefined,
+        assignmentPublishAt: m.assignmentId ? (assignmentsById[String(m.assignmentId)]?.publishAt || null) : null,
+        assignmentDueAt: m.assignmentId ? (assignmentsById[String(m.assignmentId)]?.dueAt || null) : null,
         createdAt: m.createdAt,
         updatedAt: m.updatedAt,
         pinned: !!m.pinned,
