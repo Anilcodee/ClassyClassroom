@@ -107,7 +107,15 @@ export default function AssignmentEdit(){
     finally { if (mountedRef.current) setLoading(false); }
   }
 
-  useEffect(()=>{ const ac = new AbortController(); load(ac.signal).catch(()=>{}); return ()=>{ try{ ac.abort(); } catch{} }; }, [assignmentId]);
+  useEffect(()=>{
+    mountedRef.current = true;
+    const ac = new AbortController();
+    load(ac.signal).catch(()=>{});
+    return ()=>{
+      mountedRef.current = false;
+      try{ ac.abort(); } catch{}
+    };
+  }, [assignmentId]);
 
   async function save(){
     setSaving(true); setError(null);
