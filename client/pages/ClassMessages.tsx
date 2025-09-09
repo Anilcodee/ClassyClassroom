@@ -39,6 +39,9 @@ interface MessageItem {
   comments?: CommentItem[];
   canEdit?: boolean;
   canComment?: boolean;
+  assignmentId?: string;
+  assignmentPublishAt?: string | null;
+  assignmentDueAt?: string | null;
 }
 
 export default function ClassMessages() {
