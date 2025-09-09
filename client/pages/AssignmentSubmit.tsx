@@ -109,7 +109,12 @@ export default function AssignmentSubmit(){
     finally { setSubmitting(false); }
   }
 
-  const closed = Boolean(a?.dueAt && new Date(a.dueAt).getTime() < Date.now() && a?.allowLate === false);
+  const closed = (() => {
+    if (!a?.dueAt) return false;
+    const due = new Date(a.dueAt).getTime();
+    if (isNaN(due)) return false;
+    return due < Date.now() && a?.allowLate === false;
+  })();
 
   return (
     <main className="container mx-auto py-8">
