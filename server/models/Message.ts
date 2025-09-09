@@ -22,6 +22,7 @@ export interface IMessage extends Document {
   pinned?: boolean;
   attachments: IMessageAttachment[];
   comments: IMessageComment[];
+  assignmentId?: Types.ObjectId;
 }
 
 const AttachmentSchema = new Schema<IMessageAttachment>(
