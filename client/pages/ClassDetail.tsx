@@ -181,7 +181,7 @@ export default function ClassDetail() {
         // show friendly message
         setError((e as any)?.message || 'Network error');
       }
-    })();
+    })().catch(() => {});
     return () => {
       try {
         ac.abort();
