@@ -405,8 +405,6 @@ export default function ClassMessages() {
     }
   }
 
-  const location = useLocation();
-
   useEffect(() => {
     if (!token) {
       if (userRole === "student") nav("/student-auth");
