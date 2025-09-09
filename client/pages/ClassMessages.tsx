@@ -445,7 +445,7 @@ export default function ClassMessages() {
           setHasNewAssigns(latest > seen);
         }
       } catch {}
-    })();
+    })().catch(()=>{});
     return () => {
       try {
         ac.abort();
