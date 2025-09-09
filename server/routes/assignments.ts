@@ -50,7 +50,7 @@ export const listAssignments: RequestHandler = async (req: AuthRequest, res) => 
       query.$and = andConds;
     }
 
-    const docs = await Assignment.find(query).sort({ createdAt: -1 }).lean();
+    const docs = await AssignmentModel.find(query).sort({ createdAt: -1 }).lean();
     res.json({ assignments: docs });
   } catch (e) {
     console.error(e);
