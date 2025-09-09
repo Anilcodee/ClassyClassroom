@@ -201,7 +201,7 @@ export const updateAssignment: RequestHandler = async (req: AuthRequest, res) =>
       if (a.dueAt) parts.push(`Due on ${fmt(a.dueAt)}`);
       const updatedContent = [a.description || "", parts.join(" | ")].filter(Boolean).join("\n\n");
       const updatedTitle = a.type === 'quiz' ? `Quiz: ${a.title}` : `Assignment: ${a.title}`;
-      await Message.updateMany({ assignmentId: a._id }, { $set: { title: updatedTitle, content: updatedContent } }).exec();
+      await MessageModel.updateMany({ assignmentId: a._id }, { $set: { title: updatedTitle, content: updatedContent } }).exec();
     } catch (e) {
       console.error('Failed to update assignment messages', e);
     }
