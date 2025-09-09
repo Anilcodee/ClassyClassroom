@@ -45,9 +45,26 @@ export default function AssignmentSubmissions() {
     }
   }
 
+  const [classId, setClassId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const headers: Record<string,string> = {};
+        if (token) headers.Authorization = `Bearer ${token}`;
+        const r = await fetch(`/api/assignments/${assignmentId}`, { headers, cache: 'no-store' });
+        const d = await r.json().catch(() => ({}));
+        if (r.ok && mounted && d.assignment) setClassId(d.assignment.classId || null);
+      } catch {}
+    })();
+    return () => { mounted = false; };
+  }, [assignmentId]);
+
   return (
     <main className="container mx-auto py-8">
-      <Link to="/classes" className="text-sm text-foreground/70 hover:text-foreground">← Back</Link>
+      <Link to={classId ? `/classes/${classId}/assignments` : '/classes'} className="text-sm text-foreground/70 hover:text-foreground">← Back</Link>
       <h1 className="mt-2 text-2xl font-bold">Submissions</h1>
       {loading ? (
         <p className="mt-4 text-sm text-foreground/70">Loading…</p>
