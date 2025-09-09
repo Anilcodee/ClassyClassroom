@@ -19,6 +19,7 @@ export interface IAssignment extends Document {
   attachments: IAttachment[];
   dueAt?: Date | null;
   publishAt?: Date | null;
+  points?: number;
   isDraft: boolean;
   allowLate: boolean;
   allowedRollNos?: string[]; // if set, only these students see/submit
