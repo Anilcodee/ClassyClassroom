@@ -218,7 +218,7 @@ export const getAssignment: RequestHandler = async (req: AuthRequest, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { assignmentId } = req.params as { assignmentId: string };
-    const a = await Assignment.findById(assignmentId).lean();
+    const a = await AssignmentModel.findById(assignmentId).lean();
     if (!a) return res.status(404).json({ message: "Not found" });
 
     // Visibility check for students
@@ -327,7 +327,7 @@ export const listSubmissions: RequestHandler = async (req: AuthRequest, res) => 
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { assignmentId } = req.params as { assignmentId: string };
-    const a = await Assignment.findById(assignmentId).lean();
+    const a = await AssignmentModel.findById(assignmentId).lean();
     if (!a) return res.status(404).json({ message: "Not found" });
     const cls = await ClassModel.findById(a.classId).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
@@ -352,7 +352,7 @@ export const gradeSubmission: RequestHandler = async (req: AuthRequest, res) => 
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { assignmentId, submissionId } = req.params as { assignmentId: string; submissionId: string };
-    const a = await Assignment.findById(assignmentId).lean();
+    const a = await AssignmentModel.findById(assignmentId).lean();
     if (!a) return res.status(404).json({ message: "Assignment not found" });
     const cls = await ClassModel.findById(a.classId).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
