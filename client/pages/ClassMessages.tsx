@@ -456,7 +456,7 @@ export default function ClassMessages() {
         mountControllerRef.current = null;
       }
     };
-  }, [id, token]);
+  }, [id, token, location.key]);
 
   const backHref = userRole === "student" ? "/student" : "/classes";
 
