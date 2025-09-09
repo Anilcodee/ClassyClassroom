@@ -33,7 +33,7 @@ export default function StudentDashboard() {
 
   async function fetchWithRetry(
     url: string,
-    init: RequestInit = {},
+    init: RequestInit & { timeoutMs?: number } = {},
     attempt = 1,
   ): Promise<Response> {
     const { signal, ...rest } = init as any;
