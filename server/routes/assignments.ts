@@ -240,7 +240,7 @@ export const getAssignment: RequestHandler = async (req: AuthRequest, res) => {
     let submission = null;
     try {
       if (user && (user as any).role === 'student') {
-        const sub = await Submission.findOne({ assignmentId, userId }).lean();
+        const sub = await SubmissionModel.findOne({ assignmentId, userId }).lean();
         submission = sub || null;
       }
     } catch (e) { /* ignore */ }
@@ -286,7 +286,7 @@ export const submitAssignment: RequestHandler = async (req: AuthRequest, res) =>
 
     const status: "on_time" | "late" = a.dueAt && now > a.dueAt ? "late" : "on_time";
 
-    const existing = await Submission.findOne({ assignmentId, userId });
+    const existing = await SubmissionModel.findOne({ assignmentId, userId });
     if (existing) {
       existing.answers = answers;
       (existing as any).attachments = attachments;
