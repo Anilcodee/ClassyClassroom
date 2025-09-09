@@ -223,7 +223,7 @@ export const getAssignment: RequestHandler = async (req: AuthRequest, res) => {
 
     // Visibility check for students
     const userId = String((req as any).userId || "");
-    const user = await User.findById(userId).select("role rollNo").lean();
+    const user = await UserModel.findById(userId).select("role rollNo").lean();
     const cls = await ClassModelAny.findById(a.classId).select("teacher coTeachers students").lean();
     if (!cls) return res.status(404).json({ message: "Class not found" });
 
@@ -261,7 +261,7 @@ export const submitAssignment: RequestHandler = async (req: AuthRequest, res) =>
     if (!a) return res.status(404).json({ message: "Not found" });
 
     const userId = String((req as any).userId || "");
-    const u = await User.findById(userId).select("rollNo role").lean();
+    const u = await UserModel.findById(userId).select("rollNo role").lean();
     if (!u) return res.status(401).json({ message: "Unauthorized" });
 
     // Check student
