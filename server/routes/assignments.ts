@@ -314,7 +314,7 @@ export const deleteAssignment: RequestHandler = async (req: AuthRequest, res) =>
     const cls = await ClassModel.findById(a.classId).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
     if (!isOwnerOrCo(cls, userId)) return res.status(403).json({ message: "Unauthorized" });
-    await Assignment.findByIdAndDelete(assignmentId);
+    await AssignmentModel.findByIdAndDelete(assignmentId);
     res.json({ ok: true });
   } catch (e) {
     console.error(e);
