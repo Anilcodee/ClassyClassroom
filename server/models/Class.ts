@@ -15,6 +15,7 @@ export interface IClass extends Document {
   activeSession?: Types.ObjectId | null;
   imageUrl?: string;
   durationMinutes: number;
+  isArchived?: boolean;
 }
 
 const StudentSchema = new Schema<IStudent>(
