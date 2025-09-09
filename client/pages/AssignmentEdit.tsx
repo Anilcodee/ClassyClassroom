@@ -196,7 +196,19 @@ export default function AssignmentEdit(){
       if (r.status === 0 || r.status === 499) throw new Error('Network error');
       const d = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
-      nav(-1);
+      // Prefer SPA back when available, otherwise navigate to class assignments
+      try {
+        const idx = (window.history && (window.history.state as any)?.idx) || 0;
+        if (typeof idx === 'number' && idx > 0) {
+          nav(-1);
+        } else if ((a as any)?.classId) {
+          nav(`/classes/${(a as any).classId}/assignments`);
+        } else {
+          nav('/classes');
+        }
+      } catch {
+        nav('/classes');
+      }
     } catch(e:any){ setError(e.message||'Failed'); }
     finally { setSaving(false); }
   }
