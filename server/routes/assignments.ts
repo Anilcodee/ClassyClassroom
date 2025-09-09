@@ -177,6 +177,28 @@ export const updateAssignment: RequestHandler = async (req: AuthRequest, res) =>
       }
     } catch (e) { console.error('Failed to post assignment message on publish', e); }
 
+    // Update any existing messages that reference this assignment so the due date / title in the message stays in sync
+    try {
+      const fmt = (v?: Date | null) => {
+        if (!v) return "";
+        const d = new Date(v);
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mi = String(d.getMinutes()).padStart(2, '0');
+        return `${dd}-${mm}-${yyyy}, ${hh}:${mi}`;
+      };
+      const parts: string[] = [];
+      parts.push(`${a.type === 'quiz' ? 'Quiz' : 'Assignment'}: ${a.title}`);
+      if (a.dueAt) parts.push(`Due on ${fmt(a.dueAt)}`);
+      const updatedContent = [a.description || "", parts.join(" | ")].filter(Boolean).join("\n\n");
+      const updatedTitle = a.type === 'quiz' ? `Quiz: ${a.title}` : `Assignment: ${a.title}`;
+      await Message.updateMany({ assignmentId: a._id }, { $set: { title: updatedTitle, content: updatedContent } }).exec();
+    } catch (e) {
+      console.error('Failed to update assignment messages', e);
+    }
+
     res.json({ assignment: a });
   } catch (e) {
     console.error(e);
