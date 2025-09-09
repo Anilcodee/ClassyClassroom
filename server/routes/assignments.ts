@@ -23,7 +23,7 @@ export const listAssignments: RequestHandler = async (req: AuthRequest, res) => 
   try {
     const { id } = req.params as { id: string }; // class id
     const userId = String((req as any).userId || "");
-    const user = await User.findById(userId).select("role enrolledClasses rollNo").lean();
+    const user = await UserModel.findById(userId).select("role enrolledClasses rollNo").lean();
     if (!user) return res.status(401).json({ message: "Unauthorized" });
 
     const cls = await ClassModel.findById(id).select("teacher coTeachers students").lean();
