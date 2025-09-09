@@ -113,7 +113,7 @@ export const createAssignment: RequestHandler = async (req: AuthRequest, res) =>
         parts.push(`${doc.type === 'quiz' ? 'Quiz' : 'Assignment'}: ${doc.title}`);
         if (doc.dueAt) parts.push(`Due on ${fmt(doc.dueAt)}`);
         const content = [doc.description || "", parts.join(" | ")].filter(Boolean).join("\n\n");
-        await Message.create({ classId: id, teacherId: userId, title: doc.type === 'quiz' ? `Quiz: ${doc.title}` : `Assignment: ${doc.title}`, content: content || (doc.type === 'quiz' ? 'New quiz assigned.' : 'New assignment assigned.'), attachments: atts.slice(0, 5), comments: [], assignmentId: doc._id });
+        await MessageModel.create({ classId: id, teacherId: userId, title: doc.type === 'quiz' ? `Quiz: ${doc.title}` : `Assignment: ${doc.title}`, content: content || (doc.type === 'quiz' ? 'New quiz assigned.' : 'New assignment assigned.'), attachments: atts.slice(0, 5), comments: [], assignmentId: doc._id });
       }
     } catch (e) {
       console.error('Failed to post assignment message', e);
