@@ -194,9 +194,10 @@ export default function ClassMessages() {
   ): Promise<Response> {
     const { signal, ...rest } = init as any;
     // Prefer native fetch (globalThis) but fall back to XHR when fetch throws
+    let resolvedUrl: any = url;
     try {
       const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
-      const resolvedUrl =
+      resolvedUrl =
         typeof location !== "undefined" && typeof url === "string" && url.startsWith("/")
           ? `${location.origin}${url}`
           : url;
