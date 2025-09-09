@@ -296,7 +296,7 @@ export const submitAssignment: RequestHandler = async (req: AuthRequest, res) =>
       return res.json({ submission: existing });
     }
 
-    const sub = await Submission.create({ assignmentId, userId, answers, attachments, submittedAt: now, status });
+    const sub = await SubmissionModel.create({ assignmentId, userId, answers, attachments, submittedAt: now, status });
     res.status(201).json({ submission: sub });
   } catch (e) {
     console.error(e);
