@@ -336,7 +336,7 @@ export const listSubmissions: RequestHandler = async (req: AuthRequest, res) => 
     const subs = await SubmissionModel.find({ assignmentId }).sort({ submittedAt: -1 }).lean();
     // attach basic user info
     const userIds = subs.map((s:any)=> String(s.userId));
-    const users = await User.find({ _id: { $in: userIds } }).select('name rollNo').lean();
+    const users = await UserModel.find({ _id: { $in: userIds } }).select('name rollNo').lean();
     const byId: Record<string, any> = {};
     users.forEach(u=> byId[String(u._id)] = u);
     const mapped = subs.map(s => ({ ...s, user: byId[String(s.userId)] || null }));
