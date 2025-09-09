@@ -454,7 +454,19 @@ export default function ClassMessages() {
         mountControllerRef.current = null;
       }
     };
-  }, [id, token, location.key]);
+  }, [id, token]);
+
+  // Reload messages when user navigates back/forward in history (popstate)
+  useEffect(() => {
+    const onPop = () => {
+      try {
+        const ac = new AbortController();
+        load(ac.signal).catch(() => {});
+      } catch {}
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [id, token]);
 
   const backHref = userRole === "student" ? "/student" : "/classes";
 
