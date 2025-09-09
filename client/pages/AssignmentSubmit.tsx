@@ -116,7 +116,7 @@ export default function AssignmentSubmit(){
       <div className="flex items-center justify-between">
         <button
           type="button"
-          onClick={()=>{ if (a?.classId) nav(`/classes/${a.classId}/assignments`); else nav('/classes'); }}
+          onClick={()=>{ if (assignmentId) nav(`/assign/${assignmentId}`); else if (a?.classId) nav(`/classes/${a.classId}/assignments`); else nav('/classes'); }}
           className="text-sm text-foreground/70 hover:text-foreground"
         >
           ← Back
