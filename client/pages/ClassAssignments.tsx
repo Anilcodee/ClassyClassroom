@@ -29,6 +29,23 @@ export default function ClassAssignments(){
   const role = useMemo(()=>{ try { const raw = localStorage.getItem('user'); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
   const mountedRef = useRef(true);
 
+  async function fetchWithRetry(url: string, init: RequestInit = {}, attempt = 1): Promise<Response> {
+    const { signal, ...rest } = init as any;
+    try {
+      return await fetch(url, { ...rest, signal });
+    } catch (e: any) {
+      const aborted = (signal && (signal as any).aborted) || e?.name === 'AbortError';
+      if (aborted) {
+        return new Response(JSON.stringify({ message: 'aborted' }), { status: 499, headers: { 'Content-Type': 'application/json' } });
+      }
+      if (attempt < 2) {
+        await new Promise((r) => setTimeout(r, 300 * attempt));
+        return fetchWithRetry(url, init, attempt + 1);
+      }
+      throw e;
+    }
+  }
+
   async function load(signal?: AbortSignal){
     if (!mountedRef.current) return;
     setLoading(true); setError(null);
@@ -36,7 +53,8 @@ export default function ClassAssignments(){
       const token = localStorage.getItem('token');
       if (!token) { nav('/auth'); return; }
       const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
-      const r = await fetch(`/api/classes/${id}/assignments`, { headers, cache: 'no-store', signal });
+      const r = await fetchWithRetry(`/api/classes/${id}/assignments`, { headers, cache: 'no-store', signal });
+      if (r.status === 0 || r.status === 499) return;
       if (!r.ok) {
         let d: any = {}; try { d = await r.json(); } catch {}
         throw new Error(d?.message || r.statusText);
