@@ -6,6 +6,13 @@ import { ClassModel } from "../models/Class";
 import { User } from "../models/User";
 import { Message } from "../models/Message";
 
+// Models are wrapped as 'any' for route code to avoid complex mongoose typing issues in this project setup
+const AssignmentModel: any = Assignment as any;
+const SubmissionModel: any = Submission as any;
+const ClassModelAny: any = ClassModel as any;
+const UserModel: any = User as any;
+const MessageModel: any = Message as any;
+
 function isOwnerOrCo(cls: any, userId: string) {
   return cls && (String(cls.teacher) === userId || (cls.coTeachers || []).some((t: any) => String(t) === userId));
 }
