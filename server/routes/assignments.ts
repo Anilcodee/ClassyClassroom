@@ -333,7 +333,7 @@ export const listSubmissions: RequestHandler = async (req: AuthRequest, res) => 
     const userId = String((req as any).userId || "");
     if (!isOwnerOrCo(cls, userId)) return res.status(403).json({ message: "Unauthorized" });
 
-    const subs = await Submission.find({ assignmentId }).sort({ submittedAt: -1 }).lean();
+    const subs = await SubmissionModel.find({ assignmentId }).sort({ submittedAt: -1 }).lean();
     // attach basic user info
     const userIds = subs.map((s:any)=> String(s.userId));
     const users = await User.find({ _id: { $in: userIds } }).select('name rollNo').lean();
