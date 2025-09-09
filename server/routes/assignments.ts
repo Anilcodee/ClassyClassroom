@@ -133,7 +133,7 @@ export const updateAssignment: RequestHandler = async (req: AuthRequest, res) =>
     const { assignmentId } = req.params as { assignmentId: string };
     const a = await AssignmentModel.findById(assignmentId);
     if (!a) return res.status(404).json({ message: "Not found" });
-    const cls = await ClassModel.findById(a.classId).select("teacher coTeachers").lean();
+    const cls = await ClassModelAny.findById(a.classId).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
     if (!isOwnerOrCo(cls, userId)) return res.status(403).json({ message: "Unauthorized" });
 
@@ -224,7 +224,7 @@ export const getAssignment: RequestHandler = async (req: AuthRequest, res) => {
     // Visibility check for students
     const userId = String((req as any).userId || "");
     const user = await User.findById(userId).select("role rollNo").lean();
-    const cls = await ClassModel.findById(a.classId).select("teacher coTeachers students").lean();
+    const cls = await ClassModelAny.findById(a.classId).select("teacher coTeachers students").lean();
     if (!cls) return res.status(404).json({ message: "Class not found" });
 
     const teacherView = isOwnerOrCo(cls, userId);
@@ -311,7 +311,7 @@ export const deleteAssignment: RequestHandler = async (req: AuthRequest, res) =>
     const { assignmentId } = req.params as { assignmentId: string };
     const a = await AssignmentModel.findById(assignmentId);
     if (!a) return res.status(404).json({ message: "Not found" });
-    const cls = await ClassModel.findById(a.classId).select("teacher coTeachers").lean();
+    const cls = await ClassModelAny.findById(a.classId).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
     if (!isOwnerOrCo(cls, userId)) return res.status(403).json({ message: "Unauthorized" });
     await AssignmentModel.findByIdAndDelete(assignmentId);
@@ -329,7 +329,7 @@ export const listSubmissions: RequestHandler = async (req: AuthRequest, res) => 
     const { assignmentId } = req.params as { assignmentId: string };
     const a = await AssignmentModel.findById(assignmentId).lean();
     if (!a) return res.status(404).json({ message: "Not found" });
-    const cls = await ClassModel.findById(a.classId).select("teacher coTeachers").lean();
+    const cls = await ClassModelAny.findById(a.classId).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
     if (!isOwnerOrCo(cls, userId)) return res.status(403).json({ message: "Unauthorized" });
 
@@ -354,7 +354,7 @@ export const gradeSubmission: RequestHandler = async (req: AuthRequest, res) => 
     const { assignmentId, submissionId } = req.params as { assignmentId: string; submissionId: string };
     const a = await AssignmentModel.findById(assignmentId).lean();
     if (!a) return res.status(404).json({ message: "Assignment not found" });
-    const cls = await ClassModel.findById(a.classId).select("teacher coTeachers").lean();
+    const cls = await ClassModelAny.findById(a.classId).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
     if (!isOwnerOrCo(cls, userId)) return res.status(403).json({ message: "Unauthorized" });
 
