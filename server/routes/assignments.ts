@@ -26,7 +26,7 @@ export const listAssignments: RequestHandler = async (req: AuthRequest, res) => 
     const user = await UserModel.findById(userId).select("role enrolledClasses rollNo").lean();
     if (!user) return res.status(401).json({ message: "Unauthorized" });
 
-    const cls = await ClassModel.findById(id).select("teacher coTeachers students").lean();
+    const cls = await ClassModelAny.findById(id).select("teacher coTeachers students").lean();
     if (!cls) return res.status(404).json({ message: "Class not found" });
 
     const teacherView = isOwnerOrCo(cls, userId);
