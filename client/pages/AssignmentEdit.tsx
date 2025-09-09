@@ -22,9 +22,10 @@ export default function AssignmentEdit(){
 
   async function fetchWithRetry(url: string, init: RequestInit = {}, attempt = 1): Promise<Response> {
     const { signal, ...rest } = init as any;
+    let resolvedUrl: any = url;
     try {
       const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
-      const resolvedUrl = typeof location !== 'undefined' && typeof url === 'string' && url.startsWith('/') ? `${location.origin}${url}` : url;
+      resolvedUrl = typeof location !== 'undefined' && typeof url === 'string' && url.startsWith('/') ? `${location.origin}${url}` : url;
       return await nativeFetch(resolvedUrl, { ...rest, signal });
     } catch (e: any) {
       const aborted = (signal && (signal as any).aborted) || e?.name === 'AbortError';
