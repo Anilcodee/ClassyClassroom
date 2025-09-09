@@ -78,7 +78,7 @@ export const createAssignment: RequestHandler = async (req: AuthRequest, res) =>
       dataUrl: String(a.dataUrl || ''),
     })) : [];
 
-    const doc = await Assignment.create({
+    const doc = await AssignmentModel.create({
       classId: id,
       teacherId: userId,
       title: String(title).trim(),
