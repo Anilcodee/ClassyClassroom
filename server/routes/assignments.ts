@@ -65,7 +65,7 @@ export const createAssignment: RequestHandler = async (req: AuthRequest, res) =>
     const { id } = req.params as { id: string }; // class id
     const { title, description, type, questions, dueAt, publishAt, points, isDraft, allowLate, allowedRollNos, attachments } = req.body as any;
 
-    const cls = await ClassModel.findById(id).select("teacher coTeachers").lean();
+    const cls = await ClassModelAny.findById(id).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
     if (!isOwnerOrCo(cls, userId)) return res.status(403).json({ message: "Unauthorized" });
 
