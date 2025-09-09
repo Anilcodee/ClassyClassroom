@@ -57,6 +57,10 @@ export interface ISubmission extends Document {
   attachments: IAttachment[];
   submittedAt: Date;
   status: "on_time" | "late" | "closed";
+  score?: number | null;
+  gradedBy?: Types.ObjectId | null;
+  gradedAt?: Date | null;
+  feedback?: string;
 }
 
 const SubmissionSchema = new Schema<ISubmission>({
