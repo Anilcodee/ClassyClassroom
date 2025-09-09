@@ -64,10 +64,11 @@ export default function Classes() {
     attempt = 1,
   ): Promise<Response> {
     const { signal, ...rest } = init as any;
+    let resolvedUrl: any = url;
     try {
       // Use globalThis.fetch to avoid potential site wrappers; ensure we always return a Response or a handled error
       const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
-      const resolvedUrl =
+      resolvedUrl =
         typeof location !== "undefined" &&
         typeof url === "string" &&
         url.startsWith("/")
