@@ -27,8 +27,6 @@ export default function AssignmentSubmit(){
   const MAX_FILES = 4;
   const MAX_SIZE = 4 * 1024 * 1024;
 
-  import { fetchWithRetry } from "@/lib/fetch";
-
 
   const [submission, setSubmission] = useState<any>(null);
 
