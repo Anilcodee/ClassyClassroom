@@ -1,5 +1,4 @@
 import { RequestHandler } from "express";
-import { RequestHandler } from "express";
 import mongoose from "mongoose";
 import { Attendance } from "../models/Attendance";
 import { AuthRequest } from "../middleware/auth";
