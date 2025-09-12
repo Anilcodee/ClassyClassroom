@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { formatDateTime } from "@/lib/utils";
+import { fetchWithRetry } from "@/lib/fetch";
 
 interface Attachment { name: string; type: string; size: number; dataUrl: string }
 
