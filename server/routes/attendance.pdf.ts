@@ -3,6 +3,8 @@ import PDFDocument from "pdfkit";
 import mongoose from "mongoose";
 import { Attendance } from "../models/Attendance";
 import { ClassModel } from "../models/Class";
+const AttendanceModelAny: any = Attendance as any;
+const ClassModelAny: any = ClassModel as any;
 
 function parseDateParam(input?: string | null) {
   if (!input) return new Date(new Date().toISOString().slice(0,10));
