@@ -11,7 +11,7 @@ export const unenrollClass: RequestHandler = async (req: AuthRequest, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { id } = req.params as { id: string };
-    const user = await User.findById(req.userId);
+    const user = await UserModelAny.findById(req.userId);
     if (!user) return res.status(401).json({ message: "Unauthorized" });
     const role = (user as any).role || "teacher";
     const isStudent = (user as any).isStudent === true || role === "student";
@@ -49,7 +49,7 @@ export const listStudentClasses: RequestHandler = async (
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
   try {
-    const user = await User.findById(req.userId);
+    const user = await UserModelAny.findById(req.userId);
     if (!user) return res.status(401).json({ message: "Unauthorized" });
     const role = (user as any).role || "teacher";
     const isStudent = (user as any).isStudent === true || role === "student";
@@ -73,7 +73,7 @@ export const joinClass: RequestHandler = async (req: AuthRequest, res) => {
     if (!joinCode)
       return res.status(400).json({ message: "joinCode is required" });
 
-    const user = await User.findById(req.userId);
+    const user = await UserModelAny.findById(req.userId);
     if (!user) return res.status(401).json({ message: "Unauthorized" });
     const role = (user as any).role || "teacher";
     const isStudent = (user as any).isStudent === true || role === "student";
