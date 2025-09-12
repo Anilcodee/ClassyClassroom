@@ -3,6 +3,9 @@ import { Attendance, AttendanceSession } from "../models/Attendance";
 import { ClassModel } from "../models/Class";
 import { AuthRequest } from "../middleware/auth";
 import mongoose from "mongoose";
+const AttendanceModelAny: any = Attendance as any;
+const AttendanceSessionModelAny: any = AttendanceSession as any;
+const ClassModelAny: any = ClassModel as any;
 
 export const activateClass: RequestHandler = async (req: AuthRequest, res) => {
   if (mongoose.connection.readyState !== 1)
@@ -14,7 +17,7 @@ export const activateClass: RequestHandler = async (req: AuthRequest, res) => {
 
     // If already active and session not expired, return existing
     if (cls.isActive && cls.activeSession) {
-      const existing = await AttendanceSession.findById(cls.activeSession);
+      const existing = await AttendanceSessionModelAny.findById(cls.activeSession);
       if (existing && existing.isActive && existing.expiresAt > new Date()) {
         return res.json({ sessionId: existing.id, expiresAt: existing.expiresAt });
       }
@@ -30,7 +33,7 @@ export const activateClass: RequestHandler = async (req: AuthRequest, res) => {
 
     const minutes = Math.max(1, Math.min(10, (cls as any).durationMinutes || 4));
     const expiresAt = new Date(Date.now() + minutes * 60 * 1000);
-    const session = await AttendanceSession.create({ classId: cls.id, expiresAt, isActive: true });
+    const session = await AttendanceSessionModelAny.create({ classId: cls.id, expiresAt, isActive: true });
     cls.isActive = true;
     cls.activeSession = session._id;
     await cls.save();
@@ -46,13 +49,13 @@ export const sessionStatus: RequestHandler = async (req, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { sessionId } = req.params as { sessionId: string };
-    const session = await AttendanceSession.findById(sessionId);
+    const session = await AttendanceSessionModelAny.findById(sessionId);
     if (!session) return res.status(404).json({ message: "Session not found" });
     const now = new Date();
     if (now > session.expiresAt && session.isActive) {
       session.isActive = false;
       await session.save();
-      await ClassModel.updateOne({ _id: session.classId }, { isActive: false, activeSession: null });
+      await ClassModelAny.updateOne({ _id: session.classId }, { isActive: false, activeSession: null });
     }
     res.json({ isActive: session.isActive, expiresAt: session.expiresAt });
   } catch (e) {
@@ -67,12 +70,12 @@ export const markAttendance: RequestHandler = async (req, res) => {
   try {
     const { sessionId } = req.params as { sessionId: string };
     const { name, rollNo } = req.body as { name: string; rollNo: string };
-    const session = await AttendanceSession.findById(sessionId);
+    const session = await AttendanceSessionModelAny.findById(sessionId);
     if (!session || !session.isActive) return res.status(400).json({ message: "Session inactive" });
     const date = new Date();
     const key = date.toISOString().slice(0, 10);
-    let attendance = await Attendance.findOne({ classId: session.classId, date: { $gte: new Date(key), $lt: new Date(new Date(key).getTime() + 24*60*60*1000) } });
-    if (!attendance) attendance = await Attendance.create({ classId: session.classId, date: new Date(key), records: [] });
+    let attendance = await AttendanceModelAny.findOne({ classId: session.classId, date: { $gte: new Date(key), $lt: new Date(new Date(key).getTime() + 24*60*60*1000) } });
+    if (!attendance) attendance = await AttendanceModelAny.create({ classId: session.classId, date: new Date(key), records: [] });
     attendance.records.push({ student: { name, rollNo }, markedAt: new Date() });
     await attendance.save();
     res.json({ ok: true });
@@ -90,7 +93,7 @@ export const manualMarkAttendance: RequestHandler = async (req: AuthRequest, res
     const { name, rollNo, present } = req.body as { name: string; rollNo: string; present: boolean };
     if (!name || !rollNo) return res.status(400).json({ message: "Missing student info" });
 
-    const cls = await ClassModel.findById(id).select("teacher coTeachers").lean();
+    const cls = await ClassModelAny.findById(id).select("teacher coTeachers").lean();
     const userId = String((req as any).userId || "");
     const isOwnerOrCo = cls && (String(cls.teacher) === userId || (cls.coTeachers||[]).some((t:any)=> String(t) === userId));
     if (!isOwnerOrCo) return res.status(403).json({ message: "Unauthorized" });
@@ -98,8 +101,8 @@ export const manualMarkAttendance: RequestHandler = async (req: AuthRequest, res
     const todayKey = new Date().toISOString().slice(0,10);
     const dayStart = new Date(todayKey);
     const dayEnd = new Date(dayStart.getTime() + 24*60*60*1000);
-    let doc = await Attendance.findOne({ classId: id, date: { $gte: dayStart, $lt: dayEnd } });
-    if (!doc) doc = await Attendance.create({ classId: id, date: dayStart, records: [] });
+    let doc = await AttendanceModelAny.findOne({ classId: id, date: { $gte: dayStart, $lt: dayEnd } });
+    if (!doc) doc = await AttendanceModelAny.create({ classId: id, date: dayStart, records: [] });
 
     const idx = doc.records.findIndex(r => String(r.student.rollNo) === String(rollNo));
     if (present) {
