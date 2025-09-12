@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
 import { RequestHandler } from "express";
+import mongoose from "mongoose";
 import { AuthRequest } from "../middleware/auth";
 import { User } from "../models/User";
 import { ClassModel } from "../models/Class";
+const UserModelAny: any = User as any;
+const ClassModelAny: any = ClassModel as any;
 
 export const joinClassAsTeacher: RequestHandler = async (req: AuthRequest, res) => {
   if (mongoose.connection.readyState !== 1)
@@ -12,13 +15,13 @@ export const joinClassAsTeacher: RequestHandler = async (req: AuthRequest, res) 
     if (!joinCode || typeof joinCode !== "string")
       return res.status(400).json({ message: "joinCode is required" });
 
-    const user = await User.findById((req as any).userId).select("role").lean();
+    const user = await UserModelAny.findById((req as any).userId).select("role").lean();
     if (!user) return res.status(401).json({ message: "Unauthorized" });
     const role = (user as any).role || "teacher";
     const isTeacher = role === "teacher" && (user as any).isStudent !== true;
     if (!isTeacher) return res.status(403).json({ message: "Teacher account required" });
 
-    const cls = await ClassModel.findOne({ joinCode });
+    const cls = await ClassModelAny.findOne({ joinCode });
     if (!cls) return res.status(404).json({ message: "Class not found" });
 
     const uid = String((req as any).userId);
