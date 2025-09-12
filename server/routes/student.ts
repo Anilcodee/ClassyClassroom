@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import { AuthRequest } from "../middleware/auth";
 import { User } from "../models/User";
 import { ClassModel } from "../models/Class";
+const UserModelAny: any = User as any;
+const ClassModelAny: any = ClassModel as any;
 
 export const unenrollClass: RequestHandler = async (req: AuthRequest, res) => {
   if (mongoose.connection.readyState !== 1)
