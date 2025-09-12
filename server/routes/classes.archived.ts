@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import mongoose from "mongoose";
 import { AuthRequest } from "../middleware/auth";
 import { ClassModel } from "../models/Class";
+const ClassModelAny: any = ClassModel as any;
 
 export const listArchivedClasses: RequestHandler = async (
   req: AuthRequest,
