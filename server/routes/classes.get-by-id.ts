@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { AuthRequest } from "../middleware/auth";
 import { ClassModel } from "../models/Class";
 import mongoose from "mongoose";
+const ClassModelAny: any = ClassModel as any;
 
 export const getClass: RequestHandler = async (req: AuthRequest, res) => {
   if (mongoose.connection.readyState !== 1)
