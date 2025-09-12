@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { fetchWithRetry, xhrFetch } from "@/lib/fetch";
 
 export default function AssignmentEdit(){
   const { assignmentId } = useParams();
@@ -19,42 +20,6 @@ export default function AssignmentEdit(){
   const [allowLate, setAllowLate] = useState(true);
   const [allowedRollNos, setAllowedRollNos] = useState<string>("");
   const mountedRef = useRef(true);
-
-import { fetchWithRetry, xhrFetch } from "@/lib/fetch";
-
-
-  async function xhrFetch(url: string, options: RequestInit = {}): Promise<Response> {
-    return new Promise<Response>((resolve, reject) => {
-      try {
-        const method = (options && (options as any).method) || 'GET';
-        const headers = (options && (options as any).headers) || {};
-        const body = (options && (options as any).body) || null;
-        const resolvedUrl = typeof location !== 'undefined' && typeof url === 'string' && url.startsWith('/') ? `${location.origin}${url}` : url;
-        const xhr = new XMLHttpRequest();
-        xhr.open(method, resolvedUrl, true);
-        try {
-          Object.keys(headers || {}).forEach((hk) => {
-            try { xhr.setRequestHeader(hk, (headers as any)[hk]); } catch {}
-          });
-        } catch {}
-        xhr.onreadystatechange = () => {
-          if (xhr.readyState !== 4) return;
-          const hdrs: Record<string,string> = {};
-          try {
-            const raw = xhr.getAllResponseHeaders() || '';
-            raw.trim().split(/\r?\n/).forEach((line) => {
-              const idx = line.indexOf(':');
-              if (idx > 0) { const k = line.slice(0,idx).trim(); const v = line.slice(idx+1).trim(); hdrs[k] = v; }
-            });
-          } catch {}
-          const responseInit: ResponseInit = { status: xhr.status || 0, headers: hdrs };
-          resolve(new Response(xhr.responseText, responseInit));
-        };
-        xhr.onerror = () => reject(new Error('XHR error'));
-        if (body) xhr.send(body as any); else xhr.send();
-      } catch (err) { reject(err); }
-    });
-  }
 
   async function load(signal?: AbortSignal){
     if (!mountedRef.current) return;
