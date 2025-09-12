@@ -26,25 +26,8 @@ export default function AssignmentSubmit(){
   const MAX_FILES = 4;
   const MAX_SIZE = 4 * 1024 * 1024;
 
-  async function fetchWithRetry(url: string, init: RequestInit & { timeoutMs?: number } = {}, attempt = 1): Promise<Response> {
-    const { timeoutMs = 8000, signal, ...rest } = init as any;
-    const ac = new AbortController();
-    const onAbort = () => ac.abort();
-    if (signal) signal.addEventListener('abort', onAbort, { once: true });
-    const t = setTimeout(() => ac.abort(), timeoutMs);
-    try {
-      return await fetch(url, { ...rest, signal: ac.signal });
-    } catch (e) {
-      if (attempt < 2 && (!signal || !(signal as any).aborted)) {
-        await new Promise(r => setTimeout(r, 400));
-        return fetchWithRetry(url, init, attempt + 1);
-      }
-      throw e as any;
-    } finally {
-      clearTimeout(t);
-      if (signal) signal.removeEventListener('abort', onAbort as any);
-    }
-  }
+  import { fetchWithRetry } from "@/lib/fetch";
+
 
   const [submission, setSubmission] = useState<any>(null);
 
