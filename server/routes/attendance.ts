@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { Attendance, AttendanceSession } from "../models/Attendance";
 import { ClassModel } from "../models/Class";
+import { RequestHandler } from "express";
 import { AuthRequest } from "../middleware/auth";
 import mongoose from "mongoose";
 
