@@ -9,7 +9,7 @@ export const getClass: RequestHandler = async (req: AuthRequest, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { id } = req.params as { id: string };
-    const cls = await ClassModel.findOne({ _id: id, $or: [ { teacher: req.userId }, { coTeachers: req.userId } ] }).lean();
+    const cls = await ClassModelAny.findOne({ _id: id, $or: [ { teacher: req.userId }, { coTeachers: req.userId } ] }).lean();
     if (!cls) return res.status(404).json({ message: "Class not found" });
     res.json({ class: cls });
   } catch (e) {
