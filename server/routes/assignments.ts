@@ -362,7 +362,7 @@ export const gradeSubmission: RequestHandler = async (req: AuthRequest, res) => 
     const score = typeof payload.score === 'number' ? payload.score : (payload.score ? Number(payload.score) : null);
     const feedback = typeof payload.feedback === 'string' ? payload.feedback : '';
 
-    const sub = await Submission.findById(submissionId);
+    const sub = await SubmissionModel.findById(submissionId);
     if (!sub) return res.status(404).json({ message: "Submission not found" });
     sub.score = score;
     sub.feedback = feedback;
