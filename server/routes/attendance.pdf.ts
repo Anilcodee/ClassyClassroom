@@ -18,7 +18,7 @@ export const listAttendanceDates: RequestHandler = async (req, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { id } = req.params as { id: string };
-    const docs = await Attendance.find({ classId: id }).select("date").lean();
+    const docs = await AttendanceModelAny.find({ classId: id }).select("date").lean();
     const dates = docs.map((d) => d.date.toISOString().slice(0,10)).sort().reverse();
     res.json({ dates });
   } catch (e) {
@@ -36,9 +36,9 @@ export const classAttendancePdf: RequestHandler = async (req, res) => {
     const date = parseDateParam(dateParam);
     const dayStart = date;
     const dayEnd = new Date(dayStart.getTime() + 24*60*60*1000);
-    const cls = await ClassModel.findById(id).lean();
+    const cls = await ClassModelAny.findById(id).lean();
     if (!cls) return res.status(404).json({ message: "Class not found" });
-    const att = await Attendance.findOne({ classId: id, date: { $gte: dayStart, $lt: dayEnd } }).lean();
+    const att = await AttendanceModelAny.findOne({ classId: id, date: { $gte: dayStart, $lt: dayEnd } }).lean();
     const present = new Set((att?.records||[]).map(r => `${r.student.name}|${r.student.rollNo}`));
 
     const doc = new PDFDocument({ margin: 40 });
@@ -85,9 +85,9 @@ export const classAttendancePdfAll: RequestHandler = async (req, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { id } = req.params as { id: string };
-    const cls = await ClassModel.findById(id).lean();
+    const cls = await ClassModelAny.findById(id).lean();
     if (!cls) return res.status(404).json({ message: "Class not found" });
-    const days = await Attendance.find({ classId: id }).sort({ date: 1 }).lean();
+    const days = await AttendanceModelAny.find({ classId: id }).sort({ date: 1 }).lean();
 
     const doc = new PDFDocument({ margin: 40 });
     const filename = `${cls.name.replace(/[^a-z0-9]+/gi,'-')}-all-days.pdf`;
