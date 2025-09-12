@@ -17,7 +17,7 @@ export const unenrollClass: RequestHandler = async (req: AuthRequest, res) => {
     const isStudent = (user as any).isStudent === true || role === "student";
     if (!isStudent) return res.status(403).json({ message: "Forbidden" });
 
-    const cls = await ClassModel.findById(id);
+    const cls = await ClassModelAny.findById(id);
     if (!cls) return res.status(404).json({ message: "Class not found" });
 
     // Remove from user's enrolledClasses
@@ -55,7 +55,7 @@ export const listStudentClasses: RequestHandler = async (
     const isStudent = (user as any).isStudent === true || role === "student";
     if (!isStudent) return res.status(403).json({ message: "Forbidden" });
     const classIds = (user as any).enrolledClasses || [];
-    const classes = await ClassModel.find({ _id: { $in: classIds } })
+    const classes = await ClassModelAny.find({ _id: { $in: classIds } })
       .select("name joinCode teacher createdAt updatedAt isActive imageUrl")
       .lean();
     res.json({ classes });
@@ -79,7 +79,7 @@ export const joinClass: RequestHandler = async (req: AuthRequest, res) => {
     const isStudent = (user as any).isStudent === true || role === "student";
     if (!isStudent) return res.status(403).json({ message: "Forbidden" });
 
-    const cls = await ClassModel.findOne({ joinCode });
+    const cls = await ClassModelAny.findOne({ joinCode });
     if (!cls) return res.status(404).json({ message: "Class not found" });
 
     const rollNo = (user as any).rollNo || "";
