@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import PDFDocument from "pdfkit";
+import { RequestHandler } from "express";
 import mongoose from "mongoose";
 import { Attendance } from "../models/Attendance";
 import { ClassModel } from "../models/Class";
