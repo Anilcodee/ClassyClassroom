@@ -29,7 +29,7 @@ export const unarchiveClass: RequestHandler = async (req: AuthRequest, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { id } = req.params as { id: string };
-    const cls = await ClassModel.findOne({
+    const cls = await ClassModelAny.findOne({
       _id: id,
       $or: [{ teacher: req.userId }, { coTeachers: req.userId }],
     });
