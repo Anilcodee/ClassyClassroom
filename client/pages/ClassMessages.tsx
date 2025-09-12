@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { formatDateTime } from "@/lib/utils";
+import { fetchWithRetry } from "@/lib/fetch";
 
 interface Attachment {
   name: string;
@@ -187,7 +188,6 @@ export default function ClassMessages() {
     };
   }, []);
 
-import { fetchWithRetry } from "@/lib/fetch";
 
 
   async function load(signal?: AbortSignal) {
