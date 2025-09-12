@@ -3,6 +3,7 @@ import { User } from "../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+const UserModelAny: any = User as any;
 
 async function verifyIdToken(idToken: string) {
   // Use Google's tokeninfo endpoint for simplicity
@@ -40,7 +41,7 @@ export const signup: RequestHandler = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Roll number required for students" });
-    const existing = await User.findOne({ email: emailNorm });
+    const existing = await UserModelAny.findOne({ email: emailNorm });
     if (existing) {
       // User exists: require matching password, then enable the requested role flag
       const ok = await bcrypt.compare(password, existing.passwordHash);
@@ -82,7 +83,7 @@ export const signup: RequestHandler = async (req, res) => {
       });
     }
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await User.create({
+    const user = await UserModelAny.create({
       email: emailNorm,
       name: nameNorm,
       passwordHash,
@@ -128,7 +129,7 @@ export const login: RequestHandler = async (req, res) => {
     const emailNorm = (email || "").trim().toLowerCase();
     if (!emailNorm || !password)
       return res.status(400).json({ message: "Missing fields" });
-    const user = await User.findOne({ email: emailNorm });
+    const user = await UserModelAny.findOne({ email: emailNorm });
     if (!user)
       return res.status(401).json({ message: "Invalid email or password" });
     const ok = await bcrypt.compare(password, user.passwordHash);
@@ -259,7 +260,7 @@ export const googleCallback: RequestHandler = async (req, res) => {
     const email = (payload.email || "").toLowerCase();
     const name = payload.name || "";
 
-    const existing = await User.findOne({ email });
+    const existing = await UserModelAny.findOne({ email });
     // If existing user and already has the requested role, issue JWT and redirect with token
     const hasStudent =
       !!existing?.isStudent || (existing as any)?.role === "student";
@@ -316,7 +317,7 @@ export const googleComplete: RequestHandler = async (req, res) => {
       }
     }
 
-    const existing = await User.findOne({ email: emailNorm });
+    const existing = await UserModelAny.findOne({ email: emailNorm });
     if (existing) {
       // Verify the provided password matches existing password to allow linking role
       const ok = await bcrypt.compare(password, existing.passwordHash);
@@ -368,7 +369,7 @@ export const googleComplete: RequestHandler = async (req, res) => {
         .json({ message: "Roll number required for students" });
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await User.create({
+    const user = await UserModelAny.create({
       email: emailNorm,
       name: nameNorm,
       passwordHash,
