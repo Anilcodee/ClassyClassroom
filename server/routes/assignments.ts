@@ -180,7 +180,7 @@ export const updateAssignment: RequestHandler = async (req: AuthRequest, res) =>
         parts.push(`${a.type === 'quiz' ? 'Quiz' : 'Assignment'}: ${a.title}`);
         if (a.dueAt) parts.push(`Due on ${fmt(a.dueAt)}`);
         const content = [a.description || "", parts.join(" | ")].filter(Boolean).join("\n\n");
-        await Message.create({ classId: a.classId, teacherId: (req as any).userId, title: a.type === 'quiz' ? `Quiz: ${a.title}` : `Assignment: ${a.title}`, content, attachments: atts.slice(0, 5), comments: [], assignmentId: a._id });
+        await MessageModel.create({ classId: a.classId, teacherId: (req as any).userId, title: a.type === 'quiz' ? `Quiz: ${a.title}` : `Assignment: ${a.title}`, content, attachments: atts.slice(0, 5), comments: [], assignmentId: a._id });
       }
     } catch (e) { console.error('Failed to post assignment message on publish', e); }
 
