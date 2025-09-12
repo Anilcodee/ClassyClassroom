@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { formatDateTime } from "@/lib/utils";
+import { fetchWithRetry } from "@/lib/fetch";
 
 interface AssignmentItem { id: string; title: string; type: 'assignment'|'quiz'; description?: string; dueAt?: string|null; publishAt?: string|null; isDraft: boolean; allowLate: boolean; allowedRollNos?: string[] }
 
@@ -28,8 +29,6 @@ export default function ClassAssignments(){
 
   const role = useMemo(()=>{ try { const raw = localStorage.getItem('user'); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
   const mountedRef = useRef(true);
-
-import { fetchWithRetry } from "@/lib/fetch";
 
 
   async function load(signal?: AbortSignal){
