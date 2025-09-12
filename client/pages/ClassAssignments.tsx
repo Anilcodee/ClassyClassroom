@@ -29,22 +29,8 @@ export default function ClassAssignments(){
   const role = useMemo(()=>{ try { const raw = localStorage.getItem('user'); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
   const mountedRef = useRef(true);
 
-  async function fetchWithRetry(url: string, init: RequestInit = {}, attempt = 1): Promise<Response> {
-    const { signal, ...rest } = init as any;
-    try {
-      return await fetch(url, { ...rest, signal });
-    } catch (e: any) {
-      const aborted = (signal && (signal as any).aborted) || e?.name === 'AbortError';
-      if (aborted) {
-        return new Response(JSON.stringify({ message: 'aborted' }), { status: 499, headers: { 'Content-Type': 'application/json' } });
-      }
-      if (attempt < 2) {
-        await new Promise((r) => setTimeout(r, 300 * attempt));
-        return fetchWithRetry(url, init, attempt + 1);
-      }
-      throw e;
-    }
-  }
+import { fetchWithRetry } from "@/lib/fetch";
+
 
   async function load(signal?: AbortSignal){
     if (!mountedRef.current) return;
