@@ -11,7 +11,7 @@ export const listArchivedClasses: RequestHandler = async (
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
   try {
-    const classes = await ClassModel.find({
+    const classes = await ClassModelAny.find({
       isArchived: true,
       $or: [{ teacher: req.userId }, { coTeachers: req.userId }],
     })
