@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import mongoose from "mongoose";
 import { Message } from "../models/Message";
+const MessageModel: any = Message as any;
 import { ClassModel } from "../models/Class";
 import { AuthRequest } from "../middleware/auth";
 import { User } from "../models/User";
@@ -147,7 +148,7 @@ export const createMessage: RequestHandler = async (req: AuthRequest, res) => {
     if (!isMember)
       return res.status(403).json({ message: "Not a class member" });
 
-    const msg = await Message.create({
+    const msg = await MessageModel.create({
       classId: id,
       teacherId: (req as any).userId,
       title: title || undefined,
