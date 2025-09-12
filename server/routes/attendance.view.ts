@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { RequestHandler } from "express";
 import mongoose from "mongoose";
 import { Attendance } from "../models/Attendance";
+const AttendanceModelAny: any = Attendance as any;
 
 function normalizeDate(input?: string | null) {
   if (!input) return new Date(new Date().toISOString().slice(0,10));
@@ -19,7 +20,7 @@ export const getAttendanceForDate: RequestHandler = async (req, res) => {
     const d = normalizeDate(dateParam);
     const dayStart = d;
     const dayEnd = new Date(dayStart.getTime() + 24*60*60*1000);
-    const doc = await Attendance.findOne({ classId: id, date: { $gte: dayStart, $lt: dayEnd } }).lean();
+    const doc = await AttendanceModelAny.findOne({ classId: id, date: { $gte: dayStart, $lt: dayEnd } }).lean();
     res.json({ date: dayStart.toISOString().slice(0,10), records: doc?.records || [] });
   } catch (e) {
     console.error(e);
