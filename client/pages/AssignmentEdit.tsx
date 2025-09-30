@@ -112,6 +112,7 @@ export default function AssignmentEdit(){
       if (!r.ok) throw new Error(d?.message || r.statusText);
       // Signal other pages/tabs that this assignment changed so they can reload
       try { localStorage.setItem(`assignment-updated:${assignmentId}`, String(Date.now())); } catch {}
+      try { window.dispatchEvent(new CustomEvent('assignment-updated', { detail: { assignmentId } })); } catch {}
       // Prefer SPA back when available, otherwise navigate to class assignments
       try {
         const idx = (window.history && (window.history.state as any)?.idx) || 0;
