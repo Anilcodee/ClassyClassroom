@@ -33,11 +33,32 @@ export async function xhrFetch(url: string, options: RequestInit = {}): Promise<
 
 export async function fetchWithRetry(url: string, init: RequestInit & { timeoutMs?: number } = {}, attempt = 1): Promise<Response> {
   const { timeoutMs, signal, ...rest } = init as any;
-  // Prefer native fetch
+  // Prefer XHR for same-origin requests to avoid instrumentation wrappers (FullStory etc.)
   let resolvedUrl: any = url;
   try {
-    const nativeFetch = (globalThis as any).fetch?.bind(globalThis) ?? fetch;
     resolvedUrl = typeof location !== 'undefined' && typeof url === 'string' && url.startsWith('/') ? `${location.origin}${url}` : url;
+
+    const shouldPreferXhr = typeof url === 'string' && url.startsWith('/');
+
+    // Try XHR first for same-origin to avoid fetch wrappers
+    if (shouldPreferXhr) {
+      try {
+        return await xhrFetch(resolvedUrl, rest);
+      } catch (xhrErr) {
+        // fall through to native fetch
+      }
+    }
+
+    // Safe binding for native fetch
+    let nativeFetch: any = undefined;
+    try {
+      nativeFetch = (globalThis as any).fetch;
+      if (typeof nativeFetch === 'function') nativeFetch = nativeFetch.bind(globalThis);
+      else nativeFetch = undefined;
+    } catch (bindErr) {
+      nativeFetch = undefined;
+    }
+    if (!nativeFetch && typeof fetch === 'function') nativeFetch = fetch;
 
     // If a timeout is provided, create AbortController
     let ac: AbortController | null = null;
@@ -53,7 +74,9 @@ export async function fetchWithRetry(url: string, init: RequestInit & { timeoutM
     if (signal && onAbort) signal.addEventListener('abort', onAbort, { once: true });
 
     try {
-      return await nativeFetch(resolvedUrl, { ...rest, signal: innerSignal ?? signal });
+      if (nativeFetch) {
+        return await nativeFetch(resolvedUrl, { ...rest, signal: innerSignal ?? signal });
+      }
     } catch (e: any) {
       const aborted = (signal && (signal as any).aborted) || e?.name === 'AbortError' || (ac && (ac.signal as any).aborted);
       if (aborted) {
