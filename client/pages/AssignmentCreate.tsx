@@ -14,7 +14,7 @@ export default function AssignmentCreate(){
   const [dueAt, setDueAt] = useState<string>("");
   const [publishAt, setPublishAt] = useState<string>("");
   const [points, setPoints] = useState<number|string>(100);
-  const [isDraft, setIsDraft] = useState(true);
+  const [isDraft, setIsDraft] = useState(false);
   const [allowLate, setAllowLate] = useState(true);
   const [allowedRollNos, setAllowedRollNos] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
