@@ -470,16 +470,40 @@ export default function Classes() {
                                   className="p-1 rounded border border-border hover:bg-accent group"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    const code = c.joinCode;
-                                    navigator.clipboard
-                                      .writeText(code)
-                                      .then(() => {
-                                        toast({
-                                          title: "Copied",
-                                          description: "Join code copied",
-                                        });
-                                      })
-                                      .catch(() => {});
+                                    const code = c.joinCode || "";
+                                    const tryNative = () => {
+                                      if (navigator && (navigator as any).clipboard && typeof navigator.clipboard.writeText === 'function') {
+                                        return navigator.clipboard.writeText(code);
+                                      }
+                                      return Promise.reject(new Error('No clipboard API'));
+                                    };
+                                    const fallbackCopy = () => {
+                                      try {
+                                        const ta = document.createElement('textarea');
+                                        ta.value = code;
+                                        ta.setAttribute('readonly','');
+                                        ta.style.position = 'absolute';
+                                        ta.style.left = '-9999px';
+                                        document.body.appendChild(ta);
+                                        const selected = (document.getSelection && document.getSelection()!.rangeCount > 0);
+                                        if (!selected) ta.select();
+                                        else {
+                                          ta.focus();
+                                          ta.select();
+                                        }
+                                        const ok = document.execCommand('copy');
+                                        document.body.removeChild(ta);
+                                        if (!ok) throw new Error('execCommand failed');
+                                        return Promise.resolve();
+                                      } catch (e) {
+                                        return Promise.reject(e);
+                                      }
+                                    };
+                                    tryNative().catch(fallbackCopy).then(() => {
+                                      toast({ title: 'Copied', description: 'Join code copied' });
+                                    }).catch(() => {
+                                      toast({ title: 'Copy failed', description: 'Unable to copy join code' });
+                                    });
                                   }}
                                   onMouseEnter={(e) => {
                                     e.stopPropagation();
