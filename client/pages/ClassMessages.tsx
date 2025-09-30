@@ -369,7 +369,7 @@ export default function ClassMessages() {
     return () => window.removeEventListener('popstate', onPop);
   }, [id, token]);
 
-  // Reload messages when an assignment is updated elsewhere (other tab/page)
+  // Reload messages when an assignment is updated elsewhere (other tab/page) or in same tab via custom event
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       try {
@@ -380,8 +380,18 @@ export default function ClassMessages() {
         }
       } catch {}
     };
+    const onCustom = (ev: any) => {
+      try {
+        const ac = new AbortController();
+        load(ac.signal).catch(() => {});
+      } catch {}
+    };
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    window.addEventListener('assignment-updated', onCustom as EventListener);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('assignment-updated', onCustom as EventListener);
+    };
   }, [id, token]);
 
   const backHref = userRole === "student" ? "/student" : "/classes";
