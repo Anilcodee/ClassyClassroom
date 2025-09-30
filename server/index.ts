@@ -69,6 +69,13 @@ export function createServer() {
   connectDB().catch((e) => {
     console.error("DB connect failed:", e);
   });
+  // Start background assignment publisher
+  try {
+    const { startAssignmentPublisher } = await import('./routes/assignments');
+    startAssignmentPublisher();
+  } catch (e) {
+    console.error('Failed to start assignment publisher', e);
+  }
 
   // Health/demo
   app.get("/api/ping", (_req, res) => {
