@@ -254,7 +254,7 @@ export const updateMessage: RequestHandler = async (req: AuthRequest, res) => {
           createdAt: c.createdAt,
         })),
         canEdit: true,
-        canComment: isOwner && !isPoster,
+        canComment: isOwnerOrCo && !isPoster,
       },
     });
   } catch (e) {
