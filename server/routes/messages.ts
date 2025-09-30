@@ -50,47 +50,63 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-    // Batch fetch assignment metadata for messages that reference an assignment
-    const assignmentIds = Array.from(
-      new Set(msgs.filter((m: any) => m.assignmentId).map((m: any) => String(m.assignmentId))),
-    );
+    // Fetch assignments in this class to prefer current dates and attempt to match messages without assignmentId
+    const AssignmentModule: any = await import('../models/Assignment');
+    const AssignmentModelAny: any = AssignmentModule.Assignment;
+    const classAssigns = await AssignmentModelAny.find({ classId: id }).select('_id title publishAt dueAt').lean();
     const assignmentsById: Record<string, any> = {};
-    if (assignmentIds.length > 0) {
-      const assigns = await import('../models/Assignment').then((mod) => mod.Assignment.find({ _id: { $in: assignmentIds } }).select('publishAt dueAt').lean());
-      assigns.forEach((as: any) => {
-        assignmentsById[String(as._id)] = as;
-      });
-    }
+    classAssigns.forEach((as: any) => {
+      assignmentsById[String(as._id)] = as;
+    });
+    // Build title -> assignments map for best-effort matching of messages lacking assignmentId
+    const assignsByTitle: Record<string, any[]> = {};
+    classAssigns.forEach((as: any) => {
+      const t = String(as.title || '').trim().toLowerCase();
+      if (!t) return;
+      assignsByTitle[t] = assignsByTitle[t] || [];
+      assignsByTitle[t].push(as);
+    });
 
     res.json({
-      messages: msgs.map((m) => ({
-        id: m._id,
-        teacherId: m.teacherId,
-        title: m.title || "",
-        content: m.content,
-        assignmentId: m.assignmentId ? String(m.assignmentId) : undefined,
-        // When message references an assignment, prefer the current assignment publish/due dates
-        assignmentPublishAt: m.assignmentId ? (assignmentsById[String(m.assignmentId)]?.publishAt || null) : ((m as any).assignmentPublishAt || null),
-        assignmentDueAt: m.assignmentId ? (assignmentsById[String(m.assignmentId)]?.dueAt || null) : ((m as any).assignmentDueAt || null),
-        createdAt: m.createdAt,
-        updatedAt: m.updatedAt,
-        pinned: !!m.pinned,
-        attachments: (m.attachments || []).map((a) => ({
-          name: a.name,
-          type: a.type,
-          size: a.size,
-          dataUrl: a.dataUrl,
-        })),
-        comments: (m.comments || []).map((c) => ({
-          userId: c.userId,
-          name: c.name,
-          content: c.content,
-          createdAt: c.createdAt,
-        })),
-        canEdit:
-          Boolean(userId) && (String(m.teacherId) === userId || isOwnerOrCo),
-        canComment: isMember && String(m.teacherId) !== userId,
-      })),
+      messages: msgs.map((m) => {
+        const assignmentId = m.assignmentId ? String(m.assignmentId) : undefined;
+        let publishAt: any = null;
+        let dueAt: any = null;
+        if (assignmentId) {
+          const asg = assignmentsById[assignmentId];
+          if (asg) { publishAt = asg.publishAt || null; dueAt = asg.dueAt || null; }
+          else { publishAt = (m as any).assignmentPublishAt || null; dueAt = (m as any).assignmentDueAt || null; }
+        } else {
+          // best-effort match by title: strip leading "Assignment:" or "Quiz:" prefixes
+          try {
+            const titleText = String(m.title || '').replace(/^Quiz:\s*/i, '').replace(/^Assignment:\s*/i, '').trim().toLowerCase();
+            if (titleText && assignsByTitle[titleText] && assignsByTitle[titleText].length > 0) {
+              const asg = assignsByTitle[titleText][0];
+              publishAt = asg.publishAt || null; dueAt = asg.dueAt || null;
+            } else {
+              publishAt = (m as any).assignmentPublishAt || null; dueAt = (m as any).assignmentDueAt || null;
+            }
+          } catch {
+            publishAt = (m as any).assignmentPublishAt || null; dueAt = (m as any).assignmentDueAt || null;
+          }
+        }
+        return {
+          id: m._id,
+          teacherId: m.teacherId,
+          title: m.title || "",
+          content: m.content,
+          assignmentId: assignmentId,
+          assignmentPublishAt: publishAt,
+          assignmentDueAt: dueAt,
+          createdAt: m.createdAt,
+          updatedAt: m.updatedAt,
+          pinned: !!m.pinned,
+          attachments: (m.attachments || []).map((a) => ({ name: a.name, type: a.type, size: a.size, dataUrl: a.dataUrl })),
+          comments: (m.comments || []).map((c) => ({ userId: c.userId, name: c.name, content: c.content, createdAt: c.createdAt })),
+          canEdit: Boolean(userId) && (String(m.teacherId) === userId || isOwnerOrCo),
+          canComment: isMember && String(m.teacherId) !== userId,
+        };
+      })
     });
   } catch (e) {
     console.error(e);
