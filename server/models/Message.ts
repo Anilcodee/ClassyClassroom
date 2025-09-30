@@ -23,6 +23,8 @@ export interface IMessage extends Document {
   attachments: IMessageAttachment[];
   comments: IMessageComment[];
   assignmentId?: Types.ObjectId;
+  assignmentPublishAt?: Date | null;
+  assignmentDueAt?: Date | null;
 }
 
 const AttachmentSchema = new Schema<IMessageAttachment>(
