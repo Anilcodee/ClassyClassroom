@@ -207,6 +207,10 @@ export const updateAssignment: RequestHandler = async (req: AuthRequest, res) =>
       const updatedContent = a.description ? String(a.description) : (a.type === 'quiz' ? 'New quiz assigned.' : 'New assignment assigned.');
       const updatedTitle = a.type === 'quiz' ? `Quiz: ${a.title}` : `Assignment: ${a.title}`;
       await MessageModel.updateMany({ assignmentId: a._id }, { $set: { title: updatedTitle, content: updatedContent, assignmentPublishAt: a.publishAt || null, assignmentDueAt: a.dueAt || null } }).exec();
+      // Also update any messages without assignmentId but with the same title
+      try {
+        await MessageModel.updateMany({ classId: a.classId, assignmentId: { $exists: false }, title: updatedTitle }, { $set: { content: updatedContent, assignmentPublishAt: a.publishAt || null, assignmentDueAt: a.dueAt || null } }).exec();
+      } catch (e) { console.error('Failed to update pre-existing messages without assignmentId', e); }
     } catch (e) {
       console.error('Failed to update assignment messages', e);
     }
