@@ -57,6 +57,8 @@ const MessageSchema = new Schema<IMessage>(
     attachments: { type: [AttachmentSchema], default: [] },
     comments: { type: [CommentSchema], default: [] },
     assignmentId: { type: Schema.Types.ObjectId, ref: 'Assignment', required: false },
+    assignmentPublishAt: { type: Date, required: false },
+    assignmentDueAt: { type: Date, required: false },
   },
   { timestamps: true }
 );
