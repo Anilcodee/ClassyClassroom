@@ -69,8 +69,9 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
         title: m.title || "",
         content: m.content,
         assignmentId: m.assignmentId ? String(m.assignmentId) : undefined,
-        assignmentPublishAt: (m as any).assignmentPublishAt || (m.assignmentId ? (assignmentsById[String(m.assignmentId)]?.publishAt || null) : null),
-        assignmentDueAt: (m as any).assignmentDueAt || (m.assignmentId ? (assignmentsById[String(m.assignmentId)]?.dueAt || null) : null),
+        // When message references an assignment, prefer the current assignment publish/due dates
+        assignmentPublishAt: m.assignmentId ? (assignmentsById[String(m.assignmentId)]?.publishAt || null) : ((m as any).assignmentPublishAt || null),
+        assignmentDueAt: m.assignmentId ? (assignmentsById[String(m.assignmentId)]?.dueAt || null) : ((m as any).assignmentDueAt || null),
         createdAt: m.createdAt,
         updatedAt: m.updatedAt,
         pinned: !!m.pinned,
