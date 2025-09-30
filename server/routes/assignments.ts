@@ -199,7 +199,7 @@ export const updateAssignment: RequestHandler = async (req: AuthRequest, res) =>
       const parts: string[] = [];
       parts.push(`${a.type === 'quiz' ? 'Quiz' : 'Assignment'}: ${a.title}`);
       if (a.dueAt) parts.push(`Due on ${fmt(a.dueAt)}`);
-      const updatedContent = [a.description || "", parts.join(" | ")].filter(Boolean).join("\n\n");
+      const updatedContent = a.description ? String(a.description) : (a.type === 'quiz' ? 'New quiz assigned.' : 'New assignment assigned.');
       const updatedTitle = a.type === 'quiz' ? `Quiz: ${a.title}` : `Assignment: ${a.title}`;
       await MessageModel.updateMany({ assignmentId: a._id }, { $set: { title: updatedTitle, content: updatedContent, assignmentPublishAt: a.publishAt || null, assignmentDueAt: a.dueAt || null } }).exec();
     } catch (e) {
