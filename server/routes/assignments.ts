@@ -113,7 +113,12 @@ export const createAssignment: RequestHandler = async (req: AuthRequest, res) =>
         parts.push(`${doc.type === 'quiz' ? 'Quiz' : 'Assignment'}: ${doc.title}`);
         if (doc.dueAt) parts.push(`Due on ${fmt(doc.dueAt)}`);
         const content = doc.description ? String(doc.description) : (doc.type === 'quiz' ? 'New quiz assigned.' : 'New assignment assigned.');
-        await MessageModel.create({ classId: id, teacherId: userId, title: doc.type === 'quiz' ? `Quiz: ${doc.title}` : `Assignment: ${doc.title}`, content, attachments: atts.slice(0, 5), comments: [], assignmentId: doc._id, assignmentPublishAt: doc.publishAt || null, assignmentDueAt: doc.dueAt || null });
+        const createdMsg = await MessageModel.create({ classId: id, teacherId: userId, title: doc.type === 'quiz' ? `Quiz: ${doc.title}` : `Assignment: ${doc.title}`, content, attachments: atts.slice(0, 5), comments: [], assignmentId: doc._id, assignmentPublishAt: doc.publishAt || null, assignmentDueAt: doc.dueAt || null });
+        // Also update any pre-existing messages that reference the same title but lack assignmentId
+        try {
+          const matchTitle = doc.type === 'quiz' ? `Quiz: ${doc.title}` : `Assignment: ${doc.title}`;
+          await MessageModel.updateMany({ classId: id, assignmentId: { $exists: false }, title: matchTitle }, { $set: { content: content, assignmentPublishAt: doc.publishAt || null, assignmentDueAt: doc.dueAt || null } }).exec();
+        } catch (e) { console.error('Failed to update pre-existing messages for new assignment', e); }
       }
     } catch (e) {
       console.error('Failed to post assignment message', e);
