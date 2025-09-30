@@ -331,6 +331,63 @@ export const deleteAssignment: RequestHandler = async (req: AuthRequest, res) =>
   }
 };
 
+// Helper to publish a draft assignment and create/update messages
+export async function publishAssignmentNow(assignmentId: string) {
+  try {
+    const a = await AssignmentModel.findById(assignmentId);
+    if (!a) return;
+    if (!a.isDraft) return;
+    const now = new Date();
+    if (!a.publishAt || (a.publishAt && a.publishAt > now)) return; // not due yet
+
+    // mark published
+    a.isDraft = false;
+    await a.save();
+
+    // create message
+    try {
+      const atts = (a as any).attachments || [];
+      const content = a.description ? String(a.description) : (a.type === 'quiz' ? 'New quiz assigned.' : 'New assignment assigned.');
+      await MessageModel.create({ classId: a.classId, teacherId: a.teacherId || (a as any).teacherId, title: a.type === 'quiz' ? `Quiz: ${a.title}` : `Assignment: ${a.title}`, content, attachments: atts.slice(0, 5), comments: [], assignmentId: a._id, assignmentPublishAt: a.publishAt || null, assignmentDueAt: a.dueAt || null });
+      // update pre-existing messages without assignmentId but matching title
+      try {
+        const updatedTitle = a.type === 'quiz' ? `Quiz: ${a.title}` : `Assignment: ${a.title}`;
+        const updatedContent = a.description ? String(a.description) : (a.type === 'quiz' ? 'New quiz assigned.' : 'New assignment assigned.');
+        await MessageModel.updateMany({ classId: a.classId, assignmentId: { $exists: false }, title: updatedTitle }, { $set: { content: updatedContent, assignmentPublishAt: a.publishAt || null, assignmentDueAt: a.dueAt || null } }).exec();
+      } catch (e) { console.error('Failed to update pre-existing messages for published assignment', e); }
+    } catch (e) {
+      console.error('Failed to create message for published assignment', e);
+    }
+  } catch (e) {
+    console.error('publishAssignmentNow error', e);
+  }
+}
+
+// Start a background loop to auto-publish scheduled assignments. Call once during server startup.
+export function startAssignmentPublisher(intervalMs = 60_000) {
+  let running = false;
+  const tick = async () => {
+    if (running) return; // prevent overlapping runs
+    running = true;
+    try {
+      const now = new Date();
+      // find drafts with publishAt in the past or now
+      const due = await AssignmentModel.find({ isDraft: true, publishAt: { $exists: true, $ne: null, $lte: now } }).select('_id').lean().limit(100).exec();
+      for (const d of due) {
+        try { await publishAssignmentNow(String(d._id)); } catch (e) { console.error('Error auto-publishing assignment', d._id, e); }
+      }
+    } catch (e) {
+      console.error('Assignment publisher tick failed', e);
+    } finally {
+      running = false;
+    }
+  };
+  // run immediately then on interval
+  tick().catch(()=>{});
+  const id = setInterval(tick, intervalMs);
+  return () => clearInterval(id);
+}
+
 export const listSubmissions: RequestHandler = async (req: AuthRequest, res) => {
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
