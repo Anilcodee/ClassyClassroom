@@ -69,10 +69,19 @@ export function createServer() {
   connectDB().catch((e) => {
     console.error("DB connect failed:", e);
   });
-  // Start background assignment publisher
+  // Start background assignment publisher (dynamic import)
   try {
-    const { startAssignmentPublisher } = await import('./routes/assignments');
-    startAssignmentPublisher();
+    import('./routes/assignments')
+      .then((mod) => {
+        try {
+          if (mod && typeof mod.startAssignmentPublisher === 'function') mod.startAssignmentPublisher();
+        } catch (e) {
+          console.error('Failed to run assignment publisher', e);
+        }
+      })
+      .catch((e) => {
+        console.error('Failed to import assignment publisher', e);
+      });
   } catch (e) {
     console.error('Failed to start assignment publisher', e);
   }
