@@ -110,6 +110,8 @@ export default function AssignmentEdit(){
       if (r.status === 0 || r.status === 499) throw new Error('Network error');
       const d = await r.json().catch(()=>({}));
       if (!r.ok) throw new Error(d?.message || r.statusText);
+      // Signal other pages/tabs that this assignment changed so they can reload
+      try { localStorage.setItem(`assignment-updated:${assignmentId}`, String(Date.now())); } catch {}
       // Prefer SPA back when available, otherwise navigate to class assignments
       try {
         const idx = (window.history && (window.history.state as any)?.idx) || 0;
