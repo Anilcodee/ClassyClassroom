@@ -369,6 +369,21 @@ export default function ClassMessages() {
     return () => window.removeEventListener('popstate', onPop);
   }, [id, token]);
 
+  // Reload messages when an assignment is updated elsewhere (other tab/page)
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      try {
+        if (!e.key) return;
+        if (e.key.startsWith('assignment-updated:')) {
+          const ac = new AbortController();
+          load(ac.signal).catch(() => {});
+        }
+      } catch {}
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [id, token]);
+
   const backHref = userRole === "student" ? "/student" : "/classes";
 
   async function readFiles(fs: File[]): Promise<Attachment[]> {
