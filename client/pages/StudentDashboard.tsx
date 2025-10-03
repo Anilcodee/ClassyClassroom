@@ -364,7 +364,7 @@ export default function StudentDashboard() {
   }
 
   return (
-    <main className="container mx-auto py-10">
+    <main className="max-w-[1400px] w-full mx-auto py-10 px-8 flex flex-col">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Student dashboard</h1>
@@ -375,7 +375,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Quick add to-do beside heading */}
-        <div className="w-full sm:w-80 bg-card border border-border rounded-2xl p-3 shadow-sm">
+        <div className="bg-white border border-border rounded-2xl p-3 shadow-sm w-full sm:w-[600px]">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -420,19 +420,18 @@ export default function StudentDashboard() {
       {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
 
       {/* Inline To‑Do List option */}
-      <div className="mt-6 flex items-center justify-between max-w-xl">
+      <div className="flex items-center justify-between mt-6 ml-auto max-w-[576px]">
         <h2 className="text-lg font-semibold">To‑do</h2>
         <label className="inline-flex items-center gap-2 text-sm">
           <input
             type="checkbox"
             className="rounded border-input"
-            checked={typeof window !== 'undefined' ? (localStorage.getItem(`studentTodosEnabled:${userId}`) !== 'false') : true}
+            checked={todoEnabled}
             onChange={(e) => {
               try {
-                localStorage.setItem(`studentTodosEnabled:${userId}`, String(e.target.checked));
+                localStorage.setItem(`studentTodosEnabled:${userId || 'anon'}`, String(e.target.checked));
               } catch {}
-              // cause a re-render by toggling a stateful key — use a temp state
-              setTodoEnabled((v) => !v);
+              setTodoEnabled(e.target.checked);
             }}
           />
           <span className="text-foreground/70">Show to‑do list</span>
