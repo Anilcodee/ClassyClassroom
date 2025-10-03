@@ -687,6 +687,76 @@ export default function StudentDashboard() {
       {/* Mobile-only bottom spacer to avoid cutoff behind OS UI */}
       <div className="h-24 lg:hidden pb-[env(safe-area-inset-bottom)]" />
 
+      {/* Floating panel rendered at end to avoid JSX nesting issues */}
+      {floatingOpen && (
+        <div className="fixed top-20 right-8 z-60">
+          <div className="w-80 bg-white border border-border rounded-2xl shadow-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold">To‑do Maker</h3>
+              <button
+                aria-label="Close To-do Maker"
+                className="text-sm px-2 py-1 rounded-md hover:bg-muted"
+                onClick={() => setFloatingOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!todoText.trim()) return;
+                const id = String(Date.now()) + Math.random().toString(36).slice(2,8);
+                const next = [{ id, text: todoText.trim(), done: false }, ...todos];
+                setTodos(next);
+                setTodoText("");
+                try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+              }}
+              className="flex gap-2 mb-3"
+            >
+              <input
+                className="flex-1 rounded-md border border-input bg-background px-3 py-2"
+                placeholder="Add a to‑do"
+                value={todoText}
+                onChange={(e) => setTodoText(e.target.value)}
+              />
+              <button className="px-3 py-2 rounded-md bg-primary text-primary-foreground">Add</button>
+            </form>
+
+            <div className="max-h-64 overflow-auto">
+              <ul className="space-y-2">
+                {todos.map((t) => (
+                  <li key={t.id} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={t.done}
+                      onChange={() => {
+                        const next = todos.map((it) => (it.id === t.id ? { ...it, done: !it.done } : it));
+                        setTodos(next);
+                        try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+                      }}
+                    />
+                    <div className="flex-1">
+                      <div className={`text-sm ${t.done ? 'line-through text-foreground/60' : ''}`}>{t.text}</div>
+                    </div>
+                    <button
+                      className="text-sm text-destructive px-2"
+                      onClick={() => {
+                        const next = todos.filter((it) => it.id !== t.id);
+                        setTodos(next);
+                        try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
     </main>
   );
 }
