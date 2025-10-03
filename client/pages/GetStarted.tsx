@@ -108,14 +108,16 @@ export default function GetStarted() {
                 Student
               </Link>
             </div>
-          </div>
 
-          <div className="rounded-2xl border border-border p-4 sm:p-6 bg-card text-foreground/80 shadow-sm">
-            <h3 className="text-sm font-semibold mb-2">Why ClassyClassroom?</h3>
-            <p className="text-sm">
-              Fast, private, and built for classrooms. No clutter — just the
-              tools teachers and students need.
-            </p>
+            {/* Moved: Why ClassyClassroom placed below Teacher/Student animation inside the main card */}
+            <div className="mt-6 rounded-2xl border border-border p-4 sm:p-6 bg-card text-foreground/80 shadow-sm">
+              <h3 className="text-sm font-semibold mb-2">Why ClassyClassroom?</h3>
+              <p className="text-sm">
+                Fast, private, and built for classrooms. No clutter — just the
+                tools teachers and students need.
+              </p>
+            </div>
+
           </div>
         </div>
       </section>
