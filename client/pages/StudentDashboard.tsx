@@ -384,12 +384,13 @@ export default function StudentDashboard() {
             <div className="fixed top-8 right-8 z-50">
               {!floatingOpen ? (
                 <button
-                  aria-label="Open To-do Maker"
-                  className="h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
-                  onClick={() => setFloatingOpen(true)}
-                >
-                  +
-                </button>
+            aria-label="Open To-do Maker"
+            data-loc="client/pages/StudentDashboard.tsx:386:17"
+            className="flex items-center align-middle bg-neutral-900 rounded-full text-white h-12 w-12 justify-center ml-auto"
+            onClick={() => setFloatingOpen(true)}
+          >
+            +
+          </button>
               ) : (
                 <div className="w-80 bg-white border border-border rounded-2xl shadow-lg p-4">
                   <div className="flex items-center justify-between mb-2">
@@ -466,6 +467,10 @@ export default function StudentDashboard() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div data-loc="client/pages/StudentDashboard.tsx:382:11" $name="StudentDashboard" className="flex flex-col font-normal ml-5 w-full md:w-1/2">
+        <div data-loc="client/pages/StudentDashboard.tsx:384:13" $name="StudentDashboard" style={{ fontWeight: 400, position: "fixed", right: 32, top: 32, zIndex: 50 }} />
       </div>
 
       <form
