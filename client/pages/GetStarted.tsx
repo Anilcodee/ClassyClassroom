@@ -18,14 +18,14 @@ export default function GetStarted() {
   const isDesktop = useIsDesktop();
   return (
     <main className="min-h-[1980px] pb-[env(safe-area-inset-bottom)] bg-gradient-to-b from-background via-background to-background">
-      <section className="container mx-auto px-4 w-full max-w-[1080px] grid lg:grid-cols-2 gap-8 sm:gap-12 py-10 sm:py-12 items-center lg:items-stretch">
-        <div className="max-w-[975px] h-full flex flex-col">
+      <section className="container mx-auto px-0 w-full max-w-[1080px] grid lg:grid-cols-2 gap-8 sm:gap-12 py-12 items-center lg:items-stretch">
+        <div className="max-w-[1080px] w-[1080px] mr-[2px] h-full flex flex-col">
           <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-foreground/70 mb-4">
             <span className="h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
             Fast, secure classroom platform for teachers and students
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
+          <h1 className="text-[42px] lg:text-5xl font-extrabold tracking-tight leading-tight">
             The smarter way to run your class — attendance, messages, and more.
           </h1>
 
@@ -49,7 +49,7 @@ export default function GetStarted() {
             </Link>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               "Create and manage classes with cover images",
               "Start timed QR attendance sessions",
