@@ -365,11 +365,39 @@ export default function StudentDashboard() {
 
   return (
     <main className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold">Student dashboard</h1>
-      <p className="text-foreground/70">
-        Join your class with a code from your teacher and see your classes
-        below.
-      </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Student dashboard</h1>
+          <p className="text-foreground/70">
+            Join your class with a code from your teacher and see your classes
+            below.
+          </p>
+        </div>
+
+        {/* Quick add to-do beside heading */}
+        <div className="w-full sm:w-80">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!todoText.trim()) return;
+              const id = String(Date.now()) + Math.random().toString(36).slice(2,8);
+              const next = [{ id, text: todoText.trim(), done: false }, ...todos];
+              setTodos(next);
+              setTodoText("");
+              try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+            }}
+            className="flex gap-2"
+          >
+            <input
+              className="flex-1 rounded-lg border border-input bg-background px-3 py-2"
+              placeholder="Add a to‑do"
+              value={todoText}
+              onChange={(e) => setTodoText(e.target.value)}
+            />
+            <button className="px-4 py-2 rounded-lg bg-primary text-primary-foreground">Add</button>
+          </form>
+        </div>
+      </div>
 
       <form
         onSubmit={handleJoin}
