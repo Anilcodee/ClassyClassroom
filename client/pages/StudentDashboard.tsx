@@ -25,12 +25,17 @@ export default function StudentDashboard() {
     Record<string, { latestAt: number | null; latestBy: string | null }>
   >({});
 
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const userRaw = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+  const userId = userRaw ? JSON.parse(userRaw)?.id || null : null;
+  const role = userRaw ? JSON.parse(userRaw)?.role || "teacher" : null;
+
   // To-do list state (inline for students)
   const [todos, setTodos] = useState<{ id: string; text: string; done: boolean }[]>([]);
   const [todoText, setTodoText] = useState("");
   const [todoEnabled, setTodoEnabled] = useState<boolean>(() => {
     try {
-      return (typeof window !== 'undefined' ? localStorage.getItem(`studentTodosEnabled:${userRaw ? JSON.parse(userRaw)?.id : 'anon'}`) : 'true') !== 'false';
+      return (typeof window !== 'undefined' ? localStorage.getItem(`studentTodosEnabled:${userId || 'anon'}`) : 'true') !== 'false';
     } catch {
       return true;
     }
