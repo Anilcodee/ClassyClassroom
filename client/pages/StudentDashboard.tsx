@@ -375,7 +375,7 @@ export default function StudentDashboard() {
         </div>
 
         {/* Quick add to-do beside heading */}
-        <div className="w-full sm:w-80">
+        <div className="w-full sm:w-80 bg-card border border-border rounded-2xl p-3 shadow-sm">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -386,10 +386,10 @@ export default function StudentDashboard() {
               setTodoText("");
               try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
             }}
-            className="flex gap-2"
+            className="flex gap-2 items-center"
           >
             <input
-              className="flex-1 rounded-lg border border-input bg-background px-3 py-2"
+              className="flex-1 rounded-md border border-input bg-background px-3 py-2"
               placeholder="Add a to‑do"
               value={todoText}
               onChange={(e) => setTodoText(e.target.value)}
