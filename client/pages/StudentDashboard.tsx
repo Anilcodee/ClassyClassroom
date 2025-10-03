@@ -365,6 +365,78 @@ export default function StudentDashboard() {
       </form>
       {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
 
+      {/* Inline To‑Do List option */}
+      <div className="mt-6 flex items-center justify-between max-w-xl">
+        <h2 className="text-lg font-semibold">To‑do</h2>
+        <label className="inline-flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            className="rounded border-input"
+            checked={typeof window !== 'undefined' ? (localStorage.getItem(`studentTodosEnabled:${userId}`) !== 'false') : true}
+            onChange={(e) => {
+              try {
+                localStorage.setItem(`studentTodosEnabled:${userId}`, String(e.target.checked));
+              } catch {}
+              // cause a re-render by toggling a stateful key — use a temp state
+              setTodoEnabled((v) => !v);
+            }}
+          />
+          <span className="text-foreground/70">Show to‑do list</span>
+        </label>
+      </div>
+
+      {todoEnabled && (
+        <div className="mt-4 max-w-xl">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!todoText.trim()) return;
+              const id = String(Date.now()) + Math.random().toString(36).slice(2,8);
+              const next = [{ id, text: todoText.trim(), done: false }, ...todos];
+              setTodos(next);
+              setTodoText("");
+              try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+            }}
+            className="flex gap-2"
+          >
+            <input
+              className="flex-1 rounded-lg border border-input bg-background px-3 py-2"
+              placeholder="Add a to‑do"
+              value={todoText}
+              onChange={(e) => setTodoText(e.target.value)}
+            />
+            <button className="px-4 py-2 rounded-lg bg-primary text-primary-foreground">Add</button>
+          </form>
+
+          <ul className="mt-3 space-y-2">
+            {todos.map((t) => (
+              <li key={t.id} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={t.done}
+                  onChange={() => {
+                    const next = todos.map((it) => (it.id === t.id ? { ...it, done: !it.done } : it));
+                    setTodos(next);
+                    try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+                  }}
+                />
+                <span className={`flex-1 ${t.done ? 'line-through text-foreground/60' : ''}`}>{t.text}</span>
+                <button
+                  className="text-sm text-destructive px-2"
+                  onClick={() => {
+                    const next = todos.filter((it) => it.id !== t.id);
+                    setTodos(next);
+                    try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+                  }}
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="mt-10">
         <h2 className="text-xl font-semibold mb-3">Your classes</h2>
         {classes.length === 0 ? (
