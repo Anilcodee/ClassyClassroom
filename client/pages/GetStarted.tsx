@@ -18,7 +18,7 @@ export default function GetStarted() {
   const isDesktop = useIsDesktop();
   return (
     <main className="min-h-[calc(100dvh-56px)] pb-[env(safe-area-inset-bottom)] bg-gradient-to-b from-background via-background to-background">
-      <section className="container mx-auto px-4 w-full max-w-[1080px] grid lg:grid-cols-2 gap-8 sm:gap-12 py-10 sm:py-12 items-stretch">
+      <section className="container mx-auto px-4 w-full max-w-[1080px] grid lg:grid-cols-2 gap-8 sm:gap-12 py-10 sm:py-12 items-center lg:items-stretch">
         <div className="max-w-[975px] h-full flex flex-col">
           <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-foreground/70 mb-4">
             <span className="h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
@@ -75,8 +75,8 @@ export default function GetStarted() {
           )}
         </div>
 
-        <div className="h-full flex flex-col justify-between gap-6">
-          <div className="relative rounded-2xl border border-border bg-card shadow-xl overflow-hidden p-4 sm:p-6">
+        <div className="h-full flex flex-col items-stretch gap-6">
+          <div className="relative flex-1 rounded-2xl border border-border bg-card shadow-xl overflow-hidden p-4 sm:p-6">
             <div className="absolute -top-12 -right-12 sm:-top-16 sm:-right-16 h-40 w-40 sm:h-48 sm:w-48 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="rounded-lg p-3 sm:p-4 bg-background/80 border border-border flex flex-col items-center">
