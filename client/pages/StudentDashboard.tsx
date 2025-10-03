@@ -391,15 +391,15 @@ export default function StudentDashboard() {
       </div>
 
       <div
-        aria-label="Open To-do Maker"
-        data-loc="client/pages/StudentDashboard.tsx:386:17"
-        $name="StudentDashboard"
-        className="flex items-center align-middle bg-neutral-900 rounded-full text-white h-12 w-12 justify-center ml-auto fixed"
-        style={{ right: 32, top: 32 }}
-        onClick={() => setFloatingOpen(true)}
-      >
-        +
-      </div>
+    aria-label="Open To-do Maker"
+    data-loc="client/pages/StudentDashboard.tsx:386:17"
+    $name="StudentDashboard"
+    className="flex items-center align-middle bg-neutral-900 rounded-full text-white h-12 w-12 justify-center ml-auto fixed"
+    style={{ right: 32, top: 79, left: -58 }}
+    onClick={() => setFloatingOpen(true)}
+  >
+    +
+  </div>
 
       <form
         onSubmit={handleJoin}
