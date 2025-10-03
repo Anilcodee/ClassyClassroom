@@ -378,90 +378,90 @@ export default function StudentDashboard() {
           </p>
         </div>
 
-        {/* To‑do Maker placed inline (replaces previous quick-add) */}
-        <div className="w-full sm:w-[600px]">
-          {!floatingOpen ? (
-            <button
-              aria-label="Open To-do Maker"
-              className="h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
-              onClick={() => setFloatingOpen(true)}
-            >
-              +
-            </button>
-          ) : (
-            <div className="bg-white border border-border rounded-2xl p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-semibold">To‑do Maker</h3>
-                <button
-                  aria-label="Close To-do Maker"
-                  className="text-sm px-2 py-1 rounded-md hover:bg-muted"
-                  onClick={() => setFloatingOpen(false)}
-                >
-                  Close
-                </button>
-              </div>
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (!todoText.trim()) return;
-                  const id = String(Date.now()) + Math.random().toString(36).slice(2,8);
-                  const next = [{ id, text: todoText.trim(), done: false }, ...todos];
-                  setTodos(next);
-                  setTodoText("");
-                  try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
-                }}
-                className="flex gap-2 mb-3"
+      {/* Floating To‑do Maker: small + button at top-right */}
+      <div className="fixed top-8 right-8 z-50">
+        {!floatingOpen ? (
+          <button
+            aria-label="Open To-do Maker"
+            className="h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
+            onClick={() => setFloatingOpen(true)}
+          >
+            +
+          </button>
+        ) : (
+          <div className="w-80 bg-white border border-border rounded-2xl shadow-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold">To‑do Maker</h3>
+              <button
+                aria-label="Close To-do Maker"
+                className="text-sm px-2 py-1 rounded-md hover:bg-muted"
+                onClick={() => setFloatingOpen(false)}
               >
-                <input
-                  className="flex-1 rounded-md border border-input bg-background px-3 py-2"
-                  placeholder="Add a to‑do"
-                  value={todoText}
-                  onChange={(e) => setTodoText(e.target.value)}
-                />
-                <button className="px-3 py-2 rounded-md bg-primary text-primary-foreground">Add</button>
-              </form>
-
-              <div className="max-h-64 overflow-auto">
-                <ul className="space-y-2">
-                  {todos.map((t) => (
-                    <li key={t.id} className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={t.done}
-                        onChange={() => {
-                          const next = todos.map((it) => (it.id === t.id ? { ...it, done: !it.done } : it));
-                          setTodos(next);
-                          try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
-                        }}
-                      />
-                      <div className="flex-1">
-                        <div className={`text-sm ${t.done ? 'line-through text-foreground/60' : ''}`}>{t.text}</div>
-                        {t.priority && (
-                          <div className="text-xs mt-1">
-                            <span className={`px-2 py-0.5 rounded-full text-white text-[10px] ${t.priority === 'High' ? 'bg-red-500' : t.priority === 'Medium' ? 'bg-yellow-500' : 'bg-green-500'}`}>
-                              {t.priority}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <button
-                        className="text-sm text-destructive px-2"
-                        onClick={() => {
-                          const next = todos.filter((it) => it.id !== t.id);
-                          setTodos(next);
-                          try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
-                        }}
-                      >
-                        Remove
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                Close
+              </button>
             </div>
-          )}
-        </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!todoText.trim()) return;
+                const id = String(Date.now()) + Math.random().toString(36).slice(2,8);
+                const next = [{ id, text: todoText.trim(), done: false }, ...todos];
+                setTodos(next);
+                setTodoText("");
+                try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+              }}
+              className="flex gap-2 mb-3"
+            >
+              <input
+                className="flex-1 rounded-md border border-input bg-background px-3 py-2"
+                placeholder="Add a to‑do"
+                value={todoText}
+                onChange={(e) => setTodoText(e.target.value)}
+              />
+              <button className="px-3 py-2 rounded-md bg-primary text-primary-foreground">Add</button>
+            </form>
+
+            <div className="max-h-64 overflow-auto">
+              <ul className="space-y-2">
+                {todos.map((t) => (
+                  <li key={t.id} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={t.done}
+                      onChange={() => {
+                        const next = todos.map((it) => (it.id === t.id ? { ...it, done: !it.done } : it));
+                        setTodos(next);
+                        try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+                      }}
+                    />
+                    <div className="flex-1">
+                      <div className={`text-sm ${t.done ? 'line-through text-foreground/60' : ''}`}>{t.text}</div>
+                      {t.priority && (
+                        <div className="text-xs mt-1">
+                          <span className={`px-2 py-0.5 rounded-full text-white text-[10px] ${t.priority === 'High' ? 'bg-red-500' : t.priority === 'Medium' ? 'bg-yellow-500' : 'bg-green-500'}`}>
+                            {t.priority}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      className="text-sm text-destructive px-2"
+                      onClick={() => {
+                        const next = todos.filter((it) => it.id !== t.id);
+                        setTodos(next);
+                        try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+      </div>
       </div>
 
       <form
@@ -484,55 +484,6 @@ export default function StudentDashboard() {
       </form>
       {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
 
-      {/* Inline To‑Do List option */}
-      <div className="flex items-center justify-between mt-4 ml-auto w-[600px]">
-        <h2 className="text-lg font-semibold">To‑do</h2>
-        <label className="inline-flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            className="rounded border-input"
-            checked={todoEnabled}
-            onChange={(e) => {
-              try {
-                localStorage.setItem(`studentTodosEnabled:${userId || 'anon'}`, String(e.target.checked));
-              } catch {}
-              setTodoEnabled(e.target.checked);
-            }}
-          />
-          <span className="text-foreground/70">Show to‑do list</span>
-        </label>
-      </div>
-
-      {todoEnabled && (
-        <div className="mt-4 max-w-xl">
-          <ul className="mt-3 space-y-2">
-            {todos.map((t) => (
-              <li key={t.id} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={t.done}
-                  onChange={() => {
-                    const next = todos.map((it) => (it.id === t.id ? { ...it, done: !it.done } : it));
-                    setTodos(next);
-                    try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
-                  }}
-                />
-                <span className={`flex-1 ${t.done ? 'line-through text-foreground/60' : ''}`}>{t.text}</span>
-                <button
-                  className="text-sm text-destructive px-2"
-                  onClick={() => {
-                    const next = todos.filter((it) => it.id !== t.id);
-                    setTodos(next);
-                    try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
-                  }}
-                >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <div className="mt-10">
         <h2 className="text-xl font-semibold mb-3">Your classes</h2>
