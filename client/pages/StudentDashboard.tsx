@@ -24,6 +24,33 @@ export default function StudentDashboard() {
   const [latestMap, setLatestMap] = useState<
     Record<string, { latestAt: number | null; latestBy: string | null }>
   >({});
+
+  // To-do list state (inline for students)
+  const [todos, setTodos] = useState<{ id: string; text: string; done: boolean }[]>([]);
+  const [todoText, setTodoText] = useState("");
+  const [todoEnabled, setTodoEnabled] = useState<boolean>(() => {
+    try {
+      return (typeof window !== 'undefined' ? localStorage.getItem(`studentTodosEnabled:${userRaw ? JSON.parse(userRaw)?.id : 'anon'}`) : 'true') !== 'false';
+    } catch {
+      return true;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      const key = `studentTodos:${userId || 'anon'}`;
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+      if (raw) setTodos(JSON.parse(raw));
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    try {
+      const key = `studentTodos:${userId || 'anon'}`;
+      localStorage.setItem(key, JSON.stringify(todos));
+    } catch {}
+  }, [todos, userId]);
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const userRaw =
