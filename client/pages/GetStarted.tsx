@@ -17,7 +17,7 @@ function useIsDesktop() {
 export default function GetStarted() {
   const isDesktop = useIsDesktop();
   return (
-    <main className="min-h-[calc(100dvh-56px)] pb-[env(safe-area-inset-bottom)] bg-gradient-to-b from-background via-background to-background">
+    <main className="min-h-[1980px] pb-[env(safe-area-inset-bottom)] bg-gradient-to-b from-background via-background to-background">
       <section className="container mx-auto px-4 w-full max-w-[1080px] grid lg:grid-cols-2 gap-8 sm:gap-12 py-10 sm:py-12 items-center lg:items-stretch">
         <div className="max-w-[975px] h-full flex flex-col">
           <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-foreground/70 mb-4">
