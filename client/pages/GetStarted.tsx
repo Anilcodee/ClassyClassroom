@@ -75,8 +75,8 @@ export default function GetStarted() {
           )}
         </div>
 
-        <div className="h-full flex flex-col items-stretch gap-6">
-          <div className="relative flex-1 rounded-2xl border border-border bg-card shadow-xl overflow-hidden p-4 sm:p-6">
+        <div className="h-full flex flex-col justify-between gap-6">
+          <div className="relative rounded-2xl border border-border bg-card shadow-xl overflow-hidden p-4 sm:p-6">
             <div className="absolute -top-12 -right-12 sm:-top-16 sm:-right-16 h-40 w-40 sm:h-48 sm:w-48 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="rounded-lg p-3 sm:p-4 bg-background/80 border border-border flex flex-col items-center">
