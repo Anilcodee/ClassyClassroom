@@ -386,14 +386,14 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      <div data-loc="client/pages/StudentDashboard.tsx:382:11" $name="StudentDashboard" className="flex flex-col font-normal ml-5 w-full md:w-1/2">
-        <div data-loc="client/pages/StudentDashboard.tsx:384:13" $name="StudentDashboard" style={{ fontWeight: 400, position: "fixed", right: 32, top: 32, zIndex: 50 }} />
+      <div data-loc="client/pages/StudentDashboard.tsx:382:11" className="flex flex-col font-normal ml-5 w-full md:w-1/2">
+        <div data-loc="client/pages/StudentDashboard.tsx:384:13" style={{ fontWeight: 400, position: "fixed", right: 32, top: 32, zIndex: 50 }} />
       </div>
 
       <div
     aria-label="Open To-do Maker"
     data-loc="client/pages/StudentDashboard.tsx:386:17"
-    $name="StudentDashboard"
+   
     className="flex items-center align-middle bg-neutral-900 rounded-full text-white h-12 w-12 justify-center ml-auto fixed"
     style={{ right: 32, top: 79, left: -58 }}
     onClick={() => setFloatingOpen(true)}
