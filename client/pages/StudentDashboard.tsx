@@ -441,27 +441,6 @@ export default function StudentDashboard() {
 
       {todoEnabled && (
         <div className="mt-4 max-w-xl">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!todoText.trim()) return;
-              const id = String(Date.now()) + Math.random().toString(36).slice(2,8);
-              const next = [{ id, text: todoText.trim(), done: false }, ...todos];
-              setTodos(next);
-              setTodoText("");
-              try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
-            }}
-            className="flex gap-2"
-          >
-            <input
-              className="flex-1 rounded-lg border border-input bg-background px-3 py-2"
-              placeholder="Add a to‑do"
-              value={todoText}
-              onChange={(e) => setTodoText(e.target.value)}
-            />
-            <button className="px-4 py-2 rounded-lg bg-primary text-primary-foreground">Add</button>
-          </form>
-
           <ul className="mt-3 space-y-2">
             {todos.map((t) => (
               <li key={t.id} className="flex items-center gap-2">
