@@ -20,12 +20,12 @@ export default function GetStarted() {
     <main className="min-h-[1980px] pb-[env(safe-area-inset-bottom)] bg-gradient-to-b from-background via-background to-background">
       <section className="container mx-auto px-0 w-full max-w-[1080px] grid lg:grid-cols-2 gap-8 sm:gap-12 py-12 items-center lg:items-stretch">
         <div className="max-w-[1080px] w-[1080px] mr-[2px] h-full flex flex-col">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-foreground/70 mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-foreground/70 mb-[30px]">
             <span className="h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
             Fast, secure classroom platform for teachers and students
           </div>
 
-          <h1 className="text-[42px] lg:text-5xl font-extrabold tracking-tight leading-tight">
+          <h1 className="text-[48px] lg:text-5xl font-extrabold tracking-tight leading-tight">
             The smarter way to run your class — attendance, messages, and more.
           </h1>
 
@@ -34,15 +34,15 @@ export default function GetStarted() {
             keep students engaged. Designed to be fast and mobile friendly.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-[50px] flex flex-wrap gap-3">
             <Link
-              to="/auth"
+              to="https://c52caa9028504cdfb1564c1f0a8776e7-56334270-bc2e-4c7a-acb6-6558f6.fly.dev/auth"
               className="px-5 py-3 rounded-lg bg-primary text-primary-foreground hover:opacity-95 shadow-md w-full sm:w-auto text-center"
             >
               Get started as Teacher
             </Link>
             <Link
-              to="/student-auth"
+              to="https://c52caa9028504cdfb1564c1f0a8776e7-56334270-bc2e-4c7a-acb6-6558f6.fly.dev/student-auth"
               className="px-5 py-3 rounded-lg border border-border hover:bg-accent hover:text-accent-foreground w-full sm:w-auto text-center"
             >
               Try as Student
