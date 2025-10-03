@@ -51,12 +51,6 @@ export default function StudentDashboard() {
       localStorage.setItem(key, JSON.stringify(todos));
     } catch {}
   }, [todos, userId]);
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const userRaw =
-    typeof window !== "undefined" ? localStorage.getItem("user") : null;
-  const userId = userRaw ? JSON.parse(userRaw)?.id || null : null;
-  const role = userRaw ? JSON.parse(userRaw)?.role || "teacher" : null;
 
   async function fetchWithRetry(
     url: string,
