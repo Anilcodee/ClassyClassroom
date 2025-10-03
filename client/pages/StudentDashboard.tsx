@@ -366,54 +366,6 @@ export default function StudentDashboard() {
   return (
     <main className="max-w-[1400px] w-full mx-auto py-10 px-8 flex flex-col">
 
-      {/* AI-powered To-do Assistant — floating top-right on large screens */}
-      <div className="hidden lg:block fixed top-20 right-8 w-96 z-50">
-        <div className="bg-white border border-border rounded-2xl shadow-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-semibold">AI To‑do Assistant</h3>
-            <span className="text-xs text-foreground/60">Smart suggestions</span>
-          </div>
-          <p className="text-xs text-foreground/70 mb-2">Tell me what you need to do and I will create prioritized tasks.</p>
-          <div className="mb-2">
-            <input
-              className="w-full rounded-md border border-input px-3 py-2 mb-2"
-              placeholder="I need to finish my math homework by tomorrow"
-              value={aiInput}
-              onChange={(e) => setAiInput(e.target.value)}
-            />
-            <input
-              className="w-full rounded-md border border-input px-3 py-2"
-              placeholder="Optional notes"
-              value={aiNotes}
-              onChange={(e) => setAiNotes(e.target.value)}
-            />
-          </div>
-          <div className="flex gap-2">
-            <button
-              className="flex-1 px-3 py-2 rounded-md bg-primary text-primary-foreground"
-              onClick={() => {
-                if (!aiInput.trim()) return;
-                const parsed = parseNaturalTask(aiInput);
-                const id = String(Date.now()) + Math.random().toString(36).slice(2,8);
-                const item = { id, text: parsed.text + (aiNotes ? ` — ${aiNotes}` : ''), done: false, due: parsed.due ? parsed.due.toISOString() : null, priority: parsed.priority } as any;
-                setTodos((prev) => [item, ...prev]);
-                setAiInput("");
-                setAiNotes("");
-                try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify([item, ...todos])); } catch {}
-              }}
-            >
-              Add suggested
-            </button>
-            <button
-              className="px-3 py-2 rounded-md border border-border"
-              onClick={() => { setAiInput(""); setAiNotes(""); }}
-            >
-              Clear
-            </button>
-          </div>
-          <div className="mt-3 text-xs text-foreground/60">Examples: "Finish math homework by tomorrow", "Write essay due next week"</div>
-        </div>
-      </div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Student dashboard</h1>
