@@ -57,6 +57,63 @@ export default function StudentDashboard() {
     } catch {}
   }, [todos, userId]);
 
+  // AI helper for parsing natural language to todo
+  const [aiInput, setAiInput] = useState("");
+  const [aiNotes, setAiNotes] = useState("");
+
+  function parseNaturalTask(input: string) {
+    const now = new Date();
+    let text = input.trim();
+    let due: Date | null = null;
+    // simple patterns
+    const lower = input.toLowerCase();
+    const inDays = lower.match(/in\s+(\d+)\s+days?/i);
+    const byDate = lower.match(/(by|due)\s+(\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4})/i);
+    const tomorrow = /tomorrow/i.test(lower);
+    const nextWeek = /next week/i.test(lower);
+    const inHours = lower.match(/in\s+(\d+)\s+hours?/i);
+
+    if (tomorrow) {
+      due = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    } else if (inDays) {
+      due = new Date(now.getTime() + parseInt(inDays[1], 10) * 24 * 60 * 60 * 1000);
+    } else if (inHours) {
+      due = new Date(now.getTime() + parseInt(inHours[1], 10) * 60 * 60 * 1000);
+    } else if (nextWeek) {
+      due = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    } else if (byDate) {
+      try {
+        const parts = byDate[2].split(/[-\/.]/).map((p) => parseInt(p, 10));
+        // support DD-MM-YYYY or MM-DD-YYYY heuristics; assume MM-DD-YYYY if month<=12
+        let month = parts[0];
+        let day = parts[1];
+        let year = parts[2];
+        if (year && year < 100) year += 2000;
+        due = new Date(year, month - 1, day);
+      } catch {}
+    }
+
+    // remove date phrases from text for cleaner title
+    text = text.replace(/\b(in\s+\d+\s+days?)\b/i, "");
+    text = text.replace(/\b(in\s+\d+\s+hours?)\b/i, "");
+    text = text.replace(/\b(tomorrow|next week)\b/i, "");
+    text = text.replace(/\b(by|due)\s+\d{1,2}[-\/.]\d{1,2}[-\/.]\d{2,4}\b/i, "");
+
+    // determine priority
+    const priority = computePriority(due);
+    return { text: text.trim() || input, due, priority };
+  }
+
+  function computePriority(due: Date | null) {
+    if (!due) return "Medium";
+    const now = new Date();
+    const diff = (due.getTime() - now.getTime()) / (24 * 60 * 60 * 1000);
+    if (diff <= 1) return "High";
+    if (diff <= 3) return "High";
+    if (diff <= 7) return "Medium";
+    return "Low";
+  }
+
   async function fetchWithRetry(
     url: string,
     init: RequestInit & { timeoutMs?: number } = {},
