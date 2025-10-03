@@ -420,7 +420,7 @@ export default function StudentDashboard() {
       {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
 
       {/* Inline To‑Do List option */}
-      <div className="flex items-center justify-between mt-6 ml-auto max-w-[576px]">
+      <div className="flex items-center justify-between mt-4 ml-auto w-[600px]">
         <h2 className="text-lg font-semibold">To‑do</h2>
         <label className="inline-flex items-center gap-2 text-sm">
           <input
