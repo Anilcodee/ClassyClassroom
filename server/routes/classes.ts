@@ -33,7 +33,7 @@ export const createClass: RequestHandler = async (req: AuthRequest, res) => {
     if (!name) return res.status(400).json({ message: "Name is required" });
     const joinCode = crypto.randomBytes(4).toString("hex");
     const dm = Math.max(1, Math.min(10, Number(durationMinutes || 4)));
-    const cls = await ClassModel.create({
+    const cls = await ClassModelAny.create({
       name,
       teacher: req.userId,
       coTeachers: [],
