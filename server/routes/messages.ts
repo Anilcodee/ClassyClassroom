@@ -3,8 +3,10 @@ import mongoose from "mongoose";
 import { Message } from "../models/Message";
 const MessageModel: any = Message as any;
 import { ClassModel } from "../models/Class";
+const ClassModelAny: any = ClassModel as any;
 import { AuthRequest } from "../middleware/auth";
 import { User } from "../models/User";
+const UserModelAny: any = User as any;
 
 export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
   if (mongoose.connection.readyState !== 1)
