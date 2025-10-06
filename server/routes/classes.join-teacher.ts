@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { RequestHandler } from "express";
-import mongoose from "mongoose";
 import { AuthRequest } from "../middleware/auth";
 import { User } from "../models/User";
 import { ClassModel } from "../models/Class";
