@@ -37,7 +37,7 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
       Boolean(userId) && (isOwnerOrCo || enrolled.has(String(id)) || inRoster);
 
     if (latestOnly) {
-      const latest = await Message.findOne({ classId: id })
+      const latest = await MessageModel.findOne({ classId: id })
         .sort({ createdAt: -1 })
         .select("createdAt teacherId")
         .lean();
@@ -48,7 +48,7 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
       });
     }
 
-    const msgs = await Message.find({ classId: id })
+    const msgs = await MessageModel.find({ classId: id })
       .sort({ createdAt: -1 })
       .lean();
 
@@ -233,7 +233,7 @@ export const updateMessage: RequestHandler = async (req: AuthRequest, res) => {
       update.$push = { attachments: { $each: atts } };
     }
 
-    const msg = await Message.findById(messageId).lean();
+    const msg = await MessageModel.findById(messageId).lean();
     if (!msg) return res.status(404).json({ message: "Message not found" });
     const cls = await ClassModelAny.findById(msg.classId)
       .select("teacher coTeachers")
@@ -247,7 +247,7 @@ export const updateMessage: RequestHandler = async (req: AuthRequest, res) => {
     if (!isPoster && !isOwnerOrCo)
       return res.status(403).json({ message: "Unauthorized" });
 
-    const updated = await Message.findByIdAndUpdate(messageId, update, {
+    const updated = await MessageModel.findByIdAndUpdate(messageId, update, {
       new: true,
     }).lean();
 
@@ -292,7 +292,7 @@ export const addComment: RequestHandler = async (req: AuthRequest, res) => {
       return res.status(400).json({ message: "Content is required" });
     const userId = String((req as any).userId || "");
 
-    const msg = await Message.findById(messageId)
+    const msg = await MessageModel.findById(messageId)
       .select("classId teacherId")
       .lean();
     if (!msg) return res.status(404).json({ message: "Message not found" });
@@ -324,7 +324,7 @@ export const addComment: RequestHandler = async (req: AuthRequest, res) => {
       return res.status(403).json({ message: "Not a class member" });
 
     const name = user?.name || "User";
-    const ret = await Message.findByIdAndUpdate(
+    const ret = await MessageModel.findByIdAndUpdate(
       messageId,
       {
         $push: {
@@ -351,7 +351,7 @@ export const deleteMessage: RequestHandler = async (req: AuthRequest, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { messageId } = req.params as { messageId: string };
-    const msg = await Message.findById(messageId).lean();
+    const msg = await MessageModel.findById(messageId).lean();
     if (!msg) return res.status(404).json({ message: "Message not found" });
     const cls = await ClassModelAny.findById(msg.classId)
       .select("teacher coTeachers")
@@ -365,7 +365,7 @@ export const deleteMessage: RequestHandler = async (req: AuthRequest, res) => {
     if (!isPoster && !isOwnerOrCo)
       return res.status(403).json({ message: "Unauthorized" });
 
-    await Message.findByIdAndDelete(messageId).lean();
+    await MessageModel.findByIdAndDelete(messageId).lean();
     res.json({ ok: true });
   } catch (e) {
     console.error(e);
