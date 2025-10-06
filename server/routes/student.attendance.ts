@@ -12,7 +12,7 @@ export const getStudentAttendance: RequestHandler = async (req: AuthRequest, res
   try {
     const { id } = req.params as { id: string };
     const userId = (req as any).userId as string;
-    const user = await User.findById(userId).select("role isStudent enrolledClasses rollNo").lean();
+    const user = await UserModelAny.findById(userId).select("role isStudent enrolledClasses rollNo").lean();
     if (!user) return res.status(401).json({ message: "Unauthorized" });
     const isStudent = (user as any).role === "student" || (user as any).isStudent;
     if (!isStudent) return res.status(403).json({ message: "Forbidden" });
