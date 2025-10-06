@@ -4,7 +4,10 @@ import { AuthRequest } from "../middleware/auth";
 import { ClassModel } from "../models/Class";
 const ClassModelAny: any = ClassModel as any;
 
-export const updateClassDetails: RequestHandler = async (req: AuthRequest, res) => {
+export const updateClassDetails: RequestHandler = async (
+  req: AuthRequest,
+  res,
+) => {
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
   try {
@@ -16,17 +19,26 @@ export const updateClassDetails: RequestHandler = async (req: AuthRequest, res) 
       imageUrl?: string | null;
     };
 
-    const cls = await ClassModelAny.findOne({ _id: id, $or: [ { teacher: (req as any).userId }, { coTeachers: (req as any).userId } ] });
+    const cls = await ClassModelAny.findOne({
+      _id: id,
+      $or: [
+        { teacher: (req as any).userId },
+        { coTeachers: (req as any).userId },
+      ],
+    });
     if (!cls) return res.status(404).json({ message: "Class not found" });
 
-    if (typeof name === 'string' && name.trim()) cls.name = name.trim();
-    if (typeof durationMinutes === 'number') {
+    if (typeof name === "string" && name.trim()) cls.name = name.trim();
+    if (typeof durationMinutes === "number") {
       const dm = Math.max(1, Math.min(10, Math.floor(durationMinutes)));
       cls.durationMinutes = dm;
     }
     if (Array.isArray(students)) {
       const clean = students
-        .filter((s) => s && typeof s.name === 'string' && typeof s.rollNo === 'string')
+        .filter(
+          (s) =>
+            s && typeof s.name === "string" && typeof s.rollNo === "string",
+        )
         .map((s) => ({ name: s.name.trim(), rollNo: s.rollNo.trim() }))
         .filter((s) => s.name && s.rollNo);
       (cls as any).students = clean;

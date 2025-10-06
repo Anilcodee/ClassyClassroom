@@ -53,9 +53,11 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
       .lean();
 
     // Fetch assignments in this class to prefer current dates and attempt to match messages without assignmentId
-    const AssignmentModule: any = await import('../models/Assignment');
+    const AssignmentModule: any = await import("../models/Assignment");
     const AssignmentModelAny: any = AssignmentModule.Assignment;
-    const classAssigns = await AssignmentModelAny.find({ classId: id }).select('_id title publishAt dueAt').lean();
+    const classAssigns = await AssignmentModelAny.find({ classId: id })
+      .select("_id title publishAt dueAt")
+      .lean();
     const assignmentsById: Record<string, any> = {};
     classAssigns.forEach((as: any) => {
       assignmentsById[String(as._id)] = as;
@@ -63,7 +65,9 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
     // Build title -> assignments map for best-effort matching of messages lacking assignmentId
     const assignsByTitle: Record<string, any[]> = {};
     classAssigns.forEach((as: any) => {
-      const t = String(as.title || '').trim().toLowerCase();
+      const t = String(as.title || "")
+        .trim()
+        .toLowerCase();
       if (!t) return;
       assignsByTitle[t] = assignsByTitle[t] || [];
       assignsByTitle[t].push(as);
@@ -71,25 +75,43 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
 
     res.json({
       messages: msgs.map((m) => {
-        const assignmentId = m.assignmentId ? String(m.assignmentId) : undefined;
+        const assignmentId = m.assignmentId
+          ? String(m.assignmentId)
+          : undefined;
         let publishAt: any = null;
         let dueAt: any = null;
         if (assignmentId) {
           const asg = assignmentsById[assignmentId];
-          if (asg) { publishAt = asg.publishAt || null; dueAt = asg.dueAt || null; }
-          else { publishAt = (m as any).assignmentPublishAt || null; dueAt = (m as any).assignmentDueAt || null; }
+          if (asg) {
+            publishAt = asg.publishAt || null;
+            dueAt = asg.dueAt || null;
+          } else {
+            publishAt = (m as any).assignmentPublishAt || null;
+            dueAt = (m as any).assignmentDueAt || null;
+          }
         } else {
           // best-effort match by title: strip leading "Assignment:" or "Quiz:" prefixes
           try {
-            const titleText = String(m.title || '').replace(/^Quiz:\s*/i, '').replace(/^Assignment:\s*/i, '').trim().toLowerCase();
-            if (titleText && assignsByTitle[titleText] && assignsByTitle[titleText].length > 0) {
+            const titleText = String(m.title || "")
+              .replace(/^Quiz:\s*/i, "")
+              .replace(/^Assignment:\s*/i, "")
+              .trim()
+              .toLowerCase();
+            if (
+              titleText &&
+              assignsByTitle[titleText] &&
+              assignsByTitle[titleText].length > 0
+            ) {
               const asg = assignsByTitle[titleText][0];
-              publishAt = asg.publishAt || null; dueAt = asg.dueAt || null;
+              publishAt = asg.publishAt || null;
+              dueAt = asg.dueAt || null;
             } else {
-              publishAt = (m as any).assignmentPublishAt || null; dueAt = (m as any).assignmentDueAt || null;
+              publishAt = (m as any).assignmentPublishAt || null;
+              dueAt = (m as any).assignmentDueAt || null;
             }
           } catch {
-            publishAt = (m as any).assignmentPublishAt || null; dueAt = (m as any).assignmentDueAt || null;
+            publishAt = (m as any).assignmentPublishAt || null;
+            dueAt = (m as any).assignmentDueAt || null;
           }
         }
         return {
@@ -103,12 +125,23 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
           createdAt: m.createdAt,
           updatedAt: m.updatedAt,
           pinned: !!m.pinned,
-          attachments: (m.attachments || []).map((a) => ({ name: a.name, type: a.type, size: a.size, dataUrl: a.dataUrl })),
-          comments: (m.comments || []).map((c) => ({ userId: c.userId, name: c.name, content: c.content, createdAt: c.createdAt })),
-          canEdit: Boolean(userId) && (String(m.teacherId) === userId || isOwnerOrCo),
+          attachments: (m.attachments || []).map((a) => ({
+            name: a.name,
+            type: a.type,
+            size: a.size,
+            dataUrl: a.dataUrl,
+          })),
+          comments: (m.comments || []).map((c) => ({
+            userId: c.userId,
+            name: c.name,
+            content: c.content,
+            createdAt: c.createdAt,
+          })),
+          canEdit:
+            Boolean(userId) && (String(m.teacherId) === userId || isOwnerOrCo),
           canComment: isMember && String(m.teacherId) !== userId,
         };
-      })
+      }),
     });
   } catch (e) {
     console.error(e);
@@ -176,22 +209,20 @@ export const createMessage: RequestHandler = async (req: AuthRequest, res) => {
       attachments: atts,
       comments: [],
     });
-    res
-      .status(201)
-      .json({
-        message: {
-          id: msg.id,
-          title: msg.title || "",
-          content: msg.content,
-          createdAt: msg.createdAt,
-          updatedAt: msg.updatedAt,
-          pinned: !!msg.pinned,
-          attachments: atts,
-          comments: [],
-          canEdit: true,
-          canComment: false,
-        },
-      });
+    res.status(201).json({
+      message: {
+        id: msg.id,
+        title: msg.title || "",
+        content: msg.content,
+        createdAt: msg.createdAt,
+        updatedAt: msg.updatedAt,
+        pinned: !!msg.pinned,
+        attachments: atts,
+        comments: [],
+        canEdit: true,
+        canComment: false,
+      },
+    });
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Server error" });
@@ -256,7 +287,9 @@ export const updateMessage: RequestHandler = async (req: AuthRequest, res) => {
         id: updated!._id,
         title: updated!.title || "",
         content: updated!.content,
-        assignmentId: updated!.assignmentId ? String(updated!.assignmentId) : undefined,
+        assignmentId: updated!.assignmentId
+          ? String(updated!.assignmentId)
+          : undefined,
         createdAt: updated!.createdAt,
         updatedAt: updated!.updatedAt,
         pinned: !!updated!.pinned,
