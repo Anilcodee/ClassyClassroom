@@ -9,7 +9,7 @@ export const listClasses: RequestHandler = async (req: AuthRequest, res) => {
   if (mongoose.connection.readyState !== 1)
     return res.status(503).json({ message: "Database not connected" });
   try {
-    const classes = await ClassModel.find({
+    const classes = await ClassModelAny.find({
       isArchived: { $ne: true },
       $or: [{ teacher: req.userId }, { coTeachers: req.userId }],
     }).lean();
@@ -60,7 +60,7 @@ export const updateClassImage: RequestHandler = async (
     const { imageUrl } = req.body as { imageUrl?: string };
     if (!imageUrl)
       return res.status(400).json({ message: "imageUrl required" });
-    const cls = await ClassModel.findOne({
+    const cls = await ClassModelAny.findOne({
       _id: id,
       $or: [{ teacher: req.userId }, { coTeachers: req.userId }],
     });
