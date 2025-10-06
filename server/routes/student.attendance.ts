@@ -21,7 +21,7 @@ export const getStudentAttendance: RequestHandler = async (req: AuthRequest, res
     const enrolled = new Set(((user as any).enrolledClasses || []).map((x: any) => String(x)));
     if (!enrolled.has(String(id))) return res.status(403).json({ message: "Not enrolled in class" });
 
-    const days = await Attendance.find({ classId: id }).select("date records.student markedAt").sort({ date: 1 }).lean();
+    const days = await AttendanceModelAny.find({ classId: id }).select("date records.student markedAt").sort({ date: 1 }).lean();
     const items = days.map((d) => ({
       date: d.date.toISOString().slice(0,10),
       present: (d.records || []).some((r: any) => String(r.student.rollNo) === String(rollNo))
