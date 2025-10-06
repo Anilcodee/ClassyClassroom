@@ -74,7 +74,6 @@ export default function GetStarted() {
             </div>
           )}
         </div>
-
       </section>
 
       <div className="bg-white border border-border rounded-2xl shadow-xl w-full max-w-[1080px] lg:w-[1080px] mx-auto p-6 relative overflow-hidden">
@@ -83,34 +82,49 @@ export default function GetStarted() {
           <div className="rounded-lg p-3 sm:p-4 bg-background/80 border border-border flex flex-col items-center">
             <TeacherAnimation />
             <div className="mt-3 text-sm font-semibold">For Teachers</div>
-            <div className="text-xs text-foreground/60 mt-1">Create classes, take attendance</div>
+            <div className="text-xs text-foreground/60 mt-1">
+              Create classes, take attendance
+            </div>
           </div>
           <div className="rounded-lg p-3 sm:p-4 bg-background/80 border border-border flex flex-col items-center">
             <StudentAnimation />
             <div className="mt-3 text-sm font-semibold">For Students</div>
-            <div className="text-xs text-foreground/60 mt-1">Join classes, view attendance</div>
+            <div className="text-xs text-foreground/60 mt-1">
+              Join classes, view attendance
+            </div>
           </div>
         </div>
         <div className="mt-4 flex gap-3 justify-center">
-          <Link to="/auth" className="px-4 py-2 rounded-md bg-primary text-primary-foreground">Teacher</Link>
-          <Link to="/student-auth" className="px-4 py-2 rounded-md border border-border">Student</Link>
+          <Link
+            to="/auth"
+            className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
+          >
+            Teacher
+          </Link>
+          <Link
+            to="/student-auth"
+            className="px-4 py-2 rounded-md border border-border"
+          >
+            Student
+          </Link>
         </div>
       </div>
 
       <div className="rounded-2xl border border-border p-4 sm:p-6 bg-card text-foreground/80 shadow-sm max-w-[1080px] mx-auto mt-6">
         <h3 className="text-sm font-semibold mb-2">Why ClassyClassroom?</h3>
-        <p className="text-sm">Fast, private, and built for classrooms. No clutter — just the tools teachers and students need.</p>
+        <p className="text-sm">
+          Fast, private, and built for classrooms. No clutter — just the tools
+          teachers and students need.
+        </p>
       </div>
 
       {/* Mobile-only bottom spacer to avoid cutoff behind OS UI */}
       <div className="h-24 lg:hidden pb-[env(safe-area-inset-bottom)]" />
-
     </main>
   );
 }
 
 function TeacherAnimation() {
-
   return (
     <div className="relative w-full rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-4 sm:p-6 overflow-hidden">
       <div className="absolute -top-12 -right-12 sm:-top-20 sm:-right-20 h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
@@ -164,7 +178,6 @@ function TeacherAnimation() {
 }
 
 function StudentAnimation() {
-
   return (
     <div className="relative w-full rounded-2xl border border-border bg-card text-card-foreground shadow-xl p-4 sm:p-6 overflow-hidden">
       <div className="absolute -bottom-8 -left-8 sm:-bottom-16 sm:-left-16 h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-gradient-to-tr from-blue-400/40 to-cyan-700/40 blur-3xl" />

@@ -25,17 +25,25 @@ export default function StudentDashboard() {
     Record<string, { latestAt: number | null; latestBy: string | null }>
   >({});
 
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const userRaw = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const userRaw =
+    typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const userId = userRaw ? JSON.parse(userRaw)?.id || null : null;
   const role = userRaw ? JSON.parse(userRaw)?.role || "teacher" : null;
 
   // To-do list state (inline for students)
-  const [todos, setTodos] = useState<{ id: string; text: string; done: boolean }[]>([]);
+  const [todos, setTodos] = useState<
+    { id: string; text: string; done: boolean }[]
+  >([]);
   const [todoText, setTodoText] = useState("");
   const [todoEnabled, setTodoEnabled] = useState<boolean>(() => {
     try {
-      return (typeof window !== 'undefined' ? localStorage.getItem(`studentTodosEnabled:${userId || 'anon'}`) : 'true') !== 'false';
+      return (
+        (typeof window !== "undefined"
+          ? localStorage.getItem(`studentTodosEnabled:${userId || "anon"}`)
+          : "true") !== "false"
+      );
     } catch {
       return true;
     }
@@ -43,8 +51,9 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     try {
-      const key = `studentTodos:${userId || 'anon'}`;
-      const raw = typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+      const key = `studentTodos:${userId || "anon"}`;
+      const raw =
+        typeof window !== "undefined" ? localStorage.getItem(key) : null;
       if (raw) setTodos(JSON.parse(raw));
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -52,7 +61,7 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     try {
-      const key = `studentTodos:${userId || 'anon'}`;
+      const key = `studentTodos:${userId || "anon"}`;
       localStorage.setItem(key, JSON.stringify(todos));
     } catch {}
   }, [todos, userId]);
@@ -193,14 +202,19 @@ export default function StudentDashboard() {
   }, [role]);
 
   // XHR-based fetch to bypass instrumented window.fetch (eg. FullStory) for critical API calls
-  async function xhrFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  async function xhrFetch(
+    url: string,
+    options: RequestInit = {},
+  ): Promise<Response> {
     return new Promise<Response>((resolve, reject) => {
       try {
         const method = (options && (options as any).method) || "GET";
         const headers = (options && (options as any).headers) || {};
         const body = (options && (options as any).body) || null;
         const resolvedUrl =
-          typeof location !== "undefined" && typeof url === "string" && url.startsWith("/")
+          typeof location !== "undefined" &&
+          typeof url === "string" &&
+          url.startsWith("/")
             ? `${location.origin}${url}`
             : url;
         const xhr = new XMLHttpRequest();
@@ -271,7 +285,10 @@ export default function StudentDashboard() {
         list.map((c: any) =>
           (async () => {
             try {
-              const r = await xhrFetch(`/api/classes/${c.id || c._id}/messages?latest=1`, { headers });
+              const r = await xhrFetch(
+                `/api/classes/${c.id || c._id}/messages?latest=1`,
+                { headers },
+              );
               const d = await r.json().catch(() => ({}));
               return {
                 id: c.id || c._id,
@@ -281,11 +298,16 @@ export default function StudentDashboard() {
             } catch (err) {
               // fallback to fetchWithRetry
               try {
-                const r2 = await fetchWithRetry(`/api/classes/${c.id || c._id}/messages?latest=1`, { headers });
+                const r2 = await fetchWithRetry(
+                  `/api/classes/${c.id || c._id}/messages?latest=1`,
+                  { headers },
+                );
                 const d2 = await r2.json().catch(() => ({}));
                 return {
                   id: c.id || c._id,
-                  latestAt: d2?.latestAt ? new Date(d2.latestAt).getTime() : null,
+                  latestAt: d2?.latestAt
+                    ? new Date(d2.latestAt).getTime()
+                    : null,
                   latestBy: d2?.latestBy ? String(d2.latestBy) : null,
                 };
               } catch (e2) {
@@ -295,7 +317,10 @@ export default function StudentDashboard() {
           })(),
         ),
       );
-      const map: Record<string, { latestAt: number | null; latestBy: string | null }> = {};
+      const map: Record<
+        string,
+        { latestAt: number | null; latestBy: string | null }
+      > = {};
       results.forEach((r) => {
         if (r.status === "fulfilled")
           map[(r.value as any).id] = {
@@ -317,7 +342,9 @@ export default function StudentDashboard() {
   }
 
   function findIndexById(id: string) {
-    return classes.findIndex((c) => (c as any).id === id || (c as any)._id === id);
+    return classes.findIndex(
+      (c) => (c as any).id === id || (c as any)._id === id,
+    );
   }
 
   function moveUp(id: string) {
@@ -333,7 +360,12 @@ export default function StudentDashboard() {
 
   function moveToPosition(id: string, targetIdx: number) {
     const idx = findIndexById(id);
-    if (idx === -1 || targetIdx < 0 || targetIdx >= classes.length || idx === targetIdx)
+    if (
+      idx === -1 ||
+      targetIdx < 0 ||
+      targetIdx >= classes.length ||
+      idx === targetIdx
+    )
       return;
     setClasses((prev) => reorderArray(prev, idx, targetIdx));
   }
@@ -367,8 +399,6 @@ export default function StudentDashboard() {
 
   return (
     <main className="max-w-[1400px] w-full mx-auto py-10 px-8 flex flex-col">
-
-
       <div>
         <div className="flex gap-5 md:flex-row flex-col">
           <div className="flex flex-col w-full md:w-1/2">
@@ -381,21 +411,23 @@ export default function StudentDashboard() {
 
           <div className="flex flex-col w-full md:w-1/2 ml-5 md:ml-5">
             {/* Floating To‑do Maker: small + button at top-right */}
-            </div>
+          </div>
         </div>
       </div>
 
-      <div data-loc="client/pages/StudentDashboard.tsx:382:11" className="flex flex-col font-normal ml-5 w-full md:w-1/2">
-      </div>
+      <div
+        data-loc="client/pages/StudentDashboard.tsx:382:11"
+        className="flex flex-col font-normal ml-5 w-full md:w-1/2"
+      ></div>
 
       <div
-    aria-label="Open To-do Maker"
-    data-loc="client/pages/StudentDashboard.tsx:386:17"
-    className="flex items-center bg-neutral-900 rounded-full text-white h-12 w-12 justify-center fixed right-4 top-4 sm:right-8 sm:top-20 z-50"
-    onClick={() => setFloatingOpen(true)}
-  >
-    +
-  </div>
+        aria-label="Open To-do Maker"
+        data-loc="client/pages/StudentDashboard.tsx:386:17"
+        className="flex items-center bg-neutral-900 rounded-full text-white h-12 w-12 justify-center fixed right-4 top-4 sm:right-8 sm:top-20 z-50"
+        onClick={() => setFloatingOpen(true)}
+      >
+        +
+      </div>
 
       <form
         onSubmit={handleJoin}
@@ -416,7 +448,6 @@ export default function StudentDashboard() {
         </button>
       </form>
       {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
-
 
       <div className="mt-10">
         <h2 className="text-xl font-semibold mb-3">Your classes</h2>
@@ -482,7 +513,8 @@ export default function StudentDashboard() {
                               const isNew =
                                 meta &&
                                 meta.latestAt &&
-                                (!userId || String(meta.latestBy) !== String(userId)) &&
+                                (!userId ||
+                                  String(meta.latestBy) !== String(userId)) &&
                                 meta.latestAt > seen;
                               return isNew ? (
                                 <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 shadow ring-2 ring-background" />
@@ -500,7 +532,9 @@ export default function StudentDashboard() {
                           </Link>
                         </div>
 
-                        <div className="mt-2 text-xs text-foreground/60">Joined</div>
+                        <div className="mt-2 text-xs text-foreground/60">
+                          Joined
+                        </div>
                       </div>
 
                       <button
@@ -508,7 +542,9 @@ export default function StudentDashboard() {
                         title="More"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setMenuOpenFor(menuOpenFor === cid ? "" : String(cid));
+                          setMenuOpenFor(
+                            menuOpenFor === cid ? "" : String(cid),
+                          );
                         }}
                       >
                         <MoreVertical className="h-4 w-4" />
@@ -518,7 +554,10 @@ export default function StudentDashboard() {
                     {menuOpenFor === String(cid) && (
                       <>
                         {/* small screens: full dropdown */}
-                        <div className="absolute z-20 top-12 w-44 sm:hidden rounded-md border border-border bg-background shadow max-w-xs overflow-auto" style={{ right: '5px' }}>
+                        <div
+                          className="absolute z-20 top-12 w-44 sm:hidden rounded-md border border-border bg-background shadow max-w-xs overflow-auto"
+                          style={{ right: "5px" }}
+                        >
                           <div className="block w-full px-2 py-1 text-right">
                             <button
                               className="text-sm"
@@ -546,15 +585,19 @@ export default function StudentDashboard() {
                               try {
                                 const token = localStorage.getItem("token");
                                 const headers: Record<string, string> = {};
-                                if (token) headers.Authorization = `Bearer ${token}`;
+                                if (token)
+                                  headers.Authorization = `Bearer ${token}`;
                                 const res = await fetch(
                                   `/api/student/classes/${cid}/unenroll`,
                                   { method: "DELETE", headers },
                                 );
                                 const d = await res.json().catch(() => ({}));
-                                if (!res.ok) throw new Error(d?.message || res.statusText);
+                                if (!res.ok)
+                                  throw new Error(d?.message || res.statusText);
                                 setClasses((prev) =>
-                                  prev.filter((x) => (x.id || (x as any)._id) !== cid),
+                                  prev.filter(
+                                    (x) => (x.id || (x as any)._id) !== cid,
+                                  ),
                                 );
                               } catch (e: any) {
                                 setError(e.message || "Failed to unenroll");
@@ -568,7 +611,10 @@ export default function StudentDashboard() {
                         </div>
 
                         {/* larger screens: inline vertical panel vertically centered with the three-dot icon */}
-                        <div className="hidden sm:flex absolute z-20 top-12 flex-col items-stretch rounded-md border border-border bg-background shadow w-40 overflow-hidden" style={{ right: '5px' }}>
+                        <div
+                          className="hidden sm:flex absolute z-20 top-12 flex-col items-stretch rounded-md border border-border bg-background shadow w-40 overflow-hidden"
+                          style={{ right: "5px" }}
+                        >
                           <button
                             className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
                             onClick={(e) => {
@@ -587,15 +633,19 @@ export default function StudentDashboard() {
                               try {
                                 const token = localStorage.getItem("token");
                                 const headers: Record<string, string> = {};
-                                if (token) headers.Authorization = `Bearer ${token}`;
+                                if (token)
+                                  headers.Authorization = `Bearer ${token}`;
                                 const res = await fetch(
                                   `/api/student/classes/${cid}/unenroll`,
                                   { method: "DELETE", headers },
                                 );
                                 const d = await res.json().catch(() => ({}));
-                                if (!res.ok) throw new Error(d?.message || res.statusText);
+                                if (!res.ok)
+                                  throw new Error(d?.message || res.statusText);
                                 setClasses((prev) =>
-                                  prev.filter((x) => (x.id || (x as any)._id) !== cid),
+                                  prev.filter(
+                                    (x) => (x.id || (x as any)._id) !== cid,
+                                  ),
                                 );
                               } catch (e: any) {
                                 setError(e.message || "Failed to unenroll");
@@ -613,7 +663,9 @@ export default function StudentDashboard() {
                   <span
                     className={
                       "absolute top-2 right-2 text-xs px-2 py-1 rounded-full " +
-                      (c.isActive ? "bg-green-600 text-white" : "bg-muted text-foreground/70")
+                      (c.isActive
+                        ? "bg-green-600 text-white"
+                        : "bg-muted text-foreground/70")
                     }
                   >
                     {c.isActive ? "Active" : "Inactive"}
@@ -628,51 +680,77 @@ export default function StudentDashboard() {
       {moveFor && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
           <div className="bg-background rounded-lg border border-border p-4 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold mb-2">Move class — {classes.find(x => (x as any).id === moveFor || (x as any)._id === moveFor)?.name}</h3>
-            <p className="text-sm text-foreground/70 mb-3">Select a target class to move to. Use "Place after" to insert after the selected class.</p>
+            <h3 className="text-lg font-semibold mb-2">
+              Move class —{" "}
+              {
+                classes.find(
+                  (x) =>
+                    (x as any).id === moveFor || (x as any)._id === moveFor,
+                )?.name
+              }
+            </h3>
+            <p className="text-sm text-foreground/70 mb-3">
+              Select a target class to move to. Use "Place after" to insert
+              after the selected class.
+            </p>
             <div className="flex items-center gap-3 mb-3">
               <label className="inline-flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={moveAfter} onChange={(e) => setMoveAfter(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={moveAfter}
+                  onChange={(e) => setMoveAfter(e.target.checked)}
+                />
                 <span className="text-sm">Place after target</span>
               </label>
             </div>
             <div className="max-h-64 overflow-auto mb-3">
               <ul className="space-y-1">
-                {classes.filter(x => ((x as any).id || (x as any)._id) !== moveFor).map((t) => {
-                  const tid = (t as any).id || (t as any)._id;
-                  return (
-                    <li key={tid}>
-                      <button
-                        className="w-full text-left px-3 py-2 rounded hover:bg-accent"
-                        onClick={() => {
-                          setMoveError(null);
-                          try {
-                            const from = findIndexById(moveFor!);
-                            const targetIdx = findIndexById(tid);
-                            if (from === -1 || targetIdx === -1) {
-                              setMoveError('Invalid target');
-                              return;
+                {classes
+                  .filter((x) => ((x as any).id || (x as any)._id) !== moveFor)
+                  .map((t) => {
+                    const tid = (t as any).id || (t as any)._id;
+                    return (
+                      <li key={tid}>
+                        <button
+                          className="w-full text-left px-3 py-2 rounded hover:bg-accent"
+                          onClick={() => {
+                            setMoveError(null);
+                            try {
+                              const from = findIndexById(moveFor!);
+                              const targetIdx = findIndexById(tid);
+                              if (from === -1 || targetIdx === -1) {
+                                setMoveError("Invalid target");
+                                return;
+                              }
+                              let to = moveAfter ? targetIdx + 1 : targetIdx;
+                              if (from < to) to = to - 1;
+                              moveToPosition(moveFor!, to);
+                              setMoveFor(null);
+                              setMoveAfter(false);
+                            } catch (e: any) {
+                              setMoveError(e?.message || "Failed to move");
                             }
-                            let to = moveAfter ? targetIdx + 1 : targetIdx;
-                            if (from < to) to = to - 1;
-                            moveToPosition(moveFor!, to);
-                            setMoveFor(null);
-                            setMoveAfter(false);
-                          } catch (e:any) {
-                            setMoveError(e?.message || 'Failed to move');
-                          }
-                        }}
-                      >
-                        {t.name}
-                      </button>
-                    </li>
-                  );
-                })}
+                          }}
+                        >
+                          {t.name}
+                        </button>
+                      </li>
+                    );
+                  })}
               </ul>
             </div>
-            {moveError && <p className="text-sm text-destructive mb-2">{moveError}</p>}
+            {moveError && (
+              <p className="text-sm text-destructive mb-2">{moveError}</p>
+            )}
             <div className="flex justify-end gap-2">
-              <button className="px-3 py-1.5 rounded-md border border-border" onClick={() => { setMoveFor(null); setMoveAfter(false); setMoveError(null); }}>
+              <button
+                className="px-3 py-1.5 rounded-md border border-border"
+                onClick={() => {
+                  setMoveFor(null);
+                  setMoveAfter(false);
+                  setMoveError(null);
+                }}
+              >
                 Cancel
               </button>
             </div>
@@ -702,11 +780,20 @@ export default function StudentDashboard() {
               onSubmit={(e) => {
                 e.preventDefault();
                 if (!todoText.trim()) return;
-                const id = String(Date.now()) + Math.random().toString(36).slice(2,8);
-                const next = [{ id, text: todoText.trim(), done: false }, ...todos];
+                const id =
+                  String(Date.now()) + Math.random().toString(36).slice(2, 8);
+                const next = [
+                  { id, text: todoText.trim(), done: false },
+                  ...todos,
+                ];
                 setTodos(next);
                 setTodoText("");
-                try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+                try {
+                  localStorage.setItem(
+                    `studentTodos:${userId || "anon"}`,
+                    JSON.stringify(next),
+                  );
+                } catch {}
               }}
               className="flex gap-2 mb-3"
             >
@@ -716,7 +803,9 @@ export default function StudentDashboard() {
                 value={todoText}
                 onChange={(e) => setTodoText(e.target.value)}
               />
-              <button className="px-3 py-2 rounded-md bg-primary text-primary-foreground">Add</button>
+              <button className="px-3 py-2 rounded-md bg-primary text-primary-foreground">
+                Add
+              </button>
             </form>
 
             <div className="max-h-64 overflow-auto">
@@ -727,20 +816,36 @@ export default function StudentDashboard() {
                       type="checkbox"
                       checked={t.done}
                       onChange={() => {
-                        const next = todos.map((it) => (it.id === t.id ? { ...it, done: !it.done } : it));
+                        const next = todos.map((it) =>
+                          it.id === t.id ? { ...it, done: !it.done } : it,
+                        );
                         setTodos(next);
-                        try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+                        try {
+                          localStorage.setItem(
+                            `studentTodos:${userId || "anon"}`,
+                            JSON.stringify(next),
+                          );
+                        } catch {}
                       }}
                     />
                     <div className="flex-1">
-                      <div className={`text-sm ${t.done ? 'line-through text-foreground/60' : ''}`}>{t.text}</div>
+                      <div
+                        className={`text-sm ${t.done ? "line-through text-foreground/60" : ""}`}
+                      >
+                        {t.text}
+                      </div>
                     </div>
                     <button
                       className="text-sm text-destructive px-2"
                       onClick={() => {
                         const next = todos.filter((it) => it.id !== t.id);
                         setTodos(next);
-                        try { localStorage.setItem(`studentTodos:${userId || 'anon'}`, JSON.stringify(next)); } catch {}
+                        try {
+                          localStorage.setItem(
+                            `studentTodos:${userId || "anon"}`,
+                            JSON.stringify(next),
+                          );
+                        } catch {}
                       }}
                     >
                       Remove
@@ -752,7 +857,6 @@ export default function StudentDashboard() {
           </div>
         </div>
       )}
-
     </main>
   );
 }
