@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { MoreVertical } from "lucide-react";
 
@@ -396,6 +396,26 @@ export default function StudentDashboard() {
   }
 
   const [floatingOpen, setFloatingOpen] = useState(false);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLDivElement | null>(null);
+
+  // Close panel when clicking/touching outside of panel/button
+  useEffect(() => {
+    function onDocClick(e: MouseEvent | TouchEvent) {
+      if (!floatingOpen) return;
+      const target = e.target as Node | null;
+      if (!target) return;
+      if (panelRef.current && panelRef.current.contains(target)) return;
+      if (buttonRef.current && buttonRef.current.contains(target)) return;
+      setFloatingOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("touchstart", onDocClick);
+    return () => {
+      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("touchstart", onDocClick);
+    };
+  }, [floatingOpen]);
 
   return (
     <main className="max-w-[1400px] w-full mx-auto py-10 px-8 flex flex-col">
@@ -420,14 +440,19 @@ export default function StudentDashboard() {
         className="flex flex-col font-normal ml-5 w-full md:w-1/2"
       ></div>
 
-      <div
-        aria-label="Open To-do Maker"
-        data-loc="client/pages/StudentDashboard.tsx:386:17"
-        className="flex items-center bg-neutral-900 rounded-full text-white h-12 w-12 justify-center fixed right-4 top-4 sm:right-8 sm:top-20 z-50"
-        onClick={() => setFloatingOpen(true)}
-      >
-        +
-      </div>
+      {/* + button: hidden while panel is open. Hovering or clicking opens the panel */}
+      {!floatingOpen && (
+        <div
+          aria-label="Open To-do Maker"
+          data-loc="client/pages/StudentDashboard.tsx:386:17"
+          ref={buttonRef}
+          className="flex items-center bg-neutral-900 rounded-full text-white h-12 w-12 justify-center fixed right-4 top-4 sm:right-8 sm:top-20 z-50"
+          onClick={() => setFloatingOpen(true)}
+          onMouseEnter={() => setFloatingOpen(true)}
+        >
+          +
+        </div>
+      )}
 
       <form
         onSubmit={handleJoin}
@@ -764,7 +789,7 @@ export default function StudentDashboard() {
       {/* Floating panel rendered at end to avoid JSX nesting issues */}
       {floatingOpen && (
         <div className="fixed z-60 left-4 right-4 bottom-4 sm:top-20 sm:right-8 sm:left-auto sm:bottom-auto">
-          <div className="w-full sm:w-80 max-w-md bg-white border border-border rounded-2xl shadow-lg p-4">
+          <div ref={panelRef} onMouseLeave={() => setFloatingOpen(false)} onMouseEnter={() => setFloatingOpen(true)} className="w-full sm:w-80 max-w-md bg-white border border-border rounded-2xl shadow-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold">To‑do Maker</h3>
               <button
