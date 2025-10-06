@@ -789,7 +789,12 @@ export default function StudentDashboard() {
       {/* Floating panel rendered at end to avoid JSX nesting issues */}
       {floatingOpen && (
         <div className="fixed z-60 left-4 right-4 bottom-4 sm:top-20 sm:right-8 sm:left-auto sm:bottom-auto">
-          <div ref={panelRef} onMouseLeave={() => setFloatingOpen(false)} onMouseEnter={() => setFloatingOpen(true)} className="w-full sm:w-80 max-w-md bg-white border border-border rounded-2xl shadow-lg p-4">
+          <div
+            ref={panelRef}
+            onMouseLeave={() => setFloatingOpen(false)}
+            onMouseEnter={() => setFloatingOpen(true)}
+            className="w-full sm:w-80 max-w-md bg-white border border-border rounded-2xl shadow-lg p-4"
+          >
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold">To‑do Maker</h3>
               <button
