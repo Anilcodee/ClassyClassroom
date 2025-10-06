@@ -17,15 +17,15 @@ function useIsDesktop() {
 export default function GetStarted() {
   const isDesktop = useIsDesktop();
   return (
-    <main className="min-h-screen pb-[env(safe-area-inset-bottom)] bg-gradient-to-b from-background via-background to-background">
+    <main className="min-h-[1980px] pb-[env(safe-area-inset-bottom)] bg-gradient-to-b from-background via-background to-background">
       <section className="container mx-auto px-0 w-full max-w-[1080px] grid lg:grid-cols-2 gap-8 sm:gap-12 py-12 items-center lg:items-stretch">
-        <div className="w-full max-w-[1080px] mr-[2px] h-full flex flex-col">
+        <div className="w-full max-w-[1080px] lg:w-[1080px] mr-[2px] h-full flex flex-col mx-auto">
           <div className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs text-foreground/70 mb-[30px]">
             <span className="h-2 w-2 rounded-full bg-brand-500 animate-pulse"></span>
             Fast, secure classroom platform for teachers and students
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-[48px] font-extrabold tracking-tight leading-tight">
             The smarter way to run your class — attendance, messages, and more.
           </h1>
 
@@ -77,7 +77,7 @@ export default function GetStarted() {
 
       </section>
 
-      <div className="bg-white border border-border rounded-2xl shadow-xl w-full max-w-[1080px] mx-auto p-6 relative overflow-hidden">
+      <div className="bg-white border border-border rounded-2xl shadow-xl w-full max-w-[1080px] lg:w-[1080px] mx-auto p-6 relative overflow-hidden">
         <div className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-gradient-to-br from-brand-400/40 to-brand-700/40 blur-3xl" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="rounded-lg p-3 sm:p-4 bg-background/80 border border-border flex flex-col items-center">
