@@ -405,7 +405,7 @@ export const me: RequestHandler = async (req: any, res) => {
   try {
     const id = req.userId;
     if (!id) return res.status(401).json({ message: "Unauthorized" });
-    const user = await User.findById(id);
+    const user = await UserModelAny.findById(id);
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json({
       id: user.id,
