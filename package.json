@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run build:client && npm run build:server",
+    "vercel-build": "npm run build",
     "build:client": "vite build",
     "build:server": "vite build --config vite.config.server.ts",
     "start": "node dist/server/node-build.mjs",
