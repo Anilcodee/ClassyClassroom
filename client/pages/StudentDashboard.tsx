@@ -381,21 +381,17 @@ export default function StudentDashboard() {
 
           <div className="flex flex-col w-full md:w-1/2 ml-5 md:ml-5">
             {/* Floating To‑do Maker: small + button at top-right */}
-            <div className="fixed top-8 right-8 z-50" />
-          </div>
+            </div>
         </div>
       </div>
 
       <div data-loc="client/pages/StudentDashboard.tsx:382:11" className="flex flex-col font-normal ml-5 w-full md:w-1/2">
-        <div data-loc="client/pages/StudentDashboard.tsx:384:13" style={{ fontWeight: 400, position: "fixed", right: 32, top: 32, zIndex: 50 }} />
       </div>
 
       <div
     aria-label="Open To-do Maker"
     data-loc="client/pages/StudentDashboard.tsx:386:17"
-   
-    className="flex items-center align-middle bg-neutral-900 rounded-full text-white h-12 w-12 justify-center ml-auto fixed"
-    style={{ right: 32, top: 79, left: -58 }}
+    className="flex items-center bg-neutral-900 rounded-full text-white h-12 w-12 justify-center fixed right-4 top-4 sm:right-8 sm:top-20 z-50"
     onClick={() => setFloatingOpen(true)}
   >
     +
@@ -689,8 +685,8 @@ export default function StudentDashboard() {
 
       {/* Floating panel rendered at end to avoid JSX nesting issues */}
       {floatingOpen && (
-        <div className="fixed top-20 right-8 z-60">
-          <div className="w-80 bg-white border border-border rounded-2xl shadow-lg p-4">
+        <div className="fixed z-60 left-4 right-4 bottom-4 sm:top-20 sm:right-8 sm:left-auto sm:bottom-auto">
+          <div className="w-full sm:w-80 max-w-md bg-white border border-border rounded-2xl shadow-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold">To‑do Maker</h3>
               <button
