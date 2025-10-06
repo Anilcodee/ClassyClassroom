@@ -16,7 +16,7 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
     const latestOnly =
       String((req.query as any)?.latest || "") === "1" ||
       String((req.query as any)?.limit || "") === "1";
-    const cls = await ClassModel.findById(id)
+    const cls = await ClassModelAny.findById(id)
       .select("teacher coTeachers students")
       .lean();
     const userId = String((req as any).userId || "");
@@ -144,7 +144,7 @@ export const createMessage: RequestHandler = async (req: AuthRequest, res) => {
         }))
       : [];
 
-    const cls = await ClassModel.findById(id)
+    const cls = await ClassModelAny.findById(id)
       .select("teacher coTeachers students")
       .lean();
     const userId = String((req as any).userId || "");
@@ -235,7 +235,7 @@ export const updateMessage: RequestHandler = async (req: AuthRequest, res) => {
 
     const msg = await Message.findById(messageId).lean();
     if (!msg) return res.status(404).json({ message: "Message not found" });
-    const cls = await ClassModel.findById(msg.classId)
+    const cls = await ClassModelAny.findById(msg.classId)
       .select("teacher coTeachers")
       .lean();
     const userId = String((req as any).userId || "");
@@ -302,7 +302,7 @@ export const addComment: RequestHandler = async (req: AuthRequest, res) => {
         .status(403)
         .json({ message: "Poster cannot comment on own message" });
 
-    const cls = await ClassModel.findById(msg.classId)
+    const cls = await ClassModelAny.findById(msg.classId)
       .select("teacher coTeachers students")
       .lean();
     const user = await User.findById(userId)
@@ -353,7 +353,7 @@ export const deleteMessage: RequestHandler = async (req: AuthRequest, res) => {
     const { messageId } = req.params as { messageId: string };
     const msg = await Message.findById(messageId).lean();
     if (!msg) return res.status(404).json({ message: "Message not found" });
-    const cls = await ClassModel.findById(msg.classId)
+    const cls = await ClassModelAny.findById(msg.classId)
       .select("teacher coTeachers")
       .lean();
     const userId = String((req as any).userId || "");
