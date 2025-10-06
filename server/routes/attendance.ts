@@ -12,7 +12,7 @@ export const activateClass: RequestHandler = async (req: AuthRequest, res) => {
     return res.status(503).json({ message: "Database not connected" });
   try {
     const { id } = req.params as { id: string };
-    const cls = await ClassModel.findOne({ _id: id, $or: [ { teacher: req.userId }, { coTeachers: req.userId } ] });
+    const cls = await ClassModelAny.findOne({ _id: id, $or: [ { teacher: req.userId }, { coTeachers: req.userId } ] });
     if (!cls) return res.status(404).json({ message: "Class not found" });
 
     // If already active and session not expired, return existing
