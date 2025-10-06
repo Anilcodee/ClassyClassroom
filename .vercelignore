@@ -1,0 +1,13 @@
+node_modules
+.dockerignore
+Dockerfile
+.vscode
+.git
+.gitignore
+tests
+src/**/*.test.*
+coverage
+**/*.log
+.env
+.env.local
+.env.*.local

@@ -1,0 +1,134 @@
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { formatDateTime } from "@/lib/utils";
+
+interface AssignmentItem { id: string; title: string; type: 'assignment'|'quiz'; description?: string; dueAt?: string|null; publishAt?: string|null; isDraft: boolean; allowLate: boolean }
+
+export default function AssignmentDrafts(){
+  const { id } = useParams();
+  const nav = useNavigate();
+  const [items, setItems] = useState<AssignmentItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string|null>(null);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const mountedRef = useRef(true);
+
+  const role = useMemo(()=>{ try { const raw = localStorage.getItem('user'); return raw ? JSON.parse(raw).role : undefined; } catch { return undefined; } }, []);
+
+  async function load(signal?: AbortSignal){
+    if (!mountedRef.current) return;
+    setLoading(true); setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) { nav('/auth'); return; }
+      const headers: Record<string,string> = { Authorization: `Bearer ${token}` };
+      const r = await fetch(`/api/classes/${id}/assignments?status=drafts`, { headers, cache: 'no-store', signal });
+      if (!r.ok) {
+        let d: any = {}; try { d = await r.json(); } catch {}
+        throw new Error(d?.message || r.statusText);
+      }
+      const d = await r.json();
+      if (mountedRef.current) setItems((d.assignments||[]).map((a:any)=> ({ id: a._id, title: a.title, type: a.type, description: a.description, dueAt: a.dueAt, publishAt: a.publishAt, isDraft: a.isDraft, allowLate: a.allowLate })));
+    } catch(e:any){
+      if (e?.name === 'AbortError') return;
+      if (mountedRef.current) setError(e?.message || 'Failed to load');
+    } finally { if (mountedRef.current) setLoading(false); }
+  }
+
+  useEffect(()=>{
+    mountedRef.current = true;
+    const ac = new AbortController();
+    load(ac.signal).catch(()=>{});
+    return () => { mountedRef.current = false; try { ac.abort(); } catch {} };
+  }, [id]);
+
+  return (
+    <main className="container mx-auto py-8">
+      <Link to={`/classes/${id}/assignments`} className="text-sm text-foreground/70 hover:text-foreground">
+        <span className="back-arrow">←</span>&nbsp;Back to assignments
+      </Link>
+      <div className="mt-2 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Draft Assignments</h1>
+        {role !== 'student' && (
+          <Link to={`/classes/${id}/assignments/new`} className="px-3 py-2 rounded-md border border-border text-sm">Create assignment or quiz</Link>
+        )}
+      </div>
+
+      {loading ? (
+        <p className="text-sm text-foreground/70 mt-4">Loading…</p>
+      ) : error ? (
+        <p className="text-sm text-destructive mt-4">{error}</p>
+      ) : items.length === 0 ? (
+        <p className="text-sm text-foreground/70 mt-4">No drafts yet.</p>
+      ) : (
+        <ul className="mt-4 space-y-3">
+          {items.map(a => (
+            <li key={a.id} className="rounded-xl border border-border p-4 flex items-center justify-between cursor-pointer hover:bg-accent/30" onClick={()=> nav(`/assign/${a.id}/edit`)}>
+              <div>
+                <p className="font-medium">{a.title} <span className="text-xs text-foreground/60">({a.type})</span></p>
+                <p className="text-xs text-foreground/60">Draft</p>
+                {a.dueAt && <p className="text-xs text-foreground/60">Due on {formatDateTime(a.dueAt)}</p>}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  className="px-3 py-1.5 rounded-md border border-border text-sm disabled:opacity-50"
+                  disabled={busyId===a.id}
+                  onClick={async (e)=>{ e.stopPropagation();
+                    setBusyId(a.id);
+                    try {
+                      const token = localStorage.getItem('token');
+                      const r = await fetch(`/api/assignments/${a.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' }, body: JSON.stringify({ isDraft: false, publishAt: new Date().toISOString() }) });
+                      const d = await r.json().catch(()=>({}));
+                      if (!r.ok) throw new Error(d?.message || r.statusText);
+                      try {
+                        await fetch(`/api/classes/${id}/messages`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: token ? `Bearer ${token}` : '' }, body: JSON.stringify({ title: a.type === 'quiz' ? `Quiz: ${a.title}` : `Assignment: ${a.title}`, content: [a.description||'', `${a.type === 'quiz' ? 'Quiz' : 'Assignment'}: ${a.title}${a.dueAt ? ` | Due on ${formatDateTime(a.dueAt)}` : ''}`].filter(Boolean).join('\n\n') }) });
+                      } catch {}
+                      await load();
+                    } catch(e:any) { console.error(e); }
+                    finally { setBusyId(null); }
+                  }}
+                >
+                  Publish
+                </button>
+                <Link to={`/assign/${a.id}/edit`} onClick={(e)=>e.stopPropagation()} className="px-3 py-1.5 rounded-md border border-border text-sm">Edit</Link>
+                <button className="px-3 py-1.5 rounded-md border border-border text-sm text-destructive" onClick={(e)=>{ e.stopPropagation(); setConfirmId(a.id); }}>Delete</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <AlertDialog open={!!confirmId} onOpenChange={(o)=>{ if(!o) setConfirmId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this assignment?</AlertDialogTitle>
+            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={()=> setConfirmId(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async ()=>{
+                const delId = confirmId!;
+                setConfirmId(null);
+                try {
+                  const token = localStorage.getItem('token');
+                  const r = await fetch(`/api/assignments/${delId}`, { method: 'DELETE', headers: { Authorization: token ? `Bearer ${token}` : '' } });
+                  if (!r.ok) throw new Error('Failed to delete');
+                  await load();
+                } catch(e:any){ console.error(e); }
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      {/* Mobile-only bottom spacer to avoid cutoff behind OS UI */}
+      <div className="h-24 lg:hidden pb-[env(safe-area-inset-bottom)]" />
+
+    </main>
+  );
+}

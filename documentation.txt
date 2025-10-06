@@ -1,0 +1,37 @@
+Attendance App (MERN, MVC)
+
+Features
+- Teacher auth: signup/login with JWT sessions
+- Create class: name, students (manual, join link placeholder, spreadsheet import placeholder)
+- Class list: shows join code and active state
+- Activate class: 4-minute session generates QR (frontend placeholder) and auto-deactivates on expiry
+- Attendance: students mark by session link; records stored per day
+- PDF downloads: placeholder page, ready to implement server-side PDF generation
+- Responsive, modern UI with custom brand colors; animated teacher on landing and classes page
+
+How to use
+1) Sign up/login as a teacher (Auth page)
+2) Go to Classes to create a class and manage sessions
+3) Activate a class to start a 4-minute attendance window; students scan/join to mark themselves
+4) View class list and export attendance later (download page placeholder)
+
+Environment
+- Set MONGO_URI with your MongoDB connection string
+- Set JWT_SECRET for signing tokens
+
+Where to set
+- Preferred: use the Dev Server environment variables (Settings) or deployment provider dashboard
+- Alternatively, add a .env with MONGO_URI and JWT_SECRET (not recommended to commit)
+
+API (selected)
+POST /api/auth/signup {email,name,password}
+POST /api/auth/login {email,password}
+GET /api/classes (auth)
+POST /api/classes {name,students[]} (auth)
+POST /api/classes/:id/activate (auth)
+GET /api/session/:sessionId
+POST /api/session/:sessionId/mark {name,rollNo}
+
+Notes
+- CSV import, join-link flows, QR page, PDFs are scaffolded for next iteration
+- All data writes depend on MONGO_URI being configured

@@ -1,0 +1,191 @@
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import { handleDemo } from "./routes/demo";
+import { connectDB } from "./db";
+import {
+  signup,
+  login,
+  signupStudent,
+  signupTeacher,
+  loginStudent,
+  loginTeacher,
+  googleRedirect,
+  googleCallback,
+  googleComplete,
+  me,
+} from "./routes/auth";
+import { requireAuth } from "./middleware/auth";
+import { listClasses, createClass, updateClassImage } from "./routes/classes";
+import { archiveClass } from "./routes/classes.archive";
+import { listArchivedClasses, unarchiveClass } from "./routes/classes.archived";
+import { getClass } from "./routes/classes.get-by-id";
+import {
+  activateClass,
+  sessionStatus,
+  markAttendance,
+  manualMarkAttendance,
+} from "./routes/attendance";
+import { getTodayAttendance } from "./routes/attendance.today";
+import {
+  listAttendanceDates,
+  classAttendancePdf,
+  classAttendancePdfAll,
+} from "./routes/attendance.pdf";
+import { getStudentAttendance } from "./routes/student.attendance";
+import { getAttendanceForDate } from "./routes/attendance.view";
+import {
+  listMessages,
+  createMessage,
+  addComment,
+  updateMessage,
+  deleteMessage,
+} from "./routes/messages";
+import { listLatestForClasses } from "./routes/messages.latest";
+import { dbHealth } from "./routes/health";
+import { listStudentClasses, joinClass, unenrollClass } from "./routes/student";
+import { updateClassDetails } from "./routes/classes.update";
+import { joinClassAsTeacher } from "./routes/classes.join-teacher";
+import {
+  listAssignments,
+  createAssignment,
+  updateAssignment,
+  getAssignment,
+  submitAssignment,
+  listSubmissions,
+  deleteAssignment,
+  gradeSubmission,
+} from "./routes/assignments";
+
+export function createServer() {
+  const app = express();
+
+  // Middleware
+  app.use(cors());
+  app.use(express.json({ limit: "10mb" }));
+  app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+  // DB
+  connectDB().catch((e) => {
+    console.error("DB connect failed:", e);
+  });
+  // Start background assignment publisher (dynamic import)
+  try {
+    import('./routes/assignments')
+      .then((mod) => {
+        try {
+          if (mod && typeof mod.startAssignmentPublisher === 'function') mod.startAssignmentPublisher();
+        } catch (e) {
+          console.error('Failed to run assignment publisher', e);
+        }
+      })
+      .catch((e) => {
+        console.error('Failed to import assignment publisher', e);
+      });
+  } catch (e) {
+    console.error('Failed to start assignment publisher', e);
+  }
+
+  // Health/demo
+  app.get("/api/ping", (_req, res) => {
+    const ping = process.env.PING_MESSAGE ?? "ping";
+    res.json({ message: ping });
+  });
+  app.get("/api/health/db", dbHealth);
+
+  app.get("/api/demo", handleDemo);
+
+  // Auth
+  app.post("/api/auth/signup", signup);
+  app.post("/api/auth/login", login);
+  app.post("/api/auth/signup/student", signupStudent);
+  app.post("/api/auth/signup/teacher", signupTeacher);
+  app.post("/api/auth/login/student", loginStudent);
+  app.post("/api/auth/login/teacher", loginTeacher);
+
+  // Google OAuth
+  app.get("/api/auth/google", googleRedirect);
+  app.get("/api/auth/google/callback", googleCallback);
+  app.post("/api/auth/google/complete", googleComplete);
+  app.get("/api/auth/me", requireAuth, me);
+
+  // Classes
+  app.get("/api/classes", requireAuth, listClasses);
+  app.post("/api/classes", requireAuth, createClass);
+  app.patch("/api/classes/:id/image", requireAuth, updateClassImage);
+  app.patch("/api/classes/:id", requireAuth, updateClassDetails);
+  app.patch("/api/classes/:id/archive", requireAuth, archiveClass);
+  app.patch("/api/classes/:id/unarchive", requireAuth, unarchiveClass);
+  app.get("/api/classes/archived", requireAuth, listArchivedClasses);
+  app.get("/api/classes/:id", requireAuth, getClass);
+
+  // Attendance (teacher view)
+  app.get("/api/classes/:id/attendance/today", requireAuth, getTodayAttendance);
+  app.get("/api/classes/:id/attendance", requireAuth, getAttendanceForDate);
+  app.get(
+    "/api/classes/:id/attendance/dates",
+    requireAuth,
+    listAttendanceDates,
+  );
+  app.get("/api/classes/:id/attendance/pdf", requireAuth, classAttendancePdf);
+  app.get(
+    "/api/classes/:id/attendance/pdf/all",
+    requireAuth,
+    classAttendancePdfAll,
+  );
+
+  // Attendance (session)
+  app.post("/api/classes/:id/activate", requireAuth, activateClass);
+  app.get("/api/session/:sessionId", sessionStatus);
+  app.post("/api/session/:sessionId/mark", markAttendance);
+  app.post(
+    "/api/classes/:id/attendance/manual",
+    requireAuth,
+    manualMarkAttendance,
+  );
+
+  // Messages
+  app.get("/api/classes/:id/messages", requireAuth, listMessages);
+  app.post("/api/classes/:id/messages", requireAuth, createMessage);
+  app.patch("/api/messages/:messageId", requireAuth, updateMessage);
+  app.delete("/api/messages/:messageId", requireAuth, deleteMessage);
+  app.post("/api/messages/:messageId/comments", requireAuth, addComment);
+  app.get("/api/messages/latest", requireAuth, listLatestForClasses);
+
+  // Assignments
+  app.get("/api/classes/:id/assignments", requireAuth, listAssignments);
+  app.post("/api/classes/:id/assignments", requireAuth, createAssignment);
+  app.get("/api/assignments/:assignmentId", requireAuth, getAssignment);
+  app.patch("/api/assignments/:assignmentId", requireAuth, updateAssignment);
+  app.post(
+    "/api/assignments/:assignmentId/submit",
+    requireAuth,
+    submitAssignment,
+  );
+  app.get(
+    "/api/assignments/:assignmentId/submissions",
+    requireAuth,
+    listSubmissions,
+  );
+  app.post(
+    "/api/assignments/:assignmentId/submissions/:submissionId/grade",
+    requireAuth,
+    gradeSubmission,
+  );
+  app.delete("/api/assignments/:assignmentId", requireAuth, deleteAssignment);
+
+  // Student
+  app.get("/api/student/classes", requireAuth, listStudentClasses);
+  app.post("/api/student/classes/join", requireAuth, joinClass);
+  app.get(
+    "/api/student/classes/:id/attendance",
+    requireAuth,
+    getStudentAttendance,
+  );
+  app.delete("/api/student/classes/:id/unenroll", requireAuth, unenrollClass);
+
+  // Teachers: join as co-teacher
+  app.post("/api/classes/join-as-teacher", requireAuth, joinClassAsTeacher);
+
+  return app;
+}
