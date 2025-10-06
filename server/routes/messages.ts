@@ -24,7 +24,7 @@ export const listMessages: RequestHandler = async (req: AuthRequest, res) => {
       ? String(cls.teacher) === userId ||
         (cls.coTeachers || []).some((t: any) => String(t) === userId)
       : false;
-    const user = await User.findById(userId)
+    const user = await UserModelAny.findById(userId)
       .select("enrolledClasses rollNo")
       .lean();
     const enrolled = new Set(
@@ -153,7 +153,7 @@ export const createMessage: RequestHandler = async (req: AuthRequest, res) => {
         (cls.coTeachers || []).some((t: any) => String(t) === userId)
       : false;
     // Allow any class member (teacher, co-teacher, or student in class) to post
-    const user = await User.findById(userId)
+    const user = await UserModelAny.findById(userId)
       .select("enrolledClasses rollNo")
       .lean();
     const enrolled = new Set(
@@ -305,7 +305,7 @@ export const addComment: RequestHandler = async (req: AuthRequest, res) => {
     const cls = await ClassModelAny.findById(msg.classId)
       .select("teacher coTeachers students")
       .lean();
-    const user = await User.findById(userId)
+    const user = await UserModelAny.findById(userId)
       .select("name enrolledClasses rollNo")
       .lean();
     const isOwnerOrCo = cls
